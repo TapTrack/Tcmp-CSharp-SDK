@@ -1,0 +1,325 @@
+﻿<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApplication1"
+        xmlns:ed="http://schemas.microsoft.com/expression/2010/drawing" x:Class="TapTrack.Demo.MainWindow"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        xmlns:gif="http://wpfanimatedgif.codeplex.com"
+        mc:Ignorable="d"
+        Title="TappyUSB Demo" Height="650" Width="800" Foreground="{x:Null}" Background="{StaticResource LightBackground}">
+    <Grid Background="{StaticResource LightBackground}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50"/>
+            <RowDefinition Name="settingsContainer" Height="0"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <WrapPanel Grid.Row="0" HorizontalAlignment="Left">
+            <TextBlock Margin="10" FontSize="20" Foreground="White">TapTrack</TextBlock>
+        </WrapPanel>
+        <WrapPanel Grid.Row="0" HorizontalAlignment="Right" >
+            <Button Margin="10" Height="15" Padding="0" Background="White" BorderBrush="{x:Null}" Style="{StaticResource StopButton}" Click="StopButton_Click"/>
+            <Button Name="autoDetectButton" Margin="10" Height="25" Padding="0" Background="{x:Null}" BorderBrush="{x:Null}" Style="{StaticResource USBButton}" Click="AutoDetectButton_Click"/>
+            <Button Margin="10" Height="25" Padding="0" Background="{x:Null}" BorderBrush="{x:Null}" Style="{StaticResource SettingsButton}" Click="SettingsButton_Click"/>
+        </WrapPanel>
+        <Border Grid.Row="1" Background="{StaticResource LightBackground}">
+            <StackPanel Orientation="Vertical">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                    <Label Margin="10,10,0,0" Padding="0,0,0,10" Foreground="White" Content="Timeout"/>
+                    <TextBlock Margin="5,0,0,0" VerticalAlignment="Center" >
+                        <Hyperlink Foreground="White" ToolTip="Timeout is in secs. 0 = no timeout">
+                            ?
+                        </Hyperlink>
+                    </TextBlock>
+                    <xctk:IntegerUpDown Name="timeout" Margin="10,5,0,5" FormatString="N0" Value="0" Increment="1" Minimum="0" Maximum="255"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                    <CheckBox Name="lockCheckBox"  VerticalAlignment="Center" Margin="10,0,0,0" IsChecked="False"></CheckBox>
+                    <Label Foreground="White" Content="Lock after writing"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+        <Popup Name="statusPopup" Placement="Center" Grid.Row="2" Height="Auto" MinWidth="175" Width="Auto" PopupAnimation="Fade">
+            <Border CornerRadius="1" BorderBrush="Gray" BorderThickness="2" Background="{StaticResource DarkBackground}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition Name="dismissButtonContainer" Height="0"/>
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Row="0">
+                        <StackPanel Margin="0,20,0,0" Orientation="Horizontal" HorizontalAlignment="Center" >
+                            <Label Name="statusText" FontSize="15" VerticalAlignment="Center" Foreground="White"/>
+                            <Image Name="statusImage" Height="30" gif:ImageBehavior.AnimatedSource="{x:Null}" />
+                        </StackPanel>
+                        <Label Name="statusMessage" Padding="10,0,10,10" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White"/>
+                    </StackPanel>
+
+                    <Button Name="dismissButton" HorizontalAlignment="Center" Visibility="Hidden" Grid.Row="1" Style="{StaticResource RoundButton}" Click="DismissButton_Click">Dismiss</Button>
+                </Grid>
+            </Border>
+        </Popup>
+        <TabControl Padding="0" Grid.Row="2" ItemContainerStyle="{StaticResource SimpleTabItem}" BorderBrush="#FF15AAFF" Background="{x:Null}" BorderThickness="0,2,0,0" Foreground="{x:Null}">
+            <TabControl.Resources>
+                <Style TargetType="{x:Type Grid}">
+                    <Setter Property="Background" Value="{StaticResource LightBackground}"/>
+                </Style>
+                <Style TargetType="{x:Type TabPanel}">
+                    <Setter Property="HorizontalAlignment" Value="Left"/>
+                </Style>
+            </TabControl.Resources>
+            <TabItem Header="Detect">
+                <TabControl Padding="0" TabStripPlacement="Left" Background="{x:Null}" BorderThickness="0">
+                    <TabControl.Resources>
+                        <Style TargetType="{x:Type Grid}">
+                            <Setter Property="Background" Value="White"/>
+                        </Style>
+                        <Style TargetType="{x:Type TabPanel}">
+                            <Setter Property="VerticalAlignment" Value="Top"/>
+                        </Style>
+                    </TabControl.Resources>
+                    <TabItem Style="{StaticResource DetectNdefTab}">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <StackPanel Background="{StaticResource DarkBackground}" Orientation="Vertical">
+                                <Label Margin="10,10,0,0" Padding="0,0,0,10" Foreground="White" Content="Content"/>
+                                <TextBox Name="ndefData" AcceptsReturn="True" Style="{StaticResource TextBox}"></TextBox>
+                                <Button Name="readNdefButton" Margin="10" HorizontalAlignment="Right" Style="{StaticResource RoundButton}" Click="ReadNdefButton_Click">Read</Button>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </TabItem>
+                    <TabItem Style="{StaticResource DetectTagTab}">
+                        <StackPanel Background="{StaticResource DarkBackground}" Orientation="Vertical">
+                            <Label Margin="10,10,0,0" Padding="0,0,0,10" Foreground="White" Content="UID"/>
+                            <TextBox Name="uidTextBox" Style="{StaticResource TextBox}"></TextBox>
+                            <Label Margin="10,0,0,0" Padding="0,0,0,10" Foreground="White" Content="Type"/>
+                            <TextBox Name="typeTextBox"  Style="{StaticResource TextBox}"></TextBox>
+                            <Button Name="readUIDButton" Margin="10" HorizontalAlignment="Right" Style="{StaticResource RoundButton}" Click="ReadUIDButton_Click">Read</Button>
+                        </StackPanel>
+                    </TabItem>
+                    <TabItem Style="{StaticResource DetectTypeBTab}">
+                        <StackPanel Background="{StaticResource DarkBackground}" Orientation="Vertical">
+                            <Label Margin="10,10,0,0" Padding="0,0,0,10" Foreground="White" Content="ATQB"/>
+                            <TextBox Name="atqbTextBox"  Style="{StaticResource TextBox}"></TextBox>
+                            <Label Margin="10,0,0,0" Padding="0,0,0,10" Foreground="White" Content="ATTRIB"/>
+                            <TextBox Name="attribTextBox" Style="{StaticResource TextBox}"></TextBox>
+                            <WrapPanel Margin="10" Orientation="Horizontal" HorizontalAlignment="Right">
+                                <Button Style="{StaticResource RoundButton}" Click="ReadType4B">Read</Button>
+                            </WrapPanel>
+                        </StackPanel>
+                    </TabItem>
+                </TabControl>
+            </TabItem>
+            <TabItem Header="Write">
+                <TabControl Padding="0" TabStripPlacement="Left" Background="{x:Null}" BorderThickness="0">
+                    <TabControl.Resources>
+                        <Style TargetType="{x:Type Grid}">
+                            <Setter Property="Background" Value="White"/>
+                        </Style>
+                        <Style TargetType="{x:Type TabPanel}">
+                            <Setter Property="VerticalAlignment" Value="Top"/>
+                        </Style>
+                    </TabControl.Resources>
+                    <TabItem Header="Write URL" Style="{StaticResource WriteURL}">
+                        <StackPanel  Background="{StaticResource DarkBackground}" Orientation="Vertical">
+                            <Label Margin="10,10,0,0" Padding="0,0,0,10" Foreground="White" Target="{Binding ElementName=urlTextBox}" Content="URL"/>
+                            <TextBox Name="urlTextBox" Margin="10,0,20,20" Foreground="White" Background="{StaticResource LightBackground}" BorderBrush="#595959" BorderThickness="0,0,0,1"/>
+                            <Button Name="writeURLButton" Margin="10" HorizontalAlignment="Right" Style="{StaticResource RoundButton}" Click="WriteURLButton_Click">Write</Button>
+                        </StackPanel>
+                    </TabItem>
+                    <TabItem Style="{StaticResource WriteText}">
+                        <StackPanel  Background="{StaticResource DarkBackground}" Orientation="Vertical">
+                            <Label Margin="10,10,0,0" Padding="0,0,0,10" Foreground="White" Target="{Binding ElementName=TextBox}" Content="Text"/>
+                            <TextBox Name="TextBox" Margin="10,0,20,20" Foreground="White" Background="{StaticResource LightBackground}" BorderBrush="#595959" BorderThickness="0,0,0,1"/>
+                            <Button Name="writeTextButton" Margin="10" HorizontalAlignment="Right" Style="{StaticResource RoundButton}" Click="WriteTextButton_Click">Write</Button>
+                        </StackPanel>
+                    </TabItem>
+                    <TabItem Header="Write VCard" Style="{StaticResource WriteVCardTab}">
+                        <ScrollViewer Background="{StaticResource DarkBackground}">
+                            <StackPanel>
+                                <GroupBox Header="Personal Information" Foreground="White" Margin="10">
+                                    <StackPanel>
+                                        <WrapPanel Orientation="Horizontal">
+                                            <Image Margin="10,0,0,0" Height="24" Source="{StaticResource Name}"/>
+                                            <Label Margin="10,10,0,0" Padding="0,0,0,10" Foreground="White" Content="Name"/>
+                                        </WrapPanel>
+                                        <TextBox Name="nameTextBox" Style="{StaticResource TextBox}"></TextBox>
+                                        <WrapPanel Orientation="Horizontal">
+                                            <Image Margin="10,0,0,0" Height="24" Source="{StaticResource Email}"/>
+                                            <Label Margin="10,10,0,0" Padding="0,0,0,10" Foreground="White" Content="Email"/>
+                                        </WrapPanel>
+                                        <TextBox Name="emailTextBox" Style="{StaticResource TextBox}"></TextBox>
+                                        <Grid Background="{x:Null}">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="1*"/>
+                                                <ColumnDefinition Width="1*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel Orientation="Vertical" Grid.Column="0">
+                                                <WrapPanel Orientation="Horizontal">
+                                                    <Image Margin="10,0,0,0" Height="24" Source="{StaticResource SmartPhone}"/>
+                                                    <Label Margin="10,10,0,0" Padding="0,0,0,10" Foreground="White" Content="Cell Phone"/>
+                                                </WrapPanel>
+                                                <TextBox Name="cellPhoneTextBox" Style="{StaticResource TextBox}"></TextBox>
+                                            </StackPanel>
+                                            <StackPanel Orientation="Vertical" Grid.Column="1">
+                                                <WrapPanel Orientation="Horizontal">
+                                                    <Image Margin="10,0,0,0" Height="24" Source="{StaticResource Phone}"/>
+                                                    <Label Margin="10,10,0,0" Padding="0,0,0,10" Foreground="White" Content="Home Phone"/>
+                                                </WrapPanel>
+                                                <TextBox Name="homePhoneTextBox" Style="{StaticResource TextBox}"></TextBox>
+                                            </StackPanel>
+                                        </Grid>
+                                        <WrapPanel Orientation="Horizontal">
+                                            <Image Margin="10,0,0,0" Height="24" Source="{StaticResource Address}"/>
+                                            <Label Margin="10,10,0,0" Padding="0,0,0,10" Foreground="White" Content="Home Address"/>
+                                        </WrapPanel>
+                                        <TextBox Name="homeAddrTextBox" Style="{StaticResource TextBox}"></TextBox>
+                                        <WrapPanel Orientation="Horizontal">
+                                            <Image Margin="10,0,0,0" Height="24" Source="{StaticResource Website}"/>
+                                            <Label Margin="10,10,0,0" Padding="0,0,0,10" Foreground="White" Content="Website"/>
+                                        </WrapPanel>
+                                        <TextBox Name="websiteTextBox" Style="{StaticResource TextBox}"></TextBox>
+                                    </StackPanel>
+                                </GroupBox>
+                                <GroupBox Header="Work Information" Foreground="White" Margin="10">
+                                    <StackPanel>
+                                        <Grid Background="{x:Null}">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="1*"/>
+                                                <ColumnDefinition Width="1*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel Orientation="Vertical" Grid.Column="0">
+                                                <WrapPanel Orientation="Horizontal">
+                                                    <Image Margin="10,0,0,0" Height="24" Source="{StaticResource Company}"/>
+                                                    <Label Margin="10,10,0,0" Padding="0,0,0,10" Foreground="White" Content="Company"/>
+                                                </WrapPanel>
+                                                <TextBox Name="companyTextBox" Style="{StaticResource TextBox}"></TextBox>
+                                            </StackPanel>
+                                            <StackPanel Orientation="Vertical" Grid.Column="1">
+                                                <WrapPanel Orientation="Horizontal">
+                                                    <Image Margin="10,0,0,0" Height="24" Source="{StaticResource Title}"/>
+                                                    <Label Margin="10,10,0,0" Padding="0,0,0,10" Foreground="White" Content="Title"/>
+                                                </WrapPanel>
+                                                <TextBox Name="titleTextBox" Style="{StaticResource TextBox}"></TextBox>
+                                            </StackPanel>
+                                        </Grid>
+
+                                        <WrapPanel Orientation="Horizontal">
+                                            <Image Margin="10,0,0,0" Height="24" Source="{StaticResource Email}"/>
+                                            <Label Margin="10,10,0,0" Padding="0,0,0,10" Foreground="White" Content="Business Email"/>
+                                        </WrapPanel>
+                                        <TextBox Name="businessEmailTextBox" Style="{StaticResource TextBox}"></TextBox>
+                                        <WrapPanel Orientation="Horizontal">
+                                            <Image Margin="10,0,0,0" Height="24" Source="{StaticResource Phone}"/>
+                                            <Label Margin="10,10,0,0" Padding="0,0,0,10" Foreground="White" Content="Phone"/>
+                                        </WrapPanel>
+                                        <TextBox Name="workPhoneTextBox" Style="{StaticResource TextBox}"></TextBox>
+                                        <WrapPanel Orientation="Horizontal">
+                                            <Image Margin="10,0,0,0" Height="24" Source="{StaticResource Address}"/>
+                                            <Label Margin="10,10,0,0" Padding="0,0,0,10" Foreground="White" Content="Business Address"/>
+                                        </WrapPanel>
+                                        <TextBox Name="businessAddrTextBox" Style="{StaticResource TextBox}"></TextBox>
+                                    </StackPanel>
+                                </GroupBox>
+                                <Grid Background="{x:Null}">
+                                    <Button HorizontalAlignment="Left" Style="{StaticResource RoundButton}" Click="ClearVCardButton_Click">Clear</Button>
+                                    <Button HorizontalAlignment="Right" Style="{StaticResource RoundButton}" Click="WriteVCardButton_Click">Write</Button>
+                                </Grid>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </TabItem>
+                    <TabItem Style="{StaticResource WriteMultiTab}">
+                        <DockPanel Background="{StaticResource DarkBackground}">
+                            <Grid DockPanel.Dock="Bottom" Background="{x:Null}">
+                                <WrapPanel HorizontalAlignment="Left" VerticalAlignment="Center">
+                                    <Button Name="addTextRowButton" Style="{StaticResource RoundButton}" Click="AddTextRowButton_Click">Add Text</Button>
+                                    <Button Name="addUriRowButton" Style="{StaticResource RoundButton}" Click="AddUriRowButton_Click">Add URI</Button>
+                                    <Button Style="{StaticResource RoundButton}" Click="ClearButton_Click">Clear</Button>
+                                </WrapPanel>
+                                <WrapPanel HorizontalAlignment="Right" VerticalAlignment="Center">
+                                    <Button Style="{StaticResource RoundButton}" Click="WriteMultNdef">Write</Button>
+                                </WrapPanel>
+                            </Grid>
+                            <DataGrid ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.HorizontalScrollBarVisibility="Auto" Background="{x:Null}" AutoGenerateColumns="False" Name="records" Margin="10" CanUserAddRows="False" Foreground="White">
+                                <DataGrid.RowHeaderWidth>0</DataGrid.RowHeaderWidth>
+                                <DataGrid.Resources>
+                                    <Style TargetType="{x:Type DataGridColumnHeader}">
+                                        <Setter Property="Background" Value="{StaticResource AccentHighLightDark}" />
+                                    </Style>
+                                    <Style TargetType="{x:Type DataGridCell}">
+                                        <Setter Property="Background" Value="{StaticResource DarkBackground}"/>
+                                        <Setter Property="BorderBrush" Value="{StaticResource LightBackground}"/>
+                                        <Style.Triggers>
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <Setter Property="Background" Value="{StaticResource LightBackground}"/>
+                                            </Trigger>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Background" Value="{StaticResource LightBackground}"/>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </DataGrid.Resources>
+                                <DataGrid.Columns>
+                                    <DataGridTemplateColumn Header="Type" Width="1*">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <ComboBox ItemsSource="{Binding Options}" SelectedItem="{Binding Selected}"/>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+
+                                    <DataGridTextColumn Header="Content" Binding="{Binding Content}" Width="4*">
+
+                                    </DataGridTextColumn>
+
+                                    <DataGridTemplateColumn Header="Remove" Width="1*">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Button Tag="{Binding Index}" Style="{StaticResource RoundButton}" Click="RemoveButton_Click">
+                                                    Remove
+                                                </Button>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </DockPanel>
+                    </TabItem>
+                </TabControl>
+            </TabItem>
+            <TabItem Header="Utilities">
+                <TabControl Padding="0" TabStripPlacement="Left" Background="{x:Null}" BorderThickness="0">
+                    <TabControl.Resources>
+                        <Style TargetType="{x:Type Grid}">
+                            <Setter Property="Background" Value="White"/>
+                        </Style>
+                        <Style TargetType="{x:Type TabPanel}">
+                            <Setter Property="VerticalAlignment" Value="Top"/>
+                        </Style>
+                    </TabControl.Resources>
+                    <TabItem Style="{StaticResource LockTab}">
+                        <StackPanel Background="{StaticResource DarkBackground}">
+                            <Button HorizontalAlignment="Right" Style="{StaticResource RoundButton}" Click="LockButton_Click">
+                                Lock
+                            </Button>
+                        </StackPanel>
+                    </TabItem>
+                    <TabItem Style="{StaticResource LaunchUrl}">
+                        <StackPanel Background="{StaticResource DarkBackground}">
+                            <Button HorizontalAlignment="Right" Style="{StaticResource RoundButton}" Click="launchUrlButton_Click">
+                                Launch
+                            </Button>
+                        </StackPanel>
+                    </TabItem>
+                    <TabItem Style="{StaticResource PlatformConfig}">
+                        <StackPanel Background="{StaticResource DarkBackground}">
+                            <Button HorizontalAlignment="Right" Style="{StaticResource RoundButton}" Click="configureTagForPlatform_Click">
+                                Start writing
+                            </Button>
+                        </StackPanel>
+                    </TabItem>
+                </TabControl>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</Window>
