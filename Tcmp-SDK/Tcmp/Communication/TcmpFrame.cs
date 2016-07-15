@@ -6,12 +6,18 @@ namespace TapTrack.Tcmp.Communication
 {
     public class TcmpFrame
     {
+        /// <summary>
+        /// Bytes of frame
+        /// </summary>
         protected List<byte> contents;
 
         protected TcmpFrame()
         {
         }
 
+        /// <summary>
+        /// The total frame length
+        /// </summary>
         public int FrameLength
         {
             get
@@ -20,6 +26,9 @@ namespace TapTrack.Tcmp.Communication
             }
         }
 
+        /// <summary>
+        /// Length represented by Len1 and Len0
+        /// </summary>
         public int Length
         {
             get
@@ -97,6 +106,9 @@ namespace TapTrack.Tcmp.Communication
             }
         }
 
+        /// <summary>
+        /// Data payload of the frame
+        /// </summary>
         public byte[] Data
         {
             get
@@ -246,6 +258,12 @@ namespace TapTrack.Tcmp.Communication
             return temp;
         }
 
+        /// <summary>
+        /// Checks if the frame given has a CRC error
+        /// </summary>
+        /// <param name="frame">Frame to be checked</param>
+        /// <param name="crc">CRC to be compare to</param>
+        /// <returns>True if there is a CRC error, false otherwise</returns>
         protected static bool HasCrcError(TcmpFrame frame, byte[] crc)
         {
             List<byte> data = new List<byte>(frame.ToArray());
@@ -258,6 +276,11 @@ namespace TapTrack.Tcmp.Communication
                 return false;
         }
 
+        /// <summary>
+        /// Checks if the frame given has a LCS errors, CRC errors, or other errors
+        /// </summary>
+        /// <param name="frame"></param>
+        /// <returns>True is frame has no errors, false otherwise</returns>
         public static bool IsValidFrame(TcmpFrame frame)
         {
             if (frame == null)
@@ -283,6 +306,10 @@ namespace TapTrack.Tcmp.Communication
             return true;
         }
 
+        /// <summary>
+        /// Converts the TcmpFrame object to it's byte array form
+        /// </summary>
+        /// <returns></returns>
         public byte[] ToArray()
         {
             return contents.ToArray();

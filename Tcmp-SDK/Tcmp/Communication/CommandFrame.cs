@@ -6,6 +6,9 @@ using TapTrack.Tcmp.CommandFamilies;
 
 namespace TapTrack.Tcmp.Communication
 {
+    /// <summary>
+    /// Represents a command frame that is sent to the Tappy
+    /// </summary>
     public class CommandFrame : TcmpFrame
     {
         public CommandFrame(Command command) : base()

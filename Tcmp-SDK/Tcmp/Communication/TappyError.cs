@@ -8,6 +8,12 @@ namespace TapTrack.Tcmp.Communication
 {
     public class TappyError
     {
+        /// <summary>
+        /// Converts an error code to a human readable error
+        /// </summary>
+        /// <param name="commandFamily">command family of frame</param>
+        /// <param name="errorCode">Error code of an application frame</param>
+        /// <returns></returns>
         public static string LookUp(byte[] commandFamily, byte errorCode)
         {
             if (commandFamily[0] == 0x00 && commandFamily[1] == 0x00)

@@ -16,6 +16,104 @@ namespace TapTrack.Tcmp.Communication
     /// <summary>
     /// The Driver class is used to communicate(send commands and receive data) with a Tappy device
     /// </summary>
+    /// 
+    /// <example>
+    /// <para>
+    ///     Reading a UID from a NFC tag
+    /// </para>
+    /// <code language="cs">
+    /// using System;
+    /// using System.Collections.Generic;
+    /// using System.Linq;
+    /// using System.Text;
+    /// using System.Threading.Tasks;
+    /// 
+    /// using TapTrack.Tcmp.CommandFamilies;
+    /// using TapTrack.Tcmp.Communication;
+    /// using TapTrack.Tcmp.CommandFamilies.BasicNfc;
+    /// using TapTrack.Tcmp;
+    /// 
+    /// namespace TapTrack.Tcmp.Demo
+    /// {
+    ///     class Program
+    ///     {
+    ///         static void Main(string[] args)
+    ///         {
+    ///             Driver tappyDriver = new Driver(CommunicationProtocol.Usb); // Only USB is currently supported on Windows
+    /// 
+    ///             if (tappyDriver.AutoDetect())                               // Find and connect to a Tappy
+    ///             {
+    ///                 Command readUid = new DetectSingleTagUid(0, DetectTagSetting.Type2Type4AandMifare); // No time out and no locking detect uid command    
+    /// 
+    ///                 Callback responseCallback = (ResponseFrame frame, Exception e) =>
+    ///                 {
+    ///                     if(TcmpFrame.IsValidFrame(frame) &amp;&amp; frame.ResponseCode == 0x01)
+    ///                     {
+    ///                         Tag tag = new Tag(frame.Data);
+    /// 
+    ///                         string uid = BitConverter.ToString(tag.UID);
+    /// 
+    ///                         Console.WriteLine($"UID: {uid}");
+    ///                     }
+    ///                 };
+    /// 
+    ///                 Console.WriteLine("Waiting for a tag");
+    ///                 tappyDriver.SendCommand(readUid, responseCallback);
+    ///             }
+    ///             else
+    ///             {
+    ///                 Console.WriteLine("No Tappy found");
+    ///             }
+    /// 
+    ///             Console.ReadKey();
+    ///         }
+    ///     }
+    /// }
+    /// </code>
+    /// <para>
+    ///     Writing text to a tag
+    /// </para>
+    /// <code language='cs'>
+    /// using System;
+    /// 
+    /// using TapTrack.Tcmp.CommandFamilies;
+    /// using TapTrack.Tcmp.Communication;
+    /// using TapTrack.Tcmp.CommandFamilies.BasicNfc;
+    /// 
+    /// namespace TapTrack.Tcmp.Demo
+    /// {
+    ///     class Program
+    ///     {
+    ///         static void Main(string[] args)
+    ///         {
+    ///             Driver tappyDriver = new Driver(CommunicationProtocol.Usb); // Only USB is currently supported on Windows
+    /// 
+    ///             if (tappyDriver.AutoDetect())                               // Find and connect to a Tappy
+    ///             {
+    ///                 Command cmd = new WriteText(0, false, "Hello world!");  // No time out and no locking write command
+    /// 
+    ///                 Callback responseCallback = (ResponseFrame frame, Exception e) =>
+    ///                 {
+    ///                     if (TcmpFrame.IsValidFrame(frame) &amp;&amp; frame.ResponseCode == 0x05)
+    ///                         Console.WriteLine("Write successful");
+    ///                     else
+    ///                         Console.WriteLine("Write was unsuccessful");
+    ///                 };
+    /// 
+    ///                 Console.WriteLine("Waiting for a tag");
+    ///                 tappyDriver.SendCommand(cmd, responseCallback);
+    ///             }
+    ///             else
+    ///             {
+    ///                 Console.WriteLine("No Tappy found");
+    ///             }
+    /// 
+    ///             Console.ReadKey();
+    ///         }
+    ///     }
+    /// }
+    /// </code>
+    /// </example>
     public class Driver
     {
         private Connection conn;
@@ -153,13 +251,18 @@ namespace TapTrack.Tcmp.Communication
             return false;
         }
 
+        /// <summary>
+        /// Configure a tag to be use with the TapTrack Platform
+        /// </summary>
+        /// <param name="responseCallback">Method to be called when a data is receieved or a error has occurred</param>
         public void ConfigurePlatform(Callback responseCallback)
         {
             Command readCommand = new DetectSingleTagUid(0, DetectTagSetting.Type2Type4AandMifare);
 
             SendCommand(readCommand, delegate (ResponseFrame frame, Exception e)
             {
-                if (e != null){
+                if (e != null)
+                {
                     responseCallback?.Invoke(null, e);
                     return;
                 }
@@ -175,9 +278,9 @@ namespace TapTrack.Tcmp.Communication
         }
 
         /// <summary>
-        /// Get all TappyUSB connected to this machine
+        /// Get all the devices
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Array of device/port names</returns>
         public string[] GetAvailableDevices()
         {
             return conn.GetAvailableDevices();

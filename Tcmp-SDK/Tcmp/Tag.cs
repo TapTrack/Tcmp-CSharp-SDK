@@ -14,6 +14,10 @@ namespace TapTrack.Tcmp
         private byte typeOfTag;
         private byte[] uid;
 
+        /// <summary>
+        /// Get the tag information from response frame data
+        /// </summary>
+        /// <param name="frameData"></param>
         public Tag(byte[] frameData)
         {
             typeOfTag = frameData[0];
@@ -35,8 +39,14 @@ namespace TapTrack.Tcmp
 
         public byte TypeOfTag { get { return typeOfTag; } }
 
+        /// <summary>
+        /// The UID of the tag
+        /// </summary>
         public byte[] UID { get { return uid; } }
 
+        /// <summary>
+        /// Length of the UID
+        /// </summary>
         public int Length { get { return uid.Length; } }
     }
 }

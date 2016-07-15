@@ -13,6 +13,10 @@ namespace TapTrack.Tcmp.CommandFamilies.Type4
     {
         private const byte commandCode = 0x03;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="timeout">Maximum time the Tappy will wait for a tag. Time out is in seconds. 0 = No time out</param>
         public DetectType4B(byte timeout)
         {
             parameters.Add(timeout);

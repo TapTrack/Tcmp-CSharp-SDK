@@ -194,18 +194,18 @@ namespace TapTrack.Demo
 
         private void WriteVCardButton_Click(object sender, RoutedEventArgs e)
         {
-            VCard info = new VCard(nameTextBox.Text, cellPhoneTextBox.Text, workPhoneTextBox.Text,
-                homePhoneTextBox.Text, emailTextBox.Text, businessEmailTextBox.Text, homeAddrTextBox.Text,
-                businessAddrTextBox.Text, companyTextBox.Text, titleTextBox.Text, websiteTextBox.Text);
+            //VCard info = new VCard(nameTextBox.Text, cellPhoneTextBox.Text, workPhoneTextBox.Text,
+            //    homePhoneTextBox.Text, emailTextBox.Text, businessEmailTextBox.Text, homeAddrTextBox.Text,
+            //    businessAddrTextBox.Text, companyTextBox.Text, titleTextBox.Text, websiteTextBox.Text);
 
-            ShowPendingStatus("Waiting for tap");
+            //ShowPendingStatus("Waiting for tap");
 
-            CustomRecordPayload record = new CustomRecordPayload(info.ToByteArray(), "text/x-vcard", TypeNameField.NfcForumWellKnown);
-            NdefMessage message = new NdefMessage(record);
+            //CustomRecordPayload record = new CustomRecordPayload(info.ToByteArray(), "text/x-vcard", TypeNameField.NfcForumWellKnown);
+            //NdefMessage message = new NdefMessage(record);
 
-            Command cmd = new WriteCustomNdef((byte)timeout.Value, (bool)lockCheckBox.IsChecked, message);
+            //Command cmd = new WriteCustomNdef((byte)timeout.Value, (bool)lockCheckBox.IsChecked, message);
 
-            tappyDriver.SendCommand(cmd, ResponseCallback);
+            //tappyDriver.SendCommand(cmd, ResponseCallback);
         }
 
         private void ClearVCardButton_Click(object sender, RoutedEventArgs e)

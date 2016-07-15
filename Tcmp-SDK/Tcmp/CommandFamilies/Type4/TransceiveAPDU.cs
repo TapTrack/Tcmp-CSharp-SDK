@@ -13,6 +13,10 @@ namespace TapTrack.Tcmp.CommandFamilies.Type4
     {
         private const byte commandCode = 0x02;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="data">APDU bytes</param>
         public TransceiveAPDU(byte[] data)
         {
             parameters.AddRange(data);

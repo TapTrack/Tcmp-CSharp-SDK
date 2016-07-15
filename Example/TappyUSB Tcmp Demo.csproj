@@ -94,11 +94,13 @@
     <Reference Include="System.Xaml">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
-    <Reference Include="TapTrack.Ndef">
-      <HintPath>..\DLL\TapTrack.Ndef.dll</HintPath>
+    <Reference Include="TapTrack.Ndef, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\TapTrack.Ndef.0.1.0\lib\net452\TapTrack.Ndef.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="TapTrack.Tcmp">
-      <HintPath>..\Tcmp-SDK\bin\Debug\TapTrack.Tcmp.dll</HintPath>
+    <Reference Include="TapTrack.Tcmp, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\TapTrack.Tcmp.0.1.0\lib\net452\TapTrack.Tcmp.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />

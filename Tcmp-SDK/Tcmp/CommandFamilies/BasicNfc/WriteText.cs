@@ -10,6 +10,12 @@ namespace TapTrack.Tcmp.CommandFamilies.BasicNfc
     {
         private const byte commandCode = 0x06;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="timeout">Maximum time the Tappy will wait for a tag. Time out is in seconds. 0 = No time out</param>
+        /// <param name="willLock">If true, the Tappy will lock the tag after writing</param>
+        /// <param name="text">Text to write to a tag</param>
         public WriteText(byte timeout, bool willLock, string text)
         {
             this.parameters.Add(timeout);

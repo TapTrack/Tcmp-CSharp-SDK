@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace TapTrack.Tcmp.Communication
 {
     /// <summary>
-    /// 
+    /// Represents an application error frame that is sent by the Tappy
     /// </summary>
     public class ApplicationErrorFrame : ResponseFrame
     {
@@ -15,6 +15,9 @@ namespace TapTrack.Tcmp.Communication
         {
         }
 
+        /// <summary>
+        /// Error code associated with the error
+        /// </summary>
         public byte ErrorCode
         {
             get
@@ -23,6 +26,9 @@ namespace TapTrack.Tcmp.Communication
             }
         }
 
+        /// <summary>
+        /// Diagnostic information for Taptrack
+        /// </summary>
         public byte ErrorByte
         {
             get
@@ -31,6 +37,9 @@ namespace TapTrack.Tcmp.Communication
             }
         }
 
+        /// <summary>
+        /// Diagnostic information for Taptrack
+        /// </summary>
         public byte NfcStatus
         {
             get
@@ -39,6 +48,9 @@ namespace TapTrack.Tcmp.Communication
             }
         }
 
+        /// <summary>
+        /// Human readable error
+        /// </summary>
         public string ErrorString
         {
             get
