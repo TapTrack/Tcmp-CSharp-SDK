@@ -134,7 +134,7 @@
                             <Button Name="writeTextButton" Margin="10" HorizontalAlignment="Right" Style="{StaticResource RoundButton}" Click="WriteTextButton_Click">Write</Button>
                         </StackPanel>
                     </TabItem>
-                    <TabItem Header="Write VCard" Style="{StaticResource WriteVCardTab}">
+                    <TabItem Header="Write VCard" Style="{StaticResource WriteVCardTab}" Visibility="Hidden">
                         <ScrollViewer Background="{StaticResource DarkBackground}">
                             <StackPanel>
                                 <GroupBox Header="Personal Information" Foreground="White" Margin="10">
