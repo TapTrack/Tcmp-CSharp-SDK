@@ -237,7 +237,7 @@ namespace TapTrack.Tcmp.Communication
             return temp.ToArray();
         }
 
-        protected List<byte> RemoveEscapseCharacters(byte[] data)
+        public static List<byte> RemoveEscapseCharacters(byte[] data)
         {
             List<byte> temp = new List<byte>(data);
 

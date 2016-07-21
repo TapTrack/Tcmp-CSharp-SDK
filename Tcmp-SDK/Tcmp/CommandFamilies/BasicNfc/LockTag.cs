@@ -18,9 +18,10 @@ namespace TapTrack.Tcmp.CommandFamilies.BasicNfc
         /// </summary>
         /// <param name="timeout">Maximum time the Tappy will wait for a tag. Time out is in seconds. 0 = No time out</param>
         /// <param name="uid">Uid of the tag to lock</param>
-        public LockTag (byte timeout, byte[] uid)
+        public LockTag(byte timeout, byte[] uid)
         {
             this.parameters.Add(timeout);
+            this.parameters.Add((byte)uid.Length);
             this.parameters.AddRange(uid);
         }
 

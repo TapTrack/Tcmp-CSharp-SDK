@@ -13,14 +13,10 @@ namespace TapTrack.Tcmp.Communication
 
         protected virtual void OnDataReceived(EventArgs e)
         {
-            EventHandler handler = DataReceived;
-            if (handler != null)
-            {
-                handler(this, e);
-            }
+            DataReceived?.Invoke(this, e);
         }
 
-        public abstract void Connect(string deviceName);
+        public abstract bool Connect(string deviceName);
         public abstract void Disconnect();
         public abstract void Send(byte[] data);
         public abstract int Read(List<byte> data);

@@ -99,8 +99,8 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="TapTrack.Tcmp, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\TapTrack.Tcmp.0.1.0\lib\net452\TapTrack.Tcmp.dll</HintPath>
-      <Private>True</Private>
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Tcmp-SDK\bin\Debug\TapTrack.Tcmp.dll</HintPath>
     </Reference>
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />

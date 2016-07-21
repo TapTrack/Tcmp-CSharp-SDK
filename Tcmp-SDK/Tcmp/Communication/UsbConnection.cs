@@ -2,6 +2,7 @@
 using System.IO.Ports;
 using System.Diagnostics;
 using TapTrack.Tcmp.Communication.Exceptions;
+using System;
 
 namespace TapTrack.Tcmp.Communication
 {
@@ -23,11 +24,19 @@ namespace TapTrack.Tcmp.Communication
             OnDataReceived(e);
         }
 
-        public override void Connect(string portName)
+        public override bool Connect(string portName)
         {
-            Disconnect();
-            port.PortName = portName;
-            port.Open();
+            try
+            {
+                Disconnect();
+                port.PortName = portName;
+                port.Open();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         public override void Disconnect()
@@ -49,17 +58,14 @@ namespace TapTrack.Tcmp.Communication
         public override void Send(byte[] data)
         {
             Debug.Write("   sending: ");
-            foreach (byte b in data)
-            {
-                Debug.Write(string.Format("{0:X}", b).PadLeft(2, '0') + " ");
-            }
+            Debug.Write(BitConverter.ToString(data));
             Debug.WriteLine("");
 
             try
             {
                 port.Write(data, 0, data.Length);
             }
-            catch(System.InvalidOperationException e)
+            catch (System.InvalidOperationException e)
             {
                 throw new HardwareException("There is no TappyUSB connected");
             }

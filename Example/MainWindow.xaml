@@ -123,7 +123,7 @@
                     <TabItem Header="Write URL" Style="{StaticResource WriteURL}">
                         <StackPanel  Background="{StaticResource DarkBackground}" Orientation="Vertical">
                             <Label Margin="10,10,0,0" Padding="0,0,0,10" Foreground="White" Target="{Binding ElementName=urlTextBox}" Content="URL"/>
-                            <TextBox Name="urlTextBox" Margin="10,0,20,20" Foreground="White" Background="{StaticResource LightBackground}" BorderBrush="#595959" BorderThickness="0,0,0,1"/>
+                            <TextBox Name="urlTextBox" Margin="10,0,20,20" Foreground="White" Background="{StaticResource LightBackground}" BorderBrush="#595959" BorderThickness="0,0,0,1" Text="http://"/>
                             <Button Name="writeURLButton" Margin="10" HorizontalAlignment="Right" Style="{StaticResource RoundButton}" Click="WriteURLButton_Click">Write</Button>
                         </StackPanel>
                     </TabItem>

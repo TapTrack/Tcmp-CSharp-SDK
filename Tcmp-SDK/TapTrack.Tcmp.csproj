@@ -34,6 +34,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Management" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -69,6 +70,7 @@
     <Compile Include="Tcmp\CommandFamilies\Type4\TransceiveAPDU.cs" />
     <Compile Include="Tcmp\CommandFamilies\Type4\Type4Command.cs" />
     <Compile Include="Tcmp\Communication\ApplicationErrorFrame.cs" />
+    <Compile Include="Tcmp\Communication\Bluetooth\BluetoothDevice.cs" />
     <Compile Include="Tcmp\Communication\CommandFrame.cs" />
     <Compile Include="Tcmp\Communication\CommunicationProtocol.cs" />
     <Compile Include="Tcmp\Communication\Connection.cs" />
@@ -80,6 +82,8 @@
     <Compile Include="Tcmp\CommandFamilies\System\SystemCommand.cs" />
     <Compile Include="Tcmp\CommandFamilies\BasicNfc\StreamUid.cs" />
     <Compile Include="Tcmp\CommandFamilies\BasicNfc\BasicNfcCommand.cs" />
+    <Compile Include="Tcmp\Communication\Bluetooth\BGLib.cs" />
+    <Compile Include="Tcmp\Communication\Bluetooth\BluetoothConnection.cs" />
     <Compile Include="Tcmp\Communication\Exceptions\HardwareException.cs" />
     <Compile Include="Tcmp\Communication\Exceptions\LackOfDataException.cs" />
     <Compile Include="Tcmp\Communication\Exceptions\LcsException.cs" />

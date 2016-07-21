@@ -8,6 +8,7 @@ using TapTrack.Tcmp.CommandFamilies.System;
 using System.Threading;
 using TapTrack.Tcmp.CommandFamilies.BasicNfc;
 using TapTrack.Ndef;
+using TapTrack.Tcmp.Communication.Bluetooth;
 
 namespace TapTrack.Tcmp.Communication
 {
@@ -131,6 +132,10 @@ namespace TapTrack.Tcmp.Communication
             {
                 conn = new UsbConnection();
             }
+            else if (protocol == CommunicationProtocol.Bluetooth)
+            {
+                conn = new BluetoothConnection();
+            }
 
             buffer = new List<byte>();
             conn.DataReceived += new EventHandler(DataReceivedHandler);
@@ -142,10 +147,16 @@ namespace TapTrack.Tcmp.Communication
             if (!conn.IsOpen())
                 responseCallback(null, new HardwareException("Connection to device is not open"));
 
+            Debug.WriteLine($"     Before: {BitConverter.ToString(buffer.ToArray())}");
+
             if (conn.Read(this.buffer) == 0)
                 return;
 
+            Debug.WriteLine($"      After: {BitConverter.ToString(buffer.ToArray())}");
+            
             ResponseFrame resp;
+
+            buffer = TcmpFrame.RemoveEscapseCharacters(buffer.ToArray());
 
             for (int i = 0; i < buffer.Count; i++)
             {
@@ -158,7 +169,7 @@ namespace TapTrack.Tcmp.Communication
 
                         if (resp != null)
                         {
-                            buffer.RemoveRange(i, resp.Length + 5 + i);
+                            buffer.RemoveRange(0, resp.Length + 5 + i);
 
                             Debug.WriteLine(string.Format("Command family: {0:X}, {1:X}\nResponse Code: {2:X}", resp.CommandFamily[0], resp.CommandFamily[1], resp.ResponseCode));
                             responseCallback?.Invoke(resp, null);
@@ -169,11 +180,6 @@ namespace TapTrack.Tcmp.Communication
                 catch (LcsException exc)
                 {
                     responseCallback?.Invoke(null, new LcsException(this.buffer.ToArray(), "There is an error in the length bytes since Len1+Len0+Lcs != 0"));
-                }
-                catch (LackOfDataException exc)
-                {
-                    if (conn.Read(this.buffer) > 0)
-                        i -= 1;
                 }
                 catch (HardwareException exc)
                 {
@@ -194,13 +200,10 @@ namespace TapTrack.Tcmp.Communication
             int payLoadLength = len1 * 256 + len0 - 5;
 
             if (buffer.Count - start < len1 * 256 + len0 + 5)
-                throw new LackOfDataException();
+                return null;
 
             if ((byte)(lcs + len1 + len0) != 0)
                 throw new LcsException(this.buffer.ToArray());
-
-            if (buffer[start + 9 + payLoadLength] != 0x7E)
-                return null;
 
             byte[] frame = new byte[payLoadLength + 10];
             Array.Copy(buffer.ToArray(), start, frame, 0, frame.Length);
@@ -230,20 +233,7 @@ namespace TapTrack.Tcmp.Communication
             bool success;
             foreach (string name in conn.GetAvailableDevices())
             {
-                Command cmd = new Ping();
-                AutoResetEvent receivedResp = new AutoResetEvent(false);
-                success = false;
-
-                conn.Connect(name);
-
-                Callback resp = (ResponseFrame frame, Exception e) =>
-                {
-                    success = true;
-                    receivedResp.Set();
-                };
-
-                SendCommand(cmd, resp);
-                receivedResp.WaitOne(100);
+                success = Connect(name);
 
                 if (success)
                     return true;
@@ -251,30 +241,31 @@ namespace TapTrack.Tcmp.Communication
             return false;
         }
 
-        /// <summary>
-        /// Configure a tag to be use with the TapTrack Platform
-        /// </summary>
-        /// <param name="responseCallback">Method to be called when a data is receieved or a error has occurred</param>
-        public void ConfigurePlatform(Callback responseCallback)
+        public bool Connect(string deviceName)
         {
-            Command readCommand = new DetectSingleTagUid(0, DetectTagSetting.Type2Type4AandMifare);
+            Command cmd = new Ping();
+            AutoResetEvent receivedResp = new AutoResetEvent(false);
+            bool success = false;
 
-            SendCommand(readCommand, delegate (ResponseFrame frame, Exception e)
+            if (!conn.Connect(deviceName))
+                return false;
+
+            Callback resp = (ResponseFrame frame, Exception e) =>
             {
-                if (e != null)
-                {
-                    responseCallback?.Invoke(null, e);
-                    return;
-                }
+                if (TcmpFrame.IsValidFrame(frame))
+                    success = true;
+                receivedResp.Set();
+            };
 
-                Tag tag = new Tag(frame.Data);
-                string uid = BitConverter.ToString(tag.UID).Replace("-", "");
-                string url = $"https://members.taptrack.com/m?id={uid}";
+            SendCommand(cmd, resp);
+            receivedResp.WaitOne(250);
 
-                Command write = new WriteUri(0, false, new NdefUri(url));
+            return success;
+        }
 
-                SendCommand(write, responseCallback);
-            });
+        public void Disconnect()
+        {
+            conn.Disconnect();
         }
 
         /// <summary>

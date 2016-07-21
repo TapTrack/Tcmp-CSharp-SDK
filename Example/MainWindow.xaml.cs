@@ -14,10 +14,10 @@ namespace TapTrack.Demo
     using Tcmp.Communication;
     using Tcmp.CommandFamilies;
     using Tcmp.CommandFamilies.BasicNfc;
+    using Tcmp.CommandFamilies.Type4;
     using Ndef;
     using Tcmp.Communication.Exceptions;
     using Tcmp;
-
 
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -31,9 +31,15 @@ namespace TapTrack.Demo
         public MainWindow()
         {
             InitializeComponent();
-            tappyDriver = new Driver(CommunicationProtocol.Usb);
+            tappyDriver = new Driver(CommunicationProtocol.Bluetooth);
             table = new ObservableCollection<Row>();
             records.ItemsSource = table;
+            this.Closed += MainWindow_Closed;
+        }
+
+        private void MainWindow_Closed(object sender, EventArgs e)
+        {
+            tappyDriver.Disconnect();
         }
 
         //
@@ -95,9 +101,8 @@ namespace TapTrack.Demo
             Action update = () =>
             {
                 uidTextBox.Text = "";
-                foreach (byte b in tag.UID)
-                    uidTextBox.Text += string.Format("{0:X}", b).PadLeft(2, '0') + " ";
-                typeTextBox.Text = string.Format("{0:X}", tag.TypeOfTag).PadLeft(2, '0');
+                uidTextBox.Text += BitConverter.ToString(tag.UID);
+                typeTextBox.Text = Tcmp.Tag.TypeLookUp(tag.TypeOfTag);
             };
             ShowSuccessStatus();
             Dispatcher.Invoke(update);
@@ -230,9 +235,38 @@ namespace TapTrack.Demo
         private void ReadType4B(object sender, RoutedEventArgs e)
         {
             ShowPendingStatus("Waiting for tap");
-            Command cmd = new DetectSingleTagUid((byte)timeout.Value, DetectTagSetting.Type2Type4AandMifare);
+            Command cmd = new DetectType4B((byte)timeout.Value);
 
-            tappyDriver.SendCommand(cmd, ResponseCallback);
+            Callback responseCallback = (ResponseFrame frame, Exception exc) =>
+            {
+                if (CheckForErrorsOrTimeout(frame, exc))
+                    return;
+
+                if (frame.ResponseCode != 0x07)
+                    return;
+
+                byte[] data = frame.Data;
+
+                Action update = () =>
+                {
+                    byte atqbLen = data[0];
+                    byte attribLen = data[1];
+                    atqbTextBox.Text = "";
+                    attribTextBox.Text = "";
+
+
+                    for (int i = 2; i < 2 + data[0]; i++)
+                        atqbTextBox.Text += string.Format("{0:X}", data[i]).PadLeft(2, '0') + " ";
+
+                    for (int i = data[0] + 2; i < data.Length; i++)
+                        attribTextBox.Text += string.Format("{0:X}", data[i]).PadLeft(2, '0') + " ";
+                };
+
+                ShowSuccessStatus();
+                Dispatcher.BeginInvoke(update);
+            };
+
+            tappyDriver.SendCommand(cmd, responseCallback);
         }
 
         private void UpdateDetTypeBForm(byte[] data)
@@ -272,9 +306,14 @@ namespace TapTrack.Demo
 
                 Tag tag = new Tag(frame.Data);
 
-                Command lockCommand = new LockTag((byte)timeout.Value, tag.UID);
+                Action Lock = () =>
+                {
+                    Command lockCommand = new LockTag((byte)timeout.Value, tag.UID);
 
-                tappyDriver.SendCommand(lockCommand, ResponseCallback);
+                    tappyDriver.SendCommand(lockCommand, ResponseCallback);
+                };
+
+                Dispatcher.BeginInvoke(Lock);
             });
         }
 
@@ -383,7 +422,6 @@ namespace TapTrack.Demo
         {
             if (!TcmpFrame.IsValidFrame(frame))
             {
-                Debug.WriteLine(TcmpFrame.IsValidFrame(frame));
                 if (e != null && e.GetType() == typeof(HardwareException))
                 {
                     ShowFailStatus("TappyUSB is not connected");
@@ -399,6 +437,11 @@ namespace TapTrack.Demo
             {
                 ApplicationErrorFrame errorFrame = (ApplicationErrorFrame)frame;
                 ShowFailStatus(errorFrame.ErrorString);
+                return true;
+            }
+            else if (frame.CommandFamily0 == 0 && frame.CommandFamily1 == 0 && frame.ResponseCode < 0x05)
+            {
+                ShowFailStatus(TappyError.LookUp(frame.CommandFamily, frame.ResponseCode));
                 return true;
             }
             else if (frame.ResponseCode == 0x03)
@@ -456,16 +499,56 @@ namespace TapTrack.Demo
 
         private void configureTagForPlatform_Click(object sender, RoutedEventArgs e)
         {
-            tappyDriver.ConfigurePlatform(ConfigSuccess);
+            Command readCommand = new DetectSingleTagUid(0, DetectTagSetting.Type2Type4AandMifare);
+
+            tappyDriver.SendCommand(readCommand, delegate (ResponseFrame frame, Exception exc)
+            {
+                if (exc != null)
+                {
+                    return;
+                }
+                else if (!TcmpFrame.IsValidFrame(frame))
+                {
+                    ShowFailStatus("Error occured");
+                    return;
+                }
+                else if (frame.IsApplicationErrorFrame())
+                {
+                    ShowFailStatus(((ApplicationErrorFrame)frame).ErrorString);
+                    return;
+                }
+
+                Tag tag = new Tag(frame.Data);
+                string uid = BitConverter.ToString(tag.UID).Replace("-", "");
+                string url = $"https://members.taptrack.com/m?id={uid}";
+                Command write = new WriteUri(0, false, new NdefUri(url));
+
+                Task.Run(() =>
+                {
+                    tappyDriver.SendCommand(write, ConfigSuccess);
+                });
+            });
         }
 
         private void ConfigSuccess(ResponseFrame frame, Exception e)
         {
-            byte[] data = frame.Data;
+            if (e != null)
+            {
+                return;
+            }
+            else if (!TcmpFrame.IsValidFrame(frame))
+            {
+                ShowFailStatus("Error occured");
+                return;
+            }
+            else if (frame.IsApplicationErrorFrame())
+            {
+                ShowFailStatus(((ApplicationErrorFrame)frame).ErrorString);
+                return;
+            }
 
-            List<byte> temp = new List<byte>(frame.Data);
-            Tag tag = new Tag(temp.GetRange(1, data.Length - 1).ToArray());
-            Debug.WriteLine("Here " + BitConverter.ToString(tag.UID));
+            Tag tag = new Tag(frame.Data);
+
             string uid = BitConverter.ToString(tag.UID).Replace("-", "");
             Process.Start(string.Format($"https://members.taptrack.com/x.php?tag_code={uid}"));
         }

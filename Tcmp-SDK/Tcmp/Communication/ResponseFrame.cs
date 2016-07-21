@@ -14,7 +14,7 @@ namespace TapTrack.Tcmp.Communication
     {
         public ResponseFrame(byte[] raw)
         {
-            contents = RemoveEscapseCharacters(raw);
+            contents = new List<byte>(raw);
         }
 
         /// <summary>
