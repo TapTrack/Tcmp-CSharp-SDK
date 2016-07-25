@@ -148,11 +148,11 @@ namespace TapTrack.Demo
             {
                 if (row.Selected.Equals("Text"))
                 {
-                    recs.Add(new TextRecordPayload("en", (row.Content == null) ? "" : row.Content));
+                    recs.Add(new TextRecordPayload("en", row.Content ?? "" ));
                 }
                 else
                 {
-                    recs.Add(new UriRecordPayload((row.Content == null) ? "" : row.Content));
+                    recs.Add(new UriRecordPayload((row.Content ?? "")));
                 }
             }
 
@@ -334,7 +334,7 @@ namespace TapTrack.Demo
             Task.Run(() =>
             {
                 if (tappyDriver.AutoDetect())
-                    ShowSuccessStatus();
+                    ShowSuccessStatus($"Connected to {tappyDriver.DeviceName}");
                 else
                     ShowFailStatus("No TappyUSB found");
             });
@@ -356,42 +356,36 @@ namespace TapTrack.Demo
             ImageBehavior.SetAnimatedSource(statusImage, (BitmapImage)FindResource("Pending"));
         }
 
-        private void ShowSuccessStatus()
+        private void ShowSuccessStatus(string message = "")
         {
-            Action show = () => _ShowSuccessStatus();
+            Action show = () => {
+                statusPopup.IsOpen = true;
+                statusText.Content = "Success";
+                statusMessage.Content = message;
+                ImageBehavior.SetAnimatedSource(statusImage, (BitmapImage)FindResource("Success"));
+
+                Task.Run(() =>
+                {
+                    Thread.Sleep(750);
+                    HideStatus();
+                });
+            };
 
             Dispatcher.BeginInvoke(show);
-        }
-
-        private void _ShowSuccessStatus()
-        {
-            statusPopup.IsOpen = true;
-            statusText.Content = "Success";
-            statusMessage.Content = "";
-            ImageBehavior.SetAnimatedSource(statusImage, (BitmapImage)FindResource("Success"));
-
-            Task.Run(() =>
-            {
-                Thread.Sleep(750);
-                HideStatus();
-            });
         }
 
         private void ShowFailStatus(string message)
         {
-            Action show = () => _ShowFailStatus(message);
+            Action show = () => {
+                dismissButtonContainer.Height = new GridLength(50);
+                dismissButton.Visibility = Visibility.Visible;
+                statusPopup.IsOpen = true;
+                statusText.Content = "Fail";
+                statusMessage.Content = message;
+                ImageBehavior.SetAnimatedSource(statusImage, (BitmapImage)FindResource("Error"));
+            };
 
             Dispatcher.BeginInvoke(show);
-        }
-
-        private void _ShowFailStatus(string message)
-        {
-            dismissButtonContainer.Height = new GridLength(50);
-            dismissButton.Visibility = Visibility.Visible;
-            statusPopup.IsOpen = true;
-            statusText.Content = "Fail";
-            statusMessage.Content = message;
-            ImageBehavior.SetAnimatedSource(statusImage, (BitmapImage)FindResource("Error"));
         }
 
         private void HideStatus()
@@ -460,7 +454,7 @@ namespace TapTrack.Demo
             DetectandLaunch();
         }
 
-        public void DetectandLaunch()
+        private void DetectandLaunch()
         {
             Command cmd = new DetectSingleNdef(0, DetectTagSetting.Type2Type4AandMifare);
             tappyDriver.SendCommand(cmd, LaunchCallback);

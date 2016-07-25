@@ -43,7 +43,8 @@
     <BitmapImage x:Key="Ndef_highlight" UriSource="/Resources/ndef_highlight.png"/>
     <BitmapImage x:Key="Platform" UriSource="/Resources/platform.png"/>
     <BitmapImage x:Key="Platform_highlight" UriSource="/Resources/platform_highlight.png"/>
-
+    <BitmapImage x:Key="Disconnect" UriSource="/Resources/disconnect.png"/>
+    <BitmapImage x:Key="Disconnect_highlight" UriSource="/Resources/disconnect_highlight.png"/>
 
     <Style x:Key="TextBox" TargetType="{x:Type TextBox}">
         <Setter Property="Margin" Value="10,0,20,20"/>
@@ -152,6 +153,25 @@
                     <Grid ToolTip="Settings">
                         <Image Name="Pressed" Visibility="Hidden" Source="{StaticResource Settings_highlight}"/>
                         <Image Name="Unpressed" Visibility="Visible" Source="{StaticResource Settings}"/>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Pressed" Property="Visibility" Value="Visible"/>
+                            <Setter TargetName="Unpressed" Property="Visibility" Value="Hidden"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="DisconnectButton" TargetType="{x:Type Button}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Grid ToolTip="Disconnect">
+                        <Image Name="Pressed" Visibility="Hidden" Source="{StaticResource Disconnect_highlight}"/>
+                        <Image Name="Unpressed" Visibility="Visible" Source="{StaticResource Disconnect}"/>
                     </Grid>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">

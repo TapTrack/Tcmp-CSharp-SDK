@@ -136,6 +136,7 @@ namespace TapTrack.Tcmp.Communication
 
             buffer = new List<byte>();
             conn.DataReceived += new EventHandler(DataReceivedHandler);
+            DeviceName = null;
         }
 
         private void DataReceivedHandler(object sender, EventArgs e)
@@ -257,12 +258,16 @@ namespace TapTrack.Tcmp.Communication
             SendCommand(cmd, resp);
             receivedResp.WaitOne(250);
 
+            if (success)
+                DeviceName = deviceName;
+
             return success;
         }
 
         public void Disconnect()
         {
             conn.Disconnect();
+            DeviceName = null;
         }
 
         /// <summary>
@@ -272,6 +277,16 @@ namespace TapTrack.Tcmp.Communication
         public string[] GetAvailableDevices()
         {
             return conn.GetAvailableDevices();
+        }
+
+        /// <summary>
+        /// Gets the name of the device the driver is currently connected to (USB port name or bluetooth device name depending on the current communcation protocal).
+        /// Returns null if there is no device connected.
+        /// </summary>
+        public string DeviceName
+        {
+            get;
+            internal set;
         }
 
         /// <summary>

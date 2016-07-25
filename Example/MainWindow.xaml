@@ -19,9 +19,9 @@
             <TextBlock Margin="10" FontSize="20" Foreground="White">TapTrack</TextBlock>
         </WrapPanel>
         <WrapPanel Grid.Row="0" HorizontalAlignment="Right" >
-            <Button Style="{StaticResource RoundButton}" Click="disconnectButton_Click"  Content="Disconnect"/>
             <Button Margin="10" Height="15" Padding="0" Background="White" BorderBrush="{x:Null}" Style="{StaticResource StopButton}" Click="StopButton_Click"/>
             <Button Name="autoDetectButton" Margin="10" Height="25" Padding="0" Background="{x:Null}" BorderBrush="{x:Null}" Style="{StaticResource USBButton}" Click="AutoDetectButton_Click"/>
+            <Button Margin="10" Height="25" Style="{StaticResource DisconnectButton}" Click="disconnectButton_Click"  Content="Disconnect"/>
             <Button Margin="10" Height="25" Padding="0" Background="{x:Null}" BorderBrush="{x:Null}" Style="{StaticResource SettingsButton}" Click="SettingsButton_Click"/>
         </WrapPanel>
         <Border Grid.Row="1" Background="{StaticResource LightBackground}">
