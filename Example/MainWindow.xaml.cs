@@ -31,7 +31,7 @@ namespace TapTrack.Demo
         public MainWindow()
         {
             InitializeComponent();
-            tappyDriver = new Driver(CommunicationProtocol.Bluetooth);
+            tappyDriver = new Driver(CommunicationProtocol.Usb);
             table = new ObservableCollection<Row>();
             records.ItemsSource = table;
             this.Closed += MainWindow_Closed;
@@ -551,6 +551,11 @@ namespace TapTrack.Demo
 
             string uid = BitConverter.ToString(tag.UID).Replace("-", "");
             Process.Start(string.Format($"https://members.taptrack.com/x.php?tag_code={uid}"));
+        }
+
+        private void disconnectButton_Click(object sender, RoutedEventArgs e)
+        {
+            tappyDriver.Disconnect();
         }
     }
 }

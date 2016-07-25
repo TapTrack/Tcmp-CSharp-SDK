@@ -3,11 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using TapTrack.Tcmp.CommandFamilies;
 using TapTrack.Tcmp.Communication.Exceptions;
-using System.Linq;
 using TapTrack.Tcmp.CommandFamilies.System;
 using System.Threading;
-using TapTrack.Tcmp.CommandFamilies.BasicNfc;
-using TapTrack.Ndef;
 using TapTrack.Tcmp.Communication.Bluetooth;
 
 namespace TapTrack.Tcmp.Communication
