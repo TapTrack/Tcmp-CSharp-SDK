@@ -1,5 +1,5 @@
-﻿using System;
-using TapTrack.Ndef;
+﻿using NdefLibrary.Ndef;
+using System;
 
 namespace TapTrack.Tcmp.CommandFamilies.BasicNfc
 {
@@ -9,7 +9,6 @@ namespace TapTrack.Tcmp.CommandFamilies.BasicNfc
     public class WriteCustomNdef : BasicNfcCommand
     {
         private const byte commandCode = 0x07;
-
 
         /// <summary>
         /// 
@@ -34,7 +33,7 @@ namespace TapTrack.Tcmp.CommandFamilies.BasicNfc
         {
             this.parameters.Add(timeout);
             this.parameters.Add(Convert.ToByte(willLock));
-            this.parameters.AddRange(message.GetByteArray());
+            this.parameters.AddRange(message.ToByteArray());
         }
 
         public override byte CommandCode

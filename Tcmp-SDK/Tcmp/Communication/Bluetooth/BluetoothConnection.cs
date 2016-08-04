@@ -65,28 +65,13 @@ namespace TapTrack.Tcmp.Communication.Bluetooth
             // Bluegiga Events
 
             bluetooth.BLEEventATTClientAttributeValue += DataReceivedFromTappy;
-
-            // Bluegiga Responses //
-
-            bluetooth.BLEResponseGAPConnectDirect += ConnectResponse;
-
-            try
-            {
-                bluetooth.SendCommand(port, bluetooth.BLECommandSystemReset(0));
-            }
-            finally
-            {
-                Thread.Sleep(1250);
-                port.Close();
-                port.Open();
-            }
         }
 
         private void DataReceivedHandler(object sender, SerialDataReceivedEventArgs e)
         {
             SerialPort sp = (SerialPort)sender;
             byte[] inData = new byte[sp.BytesToRead];
-
+            
             sp.Read(inData, 0, sp.BytesToRead);
 
             Debug.WriteLine("<= RX ({0}) [ {1}]", inData.Length, BitConverter.ToString(inData));
@@ -106,8 +91,13 @@ namespace TapTrack.Tcmp.Communication.Bluetooth
 
         private string GetBluegigaDevice()
         {
+            return Search("Win32_SerialPort") ?? Search("Win32_pnpEntity");
+        }
+
+        private string Search(string searchLocation)
+        {
             ManagementObjectCollection comPortDevices;
-            ManagementObjectSearcher searcher = new ManagementObjectSearcher("Select * From WIN32_SerialPort");
+            ManagementObjectSearcher searcher = new ManagementObjectSearcher($"Select * From {searchLocation}");
             comPortDevices = searcher.Get();
 
             foreach (ManagementObject device in comPortDevices)
@@ -172,12 +162,6 @@ namespace TapTrack.Tcmp.Communication.Bluetooth
             bluetooth.BLEEventConnectionStatus -= connectionStatus;
 
             return connectionEst;
-        }
-
-        private void ConnectResponse(object sender, ConnectDirectEventArgs e)
-        {
-            this.device = new BluetoothDevice();
-            device.ConnectionHandle = e.connection_handle;
         }
 
         public override void Disconnect()

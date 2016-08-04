@@ -151,7 +151,7 @@ namespace TapTrack.Tcmp.Communication
                 return;
 
             Debug.WriteLine($"      After: {BitConverter.ToString(buffer.ToArray())}");
-            
+
             ResponseFrame resp;
 
             buffer = TcmpFrame.RemoveEscapseCharacters(buffer.ToArray());
@@ -167,12 +167,20 @@ namespace TapTrack.Tcmp.Communication
 
                         if (resp != null)
                         {
-                            buffer.RemoveRange(0, resp.Length + 5 + i);
+                            buffer.RemoveRange(0, resp.FrameLength + i);
 
                             Debug.WriteLine(string.Format("Command family: {0:X}, {1:X}\nResponse Code: {2:X}", resp.CommandFamily[0], resp.CommandFamily[1], resp.ResponseCode));
                             responseCallback?.Invoke(resp, null);
                             i -= 1;
                         }
+                    }
+                }
+                catch (LackOfDataException exc)
+                {
+                    if (buffer.Count > 1 && buffer[buffer.Count - 1] == 0x7E)
+                    {
+                        responseCallback?.Invoke(null, exc);
+                        FlushBuffer();
                     }
                 }
                 catch (LcsException exc)
@@ -198,7 +206,12 @@ namespace TapTrack.Tcmp.Communication
             int payLoadLength = len1 * 256 + len0 - 5;
 
             if (buffer.Count - start < len1 * 256 + len0 + 5)
-                return null;
+            {
+                //Debug.WriteLine($"Buffer Count: {buffer.Count}");
+                //Debug.WriteLine($"Start: {start}");
+                //Debug.WriteLine($"Length: {len1 * 256 + len0 + 5}");
+                throw new LackOfDataException("Buffer length is less than the length of expected data");
+            }
 
             if ((byte)(lcs + len1 + len0) != 0)
                 throw new LcsException(this.buffer.ToArray());

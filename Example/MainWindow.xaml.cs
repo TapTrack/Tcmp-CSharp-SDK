@@ -18,6 +18,8 @@ namespace TapTrack.Demo
     using Ndef;
     using Tcmp.Communication.Exceptions;
     using Tcmp;
+    using NdefLibrary.Ndef;
+    using System.Text;
 
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -66,13 +68,43 @@ namespace TapTrack.Demo
 
             Array.Copy(data, 2 + data[1], temp, 0, temp.Length);
 
-            NdefParser parser = new NdefParser(temp);
+            NdefMessage message = NdefMessage.FromByteArray(temp);
 
             Action update = () =>
             {
-                foreach (RecordData payload in parser.GetPayLoad())
+                foreach (NdefRecord record in message)
                 {
-                    ndefData.Text += payload.Content + "\r\n";
+                    ndefData.AppendText("Ndef Record:\n\n");
+
+                    string type = Encoding.UTF8.GetString(record.Type);
+                    ndefData.AppendText($"TNF: {record.TypeNameFormat.ToString()} ({(byte)record.TypeNameFormat})\n");
+                    ndefData.AppendText($"Type: {type}\n");
+
+                    if (record.Id != null)
+                        ndefData.AppendText($"Type: {BitConverter.ToString(record.Id)}\n");
+
+                    if (type.Equals("U"))
+                    {
+                        NdefUriRecord uriRecord = new NdefUriRecord(record);
+                        ndefData.AppendText($"Payload: {uriRecord.Uri}\n");
+                    }
+                    else if (type.Equals("T"))
+                    {
+                        NdefTextRecord textRecord = new NdefTextRecord(record);
+                        ndefData.AppendText($"Encoding: {textRecord.TextEncoding.ToString()}\n");
+                        ndefData.AppendText($"Language: {textRecord.LanguageCode}\n");
+                        ndefData.AppendText($"Payload: {textRecord.Text}\n");
+                    }
+                    else if (type.Contains("text"))
+                    {
+                        ndefData.AppendText($"Payload: {Encoding.UTF8.GetString(record.Payload)}\n");
+                    }
+                    else
+                    {
+                        ndefData.AppendText($"Payload: {BitConverter.ToString(record.Payload)}");
+                    }
+
+                    ndefData.AppendText($"----------\n");
                 }
             };
 
@@ -142,21 +174,25 @@ namespace TapTrack.Demo
 
         private void WriteMultNdef(object send, RoutedEventArgs e)
         {
-            List<RecordPayload> recs = new List<RecordPayload>();
+            NdefMessage message = new NdefMessage();
 
             foreach (Row row in table)
             {
                 if (row.Selected.Equals("Text"))
                 {
-                    recs.Add(new TextRecordPayload("en", row.Content ?? "" ));
+                    NdefTextRecord temp = new NdefTextRecord()
+                    {
+                        TextEncoding = NdefTextRecord.TextEncodingType.Utf8,
+                        LanguageCode = "en",
+                        Text = row.Content ?? ""
+                    };
+                    message.Add(temp);
                 }
                 else
                 {
-                    recs.Add(new UriRecordPayload((row.Content ?? "")));
+                    message.Add(new NdefUriRecord() { Uri = row.Content ?? "" });
                 }
             }
-
-            NdefMessage message = new NdefMessage(recs.ToArray());
 
             ShowPendingStatus("Waiting for tap");
 
@@ -358,7 +394,8 @@ namespace TapTrack.Demo
 
         private void ShowSuccessStatus(string message = "")
         {
-            Action show = () => {
+            Action show = () =>
+            {
                 statusPopup.IsOpen = true;
                 statusText.Content = "Success";
                 statusMessage.Content = message;
@@ -376,7 +413,8 @@ namespace TapTrack.Demo
 
         private void ShowFailStatus(string message)
         {
-            Action show = () => {
+            Action show = () =>
+            {
                 dismissButtonContainer.Height = new GridLength(50);
                 dismissButton.Visibility = Visibility.Visible;
                 statusPopup.IsOpen = true;
@@ -414,16 +452,18 @@ namespace TapTrack.Demo
 
         public bool CheckForErrorsOrTimeout(ResponseFrame frame, Exception e)
         {
-            if (!TcmpFrame.IsValidFrame(frame))
+            if (e != null)
             {
-                if (e != null && e.GetType() == typeof(HardwareException))
-                {
+                if (e.GetType() == typeof(HardwareException))
                     ShowFailStatus("TappyUSB is not connected");
-                }
                 else
-                {
                     ShowFailStatus("An error occured");
-                }
+
+                return true;
+            }
+            else if (!TcmpFrame.IsValidFrame(frame))
+            {
+                ShowFailStatus("An error occured");
 
                 return true;
             }
@@ -470,17 +510,17 @@ namespace TapTrack.Demo
 
             Array.Copy(data, 2 + data[1], temp, 0, temp.Length);
 
-            NdefParser parser = new NdefParser(temp);
-            RecordData[] payload = parser.GetPayLoad().ToArray();
+            NdefMessage message = NdefMessage.FromByteArray(temp);
 
-            if (payload.Length > 0)
+            if (message.Count > 0)
             {
-                if (payload[0].NdefType.Equals("U"))
+                if (Encoding.UTF8.GetString(message[0].Type).Equals("U"))
                 {
-                    NdefUri uri = new NdefUri(payload[0].Content);
+                    NdefUriRecord uriRecord = new NdefUriRecord(message[0]);
+                    NdefUri uri = new NdefUri(uriRecord.Uri);
                     if (uri.Scheme == 0)
                         return;
-                    Process.Start(payload[0].Content);
+                    Process.Start(uriRecord.Uri);
                 }
             }
 
