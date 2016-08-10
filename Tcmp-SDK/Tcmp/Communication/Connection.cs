@@ -22,5 +22,6 @@ namespace TapTrack.Tcmp.Communication
         public abstract int Read(List<byte> data);
         public abstract string[] GetAvailableDevices();
         public abstract bool IsOpen();
+        public abstract void Flush();
     }
 }

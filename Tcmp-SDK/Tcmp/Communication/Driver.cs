@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using TapTrack.Tcmp.CommandFamilies;
 using TapTrack.Tcmp.Communication.Exceptions;
-using TapTrack.Tcmp.CommandFamilies.System;
 using System.Threading;
 using TapTrack.Tcmp.Communication.Bluetooth;
+using TapTrack.Tcmp.CommandFamilies;
+using TapTrack.Tcmp.CommandFamilies.BasicNfc;
+using TapTrack.Tcmp.CommandFamilies.System;
+using System.Threading.Tasks;
 
 namespace TapTrack.Tcmp.Communication
 {
@@ -233,6 +235,7 @@ namespace TapTrack.Tcmp.Communication
         public void FlushBuffer()
         {
             this.buffer.Clear();
+            this.conn.Flush();
         }
 
         /// <summary>
@@ -250,6 +253,20 @@ namespace TapTrack.Tcmp.Communication
                     return true;
             }
             return false;
+        }
+
+        public void SwitchProtocol(CommunicationProtocol protocol)
+        {
+            conn?.Disconnect();
+
+            if (protocol == CommunicationProtocol.Usb)
+                conn = new UsbConnection();
+            else if (protocol == CommunicationProtocol.Bluetooth)
+                conn = new BluetoothConnection();
+
+            FlushBuffer();
+
+            conn.DataReceived += new EventHandler(DataReceivedHandler);
         }
 
         public bool Connect(string deviceName)
@@ -348,6 +365,34 @@ namespace TapTrack.Tcmp.Communication
             {
                 this.responseCallback?.Invoke(null, e);
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="timeout"></param>
+        /// <param name="willLock"></param>
+        /// <param name="url"></param>
+        /// <param name="responseCallback"></param>
+        public void WriteUrlWithTagMirror(byte timeout, bool willLock, string url, Callback responseCallback = null)
+        {
+            Command detectTag = new DetectSingleTagUid(timeout, DetectTagSetting.Type2Type4AandMifare);
+
+            Callback detectTagCallback = (ResponseFrame frame, Exception e) =>
+            {
+                if (e == null && !frame.IsApplicationErrorFrame() && frame.ResponseCode == 0x01)
+                {
+                    Tag tag = new Tag(frame.Data);
+                    Command write = new WriteUri(timeout, willLock, url.Replace("[uid]", tag.UidToString()));
+                    Task.Run(() => SendCommand(write, responseCallback));
+                }
+                else
+                {
+                    responseCallback.Invoke(frame, e);
+                }
+            };
+
+            SendCommand(detectTag, detectTagCallback);
         }
     }
 }

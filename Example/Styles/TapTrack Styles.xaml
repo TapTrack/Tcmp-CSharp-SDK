@@ -45,6 +45,10 @@
     <BitmapImage x:Key="Platform_highlight" UriSource="/Resources/platform_highlight.png"/>
     <BitmapImage x:Key="Disconnect" UriSource="/Resources/disconnect.png"/>
     <BitmapImage x:Key="Disconnect_highlight" UriSource="/Resources/disconnect_highlight.png"/>
+    <BitmapImage x:Key="Battery" UriSource="/Resources/battery.png"/>
+    <BitmapImage x:Key="Battery_highlight" UriSource="/Resources/battery_highlight.png"/>
+    <BitmapImage x:Key="Version" UriSource="/Resources/firmware.png"/>
+    <BitmapImage x:Key="Version_highlight" UriSource="/Resources/firmware_highlight.png"/>
 
     <Style x:Key="TextBox" TargetType="{x:Type TextBox}">
         <Setter Property="Margin" Value="10,0,20,20"/>
@@ -112,7 +116,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Button}">
-                    <Grid ToolTip="Auto Detect TappyUSB">
+                    <Grid ToolTip="Auto Detect Tappy">
                         <Image Name="Pressed" Visibility="Hidden" Source="{StaticResource Usb_highlight}"/>
                         <Image Name="Unpressed" Visibility="Visible" Source="{StaticResource Usb}"/>
                     </Grid>
@@ -362,6 +366,44 @@
                     <Grid Name="Container" ToolTip="Configure a tag for use with the TapTrack platform" Background="White" Margin="10">
                         <Image Width="30" Height="30" Stretch="Fill" Name="Pressed" Visibility="Hidden" Source="{StaticResource Platform_highlight}"/>
                         <Image Width="30" Height="30" Stretch="Fill" Name="Unpressed" Visibility="Visible" Source="{StaticResource Platform}"/>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger SourceName="Container"  Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Pressed" Property="Visibility" Value="Visible"/>
+                            <Setter TargetName="Unpressed" Property="Visibility" Value="Hidden"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="BatteryTab" TargetType="{x:Type TabItem}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <Grid Name="Container" ToolTip="Get battery level" Background="White" Margin="10">
+                        <Image Width="30" Height="30" Stretch="Fill" Name="Pressed" Visibility="Hidden" Source="{StaticResource Battery_highlight}"/>
+                        <Image Width="30" Height="30" Stretch="Fill" Name="Unpressed" Visibility="Visible" Source="{StaticResource Battery}"/>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger SourceName="Container"  Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Pressed" Property="Visibility" Value="Visible"/>
+                            <Setter TargetName="Unpressed" Property="Visibility" Value="Hidden"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="VersionTab" TargetType="{x:Type TabItem}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <Grid Name="Container" ToolTip="Get version info of Tappy" Background="White" Margin="10">
+                        <Image Width="30" Height="30" Stretch="Fill" Name="Pressed" Visibility="Hidden" Source="{StaticResource Version_highlight}"/>
+                        <Image Width="30" Height="30" Stretch="Fill" Name="Unpressed" Visibility="Visible" Source="{StaticResource Version}"/>
                     </Grid>
                     <ControlTemplate.Triggers>
                         <Trigger SourceName="Container"  Property="IsMouseOver" Value="True">

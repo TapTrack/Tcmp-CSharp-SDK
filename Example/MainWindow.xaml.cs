@@ -20,7 +20,7 @@ namespace TapTrack.Demo
     using Tcmp;
     using NdefLibrary.Ndef;
     using System.Text;
-
+    using Tcmp.CommandFamilies.System;
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
@@ -365,15 +365,27 @@ namespace TapTrack.Demo
 
         private void AutoDetectButton_Click(object sender, RoutedEventArgs e)
         {
-            ShowPendingStatus("Searching for a TappyUSB");
+            ConnectWindow window = new ConnectWindow();
 
-            Task.Run(() =>
+            if (window.ShowDialog() == true)
             {
-                if (tappyDriver.AutoDetect())
-                    ShowSuccessStatus($"Connected to {tappyDriver.DeviceName}");
-                else
-                    ShowFailStatus("No TappyUSB found");
-            });
+                if (window.Protocol == CommunicationProtocol.Usb)
+                    batteryTab.Visibility = Visibility.Hidden;
+                else if (window.Protocol == CommunicationProtocol.Bluetooth)
+                    batteryTab.Visibility = Visibility.Visible;
+
+                tappyDriver.SwitchProtocol(window.Protocol);
+
+                ShowPendingStatus("Searching for a Tappy");
+
+                Task.Run(() =>
+                {
+                    if (tappyDriver.AutoDetect())
+                        ShowSuccessStatus($"Connected to {tappyDriver.DeviceName}");
+                    else
+                        ShowFailStatus("No Tappy found");
+                });
+            }
         }
 
         private void SettingsButton_Click(object sender, RoutedEventArgs e)
@@ -455,7 +467,7 @@ namespace TapTrack.Demo
             if (e != null)
             {
                 if (e.GetType() == typeof(HardwareException))
-                    ShowFailStatus("TappyUSB is not connected");
+                    ShowFailStatus("Tappy is not connected");
                 else
                     ShowFailStatus("An error occured");
 
@@ -537,20 +549,8 @@ namespace TapTrack.Demo
 
             tappyDriver.SendCommand(readCommand, delegate (ResponseFrame frame, Exception exc)
             {
-                if (exc != null)
-                {
+                if (CheckForErrorsOrTimeout(frame, exc))
                     return;
-                }
-                else if (!TcmpFrame.IsValidFrame(frame))
-                {
-                    ShowFailStatus("Error occured");
-                    return;
-                }
-                else if (frame.IsApplicationErrorFrame())
-                {
-                    ShowFailStatus(((ApplicationErrorFrame)frame).ErrorString);
-                    return;
-                }
 
                 Tag tag = new Tag(frame.Data);
                 string uid = BitConverter.ToString(tag.UID).Replace("-", "");
@@ -590,6 +590,88 @@ namespace TapTrack.Demo
         private void disconnectButton_Click(object sender, RoutedEventArgs e)
         {
             tappyDriver.Disconnect();
+        }
+
+        private void firmwareVersionButton_Click(object sender, RoutedEventArgs e)
+        {
+            ShowPendingStatus("");
+            Command cmd = new GetFirmwareVersion();
+
+            Action<string> update = (string text) =>
+            {
+                firmwareTextBox.Text = text;
+            };
+
+            Callback callback = (ResponseFrame frame, Exception exc) =>
+            {
+                if (CheckForErrorsOrTimeout(frame, exc))
+                    return;
+
+                if (frame.ResponseCode == 0x06)
+                {
+                    byte[] data = frame.Data;
+
+                    Dispatcher.BeginInvoke(update, $"{data[0]}.{data[1]}");
+                }
+                ShowSuccessStatus();
+            };
+
+            tappyDriver.SendCommand(cmd, callback);
+        }
+
+        private void hardwareVersionButton_Click(object sender, RoutedEventArgs e)
+        {
+            ShowPendingStatus("");
+            Command cmd = new GetHardwareVersion();
+
+            Action<string> update = (string text) =>
+            {
+                hardwareTextBox.Text = text;
+            };
+
+            Callback callback = (ResponseFrame frame, Exception exc) =>
+            {
+                if (CheckForErrorsOrTimeout(frame, exc))
+                    return;
+
+                if (frame.ResponseCode == 0x05)
+                {
+                    byte[] data = frame.Data;
+
+                    Dispatcher.BeginInvoke(update, $"{data[0]}.{data[1]}");
+                }
+                ShowSuccessStatus();
+            };
+
+            tappyDriver.SendCommand(cmd, callback);
+        }
+
+        private void batteryButton_Click(object sender, RoutedEventArgs e)
+        {
+            ShowPendingStatus("");
+            Command cmd = new GetBatteryLevel();
+
+            Action<string> update = (string text) =>
+            {
+                batteryTextBox.Text = text;
+            };
+
+            Callback callback = (ResponseFrame frame, Exception exc) =>
+            {
+                if (CheckForErrorsOrTimeout(frame, exc))
+                    return;
+
+
+                if (frame.ResponseCode == 0x08)
+                {
+                    byte[] data = frame.Data;
+
+                    Dispatcher.BeginInvoke(update, $"{data[0]}%");
+                }
+                ShowSuccessStatus();
+            };
+
+            tappyDriver.SendCommand(cmd, callback);
         }
     }
 }

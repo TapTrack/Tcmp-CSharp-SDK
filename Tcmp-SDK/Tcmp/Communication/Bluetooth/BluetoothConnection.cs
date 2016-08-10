@@ -13,6 +13,7 @@ using Bluegiga.BLE.Events.ATTClient;
 using Bluegiga.BLE.Responses.GAP;
 using Bluegiga.BLE.Events.Connection;
 using Bluegiga.BLE.Responses.ATTClient;
+using TapTrack.Tcmp.Communication.Exceptions;
 
 namespace TapTrack.Tcmp.Communication.Bluetooth
 {
@@ -30,20 +31,11 @@ namespace TapTrack.Tcmp.Communication.Bluetooth
         private List<byte> tappyBuffer;
         private BluetoothDevice device;
         private List<BluetoothDevice> discoveredDevices;
-
-        private AutoResetEvent connectionRespEvent;
-
+        private bool isConnected;
 
         public BluetoothConnection()
         {
-            string portName = GetBluegigaDevice();
-
-            if (portName == null)
-                throw new InvalidOperationException("There is no BLED112 - Bluegiga Bluetooth Low Energy connected to this computer");
-
-            Debug.WriteLine($"Connecting to BLED112 on port {portName}");
-
-            port = new SerialPort(portName);
+            port = new SerialPort();
             port.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
             port.Handshake = Handshake.RequestToSend;
             port.BaudRate = 115200;
@@ -51,28 +43,23 @@ namespace TapTrack.Tcmp.Communication.Bluetooth
             port.StopBits = StopBits.One;
             port.Parity = Parity.None;
 
-            port.Open();
-            port.DiscardInBuffer();
-            port.DiscardOutBuffer();
-
-            connectionRespEvent = new AutoResetEvent(false);
-
             bluetooth = new Bluegiga.BGLib();
 
             discoveredDevices = new List<BluetoothDevice>();
             tappyBuffer = new List<byte>();
+            isConnected = false;
 
             // Bluegiga Events
 
             bluetooth.BLEEventATTClientAttributeValue += DataReceivedFromTappy;
+            bluetooth.BLEEventConnectionDisconnected += Bluetooth_BLEEventConnectionDisconnected;
         }
 
         private void DataReceivedHandler(object sender, SerialDataReceivedEventArgs e)
         {
-            SerialPort sp = (SerialPort)sender;
-            byte[] inData = new byte[sp.BytesToRead];
-            
-            sp.Read(inData, 0, sp.BytesToRead);
+            byte[] inData = new byte[port.BytesToRead];
+
+            port.Read(inData, 0, inData.Length);
 
             Debug.WriteLine("<= RX ({0}) [ {1}]", inData.Length, BitConverter.ToString(inData));
 
@@ -89,9 +76,10 @@ namespace TapTrack.Tcmp.Communication.Bluetooth
             OnDataReceived(e);
         }
 
-        private string GetBluegigaDevice()
+        private void Bluetooth_BLEEventConnectionDisconnected(object sender, DisconnectedEventArgs e)
         {
-            return Search("Win32_SerialPort") ?? Search("Win32_pnpEntity");
+            isConnected = false;
+            Debug.WriteLine($"Disconnected: {e.reason}");
         }
 
         private string Search(string searchLocation)
@@ -116,8 +104,40 @@ namespace TapTrack.Tcmp.Communication.Bluetooth
             return null;
         }
 
+        private string GetBluegigaDevice()
+        {
+            return Search("Win32_SerialPort") ?? Search("Win32_pnpEntity");
+        }
+
+        public bool ConnectToBluegiga()
+        {
+            string portName = GetBluegigaDevice();
+
+            if (portName == null)
+                return false;
+
+            try
+            {
+                if (port.IsOpen)
+                    port.Close();
+                port.PortName = portName;
+                port.Open();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         public override bool Connect(string deviceName)
         {
+            if (!port.IsOpen)
+            {
+                if (!ConnectToBluegiga())
+                    return false;
+            }
+
             bool commandStarted = false;
             bool connectionEst = false;
             byte connectionHandle = 0;
@@ -148,7 +168,7 @@ namespace TapTrack.Tcmp.Communication.Bluetooth
                 {
                     this.device = device;
                     this.device.ConnectionHandle = connectionHandle;
-                    bluetooth.SendCommand(this.port, bluetooth.BLECommandGAPConnectDirect(device.BluetoothAddress, 0, 10, 200, 1000, 10));
+                    bluetooth.SendCommand(this.port, bluetooth.BLECommandGAPConnectDirect(device.BluetoothAddress, 0, 20, 40, 100, 1));
                     resp.WaitOne(200);
                     if (commandStarted)
                     {
@@ -161,18 +181,35 @@ namespace TapTrack.Tcmp.Communication.Bluetooth
             bluetooth.BLEResponseGAPConnectDirect -= connectResp;
             bluetooth.BLEEventConnectionStatus -= connectionStatus;
 
+            if (connectionEst)
+                isConnected = true;
+
             return connectionEst;
+        }
+
+        public bool DisconnectBluegiga()
+        {
+            try
+            {
+                port.Close();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         public override void Disconnect()
         {
-            if (device?.ConnectionHandle != null)
+            if (device?.ConnectionHandle != null && port.IsOpen)
                 bluetooth.SendCommand(port, bluetooth.BLECommandConnectionDisconnect((byte)device.ConnectionHandle));
+            DisconnectBluegiga();
         }
 
         public override string[] GetAvailableDevices()
         {
-            return GetAvailableDevices(1000);
+            return GetAvailableDevices(1500);
         }
 
         public string[] GetAvailableDevices(int scanTime)
@@ -181,6 +218,12 @@ namespace TapTrack.Tcmp.Communication.Bluetooth
             bool commandStarted = false;
             AutoResetEvent resp = new AutoResetEvent(false);
             discoveredDevices.Clear();
+
+            if (!port.IsOpen)
+            {
+                if (!ConnectToBluegiga())
+                    return names.ToArray();
+            }
 
             DiscoverEventHandler discoverResp = delegate (object sender, DiscoverEventArgs e)
             {
@@ -209,11 +252,12 @@ namespace TapTrack.Tcmp.Communication.Bluetooth
             };
 
             bluetooth.BLEResponseGAPDiscover += discoverResp;
-            bluetooth.BLEEventGAPScanResponse += deviceFound;
 
             bluetooth.SendCommand(port, bluetooth.BLECommandGAPDiscover(2));
 
-            resp.WaitOne(750);
+            resp.WaitOne(200);
+
+            bluetooth.BLEEventGAPScanResponse += deviceFound;
             bluetooth.BLEResponseGAPDiscover -= discoverResp;
 
             if (!commandStarted)
@@ -232,11 +276,11 @@ namespace TapTrack.Tcmp.Communication.Bluetooth
 
         public override bool IsOpen()
         {
-            if (device == null)
+            if (!port.IsOpen)
                 return false;
-            if (device.ConnectionHandle == null)
+            if (device?.ConnectionHandle == null)
                 return false;
-            return true;
+            return isConnected;
         }
 
         public override int Read(List<byte> data)
@@ -251,45 +295,65 @@ namespace TapTrack.Tcmp.Communication.Bluetooth
 
         public override void Send(byte[] data)
         {
-            if (device?.ConnectionHandle != null)
+            try
             {
-                AutoResetEvent proceed = new AutoResetEvent(false);
-                ProcedureCompletedEventHandler complete = delegate (object sender, ProcedureCompletedEventArgs e)
+                if (device?.ConnectionHandle != null && isConnected)
                 {
-                    Debug.WriteLine("Bluetooth: write complete");
-                    proceed.Set();
-                };
-
-                bluetooth.BLEEventATTClientProcedureCompleted += complete;
-
-                if (data.Length > 20)
-                {
-                    
-                    List<byte> payload = new List<byte>(data);
-                    int total = data.Length;
-                    bool signal;
-
-                    for (int i = 0; i < Math.Ceiling((double)data.Length / 20); i++)
+                    AutoResetEvent proceed = new AutoResetEvent(false);
+                    ProcedureCompletedEventHandler complete = delegate (object sender, ProcedureCompletedEventArgs e)
                     {
-                        bluetooth.SendCommand(this.port,
-                            bluetooth.BLECommandATTClientAttributeWrite((byte)device.ConnectionHandle, (ushort)Handle.Write,
-                            payload.GetRange(i * 20, (total < 20) ? total : 20).ToArray())
-                        );
-                        total -= 20;
-                        signal = proceed.WaitOne(1000);
-                        if (!signal)
-                            break;
+                        Debug.WriteLine("Bluetooth: write complete");
+                        proceed.Set();
+                    };
+
+                    bluetooth.BLEEventATTClientProcedureCompleted += complete;
+
+                    if (data.Length > 20)
+                    {
+
+                        List<byte> payload = new List<byte>(data);
+                        int total = data.Length;
+                        bool signal;
+
+                        for (int i = 0; i < Math.Ceiling((double)data.Length / 20); i++)
+                        {
+                            bluetooth.SendCommand(this.port,
+                                bluetooth.BLECommandATTClientAttributeWrite((byte)device.ConnectionHandle, (ushort)Handle.Write,
+                                payload.GetRange(i * 20, (total < 20) ? total : 20).ToArray())
+                            );
+                            total -= 20;
+                            signal = proceed.WaitOne(200);
+                            if (!signal)
+                                break;
+                        }
                     }
+                    else
+                    {
+                        bluetooth.SendCommand(this.port, bluetooth.BLECommandATTClientAttributeWrite((byte)device.ConnectionHandle, (ushort)Handle.Write, data));
+                        proceed.WaitOne(200);
+                    }
+
+                    bluetooth.BLEEventATTClientProcedureCompleted -= complete;
                 }
                 else
                 {
-                    bluetooth.SendCommand(this.port, bluetooth.BLECommandATTClientAttributeWrite((byte)device.ConnectionHandle, (ushort)Handle.Write, data));
-                    proceed.WaitOne(1000);
+                    throw new HardwareException("There is no reader connected");
                 }
-
-                bluetooth.BLEEventATTClientProcedureCompleted -= complete;
             }
+            catch (InvalidOperationException e)
+            {
+                throw new HardwareException("There is no TappyUSB connected");
+            }
+        }
 
+        public override void Flush()
+        {
+            if (port.IsOpen)
+            {
+                port.DiscardInBuffer();
+                port.DiscardOutBuffer();
+            }
+            tappyBuffer.Clear();
         }
     }
 }

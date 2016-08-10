@@ -49,6 +49,16 @@ namespace TapTrack.Tcmp
         /// </summary>
         public int Length { get { return uid.Length; } }
 
+        public string UidToString()
+        {
+            StringBuilder builder = new StringBuilder();
+
+            foreach (byte b in uid)
+                builder.Append($"{b:X}".PadLeft(2, '0'));
+
+            return builder.ToString();
+        }
+
         public static string TypeLookUp(byte tagType)
         {
             if (tagType == 0x01)

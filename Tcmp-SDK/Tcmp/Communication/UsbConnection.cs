@@ -65,7 +65,7 @@ namespace TapTrack.Tcmp.Communication
             {
                 port.Write(data, 0, data.Length);
             }
-            catch (System.InvalidOperationException e)
+            catch (InvalidOperationException e)
             {
                 throw new HardwareException("There is no TappyUSB connected");
             }
@@ -89,6 +89,15 @@ namespace TapTrack.Tcmp.Communication
             Debug.WriteLine("");
 
             return count;
+        }
+
+        public override void Flush()
+        {
+            if (port.IsOpen)
+            {
+                port.DiscardInBuffer();
+                port.DiscardOutBuffer();
+            }
         }
     }
 }

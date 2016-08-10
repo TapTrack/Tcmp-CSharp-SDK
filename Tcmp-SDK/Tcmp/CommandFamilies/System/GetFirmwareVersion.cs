@@ -11,7 +11,7 @@
         {
             get
             {
-                return CommandCode;
+                return commandCode;
             }
         }
     }

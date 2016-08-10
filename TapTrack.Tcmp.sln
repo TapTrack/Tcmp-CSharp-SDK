@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TappyUSB Tcmp Demo", "Example\TappyUSB Tcmp Demo.csproj", "{0A4DA2F5-AECC-4D4A-A942-B1CCC9CA5237}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tappy Tcmp Demo", "Example\Tappy Tcmp Demo.csproj", "{0A4DA2F5-AECC-4D4A-A942-B1CCC9CA5237}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TapTrack.Tcmp", "Tcmp-SDK\TapTrack.Tcmp.csproj", "{CD277EF8-6666-4B0C-B482-9EAFA662732E}"
 EndProject

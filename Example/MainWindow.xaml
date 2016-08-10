@@ -8,7 +8,8 @@
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:gif="http://wpfanimatedgif.codeplex.com"
         mc:Ignorable="d"
-        Title="TappyUSB Demo" Height="650" Width="800" Foreground="{x:Null}" Background="{StaticResource LightBackground}">
+        WindowStartupLocation="CenterScreen"
+        Title="Tappy Demo 2.1" Height="650" Width="800" Foreground="{x:Null}" Background="{StaticResource LightBackground}">
     <Grid Background="{StaticResource LightBackground}">
         <Grid.RowDefinitions>
             <RowDefinition Height="50"/>
@@ -83,6 +84,17 @@
                     <TabItem Style="{StaticResource DetectNdefTab}">
                         <ScrollViewer VerticalScrollBarVisibility="Auto">
                             <StackPanel Background="{StaticResource DarkBackground}" Orientation="Vertical">
+                                <StackPanel Margin="10">
+                                    <TextBlock Foreground="White" TextWrapping="Wrap" FontSize="20" Margin="0,0,0,10">
+                                        Detect NDEF
+                                    </TextBlock>
+                                    <TextBlock Foreground="White" TextWrapping="Wrap">
+                                        A special space-efficient format is called the NFC Data Exchange Format (NDEF) is commonly used to 
+                                        store data on NFC tags in a manner that allows NFC readers to make sense of the tag contents. If a tag has been formatted 
+                                        to store NDEF data in a standards-compliant fashion, this operation can be 
+                                        to retrieve that information, as well as some information about the tag itself.
+                                    </TextBlock>
+                                </StackPanel>
                                 <Label Margin="10,10,0,0" Padding="0,0,0,10" Foreground="White" Content="Content"/>
                                 <TextBox Name="ndefData" AcceptsReturn="True" Style="{StaticResource TextBox}"></TextBox>
                                 <Button Name="readNdefButton" Margin="10" HorizontalAlignment="Right" Style="{StaticResource RoundButton}" Click="ReadNdefButton_Click">Read</Button>
@@ -91,6 +103,22 @@
                     </TabItem>
                     <TabItem Style="{StaticResource DetectTagTab}">
                         <StackPanel Background="{StaticResource DarkBackground}" Orientation="Vertical">
+                            <StackPanel Margin="10">
+                                <TextBlock Foreground="White" TextWrapping="Wrap" FontSize="20" Margin="0,0,0,10">
+                                    Detect Tag
+                                </TextBlock>
+                                <TextBlock Foreground="White" TextWrapping="Wrap">
+                                    Most NFC tags are identified by a 4-, 7-, or 10-byte unique serial number (UID). The tag
+                                    will also return additional information during the detection procedure that can be
+                                    used to identify what type of tag it is. However, there are collisions between 
+                                    certain types of tags, in which case the Tappy will report either a generic type
+                                    or attempt to heuristically determine the tag technology, depending on configuration.
+                                    If the Tappy reports that a tag is a 'generic' type, this means that the heuristics were
+                                    unable to determine the specific tag technology to a sufficient level of confidence.
+                                    Additionally, for security reasons, some advanced tags can be configured to report 
+                                    a dynamic UID, in which case the UID detected will change with every scan.
+                                </TextBlock>
+                            </StackPanel>
                             <Label Margin="10,10,0,0" Padding="0,0,0,10" Foreground="White" Content="UID"/>
                             <TextBox Name="uidTextBox" Style="{StaticResource TextBox}"></TextBox>
                             <Label Margin="10,0,0,0" Padding="0,0,0,10" Foreground="White" Content="Type"/>
@@ -100,6 +128,22 @@
                     </TabItem>
                     <TabItem Style="{StaticResource DetectTypeBTab}">
                         <StackPanel Background="{StaticResource DarkBackground}" Orientation="Vertical">
+                            <StackPanel Margin="10">
+                                <TextBlock Foreground="White" TextWrapping="Wrap" FontSize="20" Margin="0,0,0,10">
+                                    Detect Type 4B
+                                </TextBlock>
+                                <TextBlock Foreground="White" TextWrapping="Wrap">
+                                    Certain ISO14443-4 (Type 4) NFC tags make use of an alternative type of radio 
+                                    modulation referred to as Type B instead of the more common Type A.
+                                    <LineBreak/>
+                                    <LineBreak/>
+                                    The detection process and resulting information for Type 4B tags is distinctly
+                                    different from that for Type 4A tags, so the Tappy must be explicitly told to 
+                                    that it is scanning for a Type 4B tag. This tool may be used to detect these 
+                                    unusual tags; if you are instead scanning for Type 4A, please use the standard 
+                                    scanning tool.
+                                </TextBlock>
+                            </StackPanel>
                             <Label Margin="10,10,0,0" Padding="0,0,0,10" Foreground="White" Content="ATQB"/>
                             <TextBox Name="atqbTextBox"  Style="{StaticResource TextBox}"></TextBox>
                             <Label Margin="10,0,0,0" Padding="0,0,0,10" Foreground="White" Content="ATTRIB"/>
@@ -123,6 +167,21 @@
                     </TabControl.Resources>
                     <TabItem Header="Write URL" Style="{StaticResource WriteURL}">
                         <StackPanel  Background="{StaticResource DarkBackground}" Orientation="Vertical">
+                            <StackPanel Margin="10">
+                                <TextBlock Foreground="White" TextWrapping="Wrap" FontSize="20" Margin="0,0,0,10">
+                                    Write URI
+                                </TextBlock>
+                                <TextBlock Foreground="White" TextWrapping="Wrap">
+                                    Writes a single Uniform Resource Idenftifier (URI) record to a tag. 
+                                    When a person with an NFC-enabled Android device taps a tag written with
+                                    a URI, it will attempt to open the resource specified if it has an app installed
+                                    that can handle that type of resource. Most commonly this takes the form of a link
+                                    to a webpage that is subsequently opened in the user's browser (http:// or https://), but it can
+                                    also be one of many other types of URI including email addresses (mailto:), 
+                                    telephone numbers (tel:), sms text messagest (sms:), or even custom URIs
+                                    unique to certain apps.
+                                </TextBlock>
+                            </StackPanel>
                             <Label Margin="10,10,0,0" Padding="0,0,0,10" Foreground="White" Target="{Binding ElementName=urlTextBox}" Content="URL"/>
                             <TextBox Name="urlTextBox" Margin="10,0,20,20" Foreground="White" Background="{StaticResource LightBackground}" BorderBrush="#595959" BorderThickness="0,0,0,1" Text="http://"/>
                             <Button Name="writeURLButton" Margin="10" HorizontalAlignment="Right" Style="{StaticResource RoundButton}" Click="WriteURLButton_Click">Write</Button>
@@ -130,10 +189,94 @@
                     </TabItem>
                     <TabItem Style="{StaticResource WriteText}">
                         <StackPanel  Background="{StaticResource DarkBackground}" Orientation="Vertical">
+                            <StackPanel Margin="10">
+                                <TextBlock Foreground="White" TextWrapping="Wrap" FontSize="20" Margin="0,0,0,10">
+                                    Write Text
+                                </TextBlock>
+                                <TextBlock Foreground="White" TextWrapping="Wrap">
+                                    Write a single UTF-8 encoded text record to a tag.
+                                    When tapped by a stock Android device, the user will see
+                                    the text contents of this record in a built-in NDEF data
+                                    viewing application.
+                                </TextBlock>
+                            </StackPanel>
                             <Label Margin="10,10,0,0" Padding="0,0,0,10" Foreground="White" Target="{Binding ElementName=TextBox}" Content="Text"/>
                             <TextBox Name="TextBox" Margin="10,0,20,20" Foreground="White" Background="{StaticResource LightBackground}" BorderBrush="#595959" BorderThickness="0,0,0,1"/>
                             <Button Name="writeTextButton" Margin="10" HorizontalAlignment="Right" Style="{StaticResource RoundButton}" Click="WriteTextButton_Click">Write</Button>
                         </StackPanel>
+                    </TabItem>
+                    <TabItem Style="{StaticResource WriteMultiTab}">
+                        <DockPanel Background="{StaticResource DarkBackground}">
+                            <Grid DockPanel.Dock="Bottom" Background="{x:Null}">
+                                <WrapPanel HorizontalAlignment="Left" VerticalAlignment="Center">
+                                    <Button Name="addTextRowButton" Style="{StaticResource RoundButton}" Click="AddTextRowButton_Click">Add Text</Button>
+                                    <Button Name="addUriRowButton" Style="{StaticResource RoundButton}" Click="AddUriRowButton_Click">Add URI</Button>
+                                    <Button Style="{StaticResource RoundButton}" Click="ClearButton_Click">Clear</Button>
+                                </WrapPanel>
+                                <WrapPanel HorizontalAlignment="Right" VerticalAlignment="Center">
+                                    <Button Style="{StaticResource RoundButton}" Click="WriteMultNdef">Write</Button>
+                                </WrapPanel>
+                            </Grid>
+                            <StackPanel Margin="10" DockPanel.Dock="Top">
+                                <TextBlock Foreground="White" TextWrapping="Wrap" FontSize="20" Margin="0,0,0,10">
+                                    Write Multi-record NDEF Message
+                                </TextBlock>
+                                <TextBlock Foreground="White" TextWrapping="Wrap">
+                                    While the other write operations in this application write a message containing
+                                    only a single record to the tag, the NFC Data Exchange Format (NDEF) 
+                                    puts no limit on the number of records a message can contain. Using this
+                                    tool, you may compose a custom NDEF message containing however many text
+                                    and URI records you require in whatever order you choose. 
+                                    Note that the default Android NDEF tag detection system uses only the first
+                                    record to determine what app to dispatch the message to. Therefore, if the first
+                                    record on the tag is a URL, the user's browser will open and the rest of the contents
+                                    will be ignored.
+                                </TextBlock>
+                            </StackPanel>
+                            <DataGrid ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.HorizontalScrollBarVisibility="Auto" Background="{x:Null}" AutoGenerateColumns="False" Name="records" Margin="10" CanUserAddRows="False" Foreground="White">
+                                <DataGrid.RowHeaderWidth>0</DataGrid.RowHeaderWidth>
+                                <DataGrid.Resources>
+                                    <Style TargetType="{x:Type DataGridColumnHeader}">
+                                        <Setter Property="Background" Value="{StaticResource AccentHighLightDark}" />
+                                    </Style>
+                                    <Style TargetType="{x:Type DataGridCell}">
+                                        <Setter Property="Background" Value="{StaticResource DarkBackground}"/>
+                                        <Setter Property="BorderBrush" Value="{StaticResource LightBackground}"/>
+                                        <Style.Triggers>
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <Setter Property="Background" Value="{StaticResource LightBackground}"/>
+                                            </Trigger>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Background" Value="{StaticResource LightBackground}"/>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </DataGrid.Resources>
+                                <DataGrid.Columns>
+                                    <DataGridTemplateColumn Header="Type" Width="1*">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <ComboBox ItemsSource="{Binding Options}" SelectedItem="{Binding Selected}"/>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+
+                                    <DataGridTextColumn Header="Content" Binding="{Binding Content}" Width="4*">
+
+                                    </DataGridTextColumn>
+
+                                    <DataGridTemplateColumn Header="Remove" Width="1*">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Button Tag="{Binding Index}" Style="{StaticResource RoundButton}" Click="RemoveButton_Click">
+                                                    Remove
+                                                </Button>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </DockPanel>
                     </TabItem>
                     <TabItem Header="Write VCard" Style="{StaticResource WriteVCardTab}" Visibility="Hidden">
                         <ScrollViewer Background="{StaticResource DarkBackground}">
@@ -229,63 +372,6 @@
                             </StackPanel>
                         </ScrollViewer>
                     </TabItem>
-                    <TabItem Style="{StaticResource WriteMultiTab}">
-                        <DockPanel Background="{StaticResource DarkBackground}">
-                            <Grid DockPanel.Dock="Bottom" Background="{x:Null}">
-                                <WrapPanel HorizontalAlignment="Left" VerticalAlignment="Center">
-                                    <Button Name="addTextRowButton" Style="{StaticResource RoundButton}" Click="AddTextRowButton_Click">Add Text</Button>
-                                    <Button Name="addUriRowButton" Style="{StaticResource RoundButton}" Click="AddUriRowButton_Click">Add URI</Button>
-                                    <Button Style="{StaticResource RoundButton}" Click="ClearButton_Click">Clear</Button>
-                                </WrapPanel>
-                                <WrapPanel HorizontalAlignment="Right" VerticalAlignment="Center">
-                                    <Button Style="{StaticResource RoundButton}" Click="WriteMultNdef">Write</Button>
-                                </WrapPanel>
-                            </Grid>
-                            <DataGrid ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.HorizontalScrollBarVisibility="Auto" Background="{x:Null}" AutoGenerateColumns="False" Name="records" Margin="10" CanUserAddRows="False" Foreground="White">
-                                <DataGrid.RowHeaderWidth>0</DataGrid.RowHeaderWidth>
-                                <DataGrid.Resources>
-                                    <Style TargetType="{x:Type DataGridColumnHeader}">
-                                        <Setter Property="Background" Value="{StaticResource AccentHighLightDark}" />
-                                    </Style>
-                                    <Style TargetType="{x:Type DataGridCell}">
-                                        <Setter Property="Background" Value="{StaticResource DarkBackground}"/>
-                                        <Setter Property="BorderBrush" Value="{StaticResource LightBackground}"/>
-                                        <Style.Triggers>
-                                            <Trigger Property="IsSelected" Value="True">
-                                                <Setter Property="Background" Value="{StaticResource LightBackground}"/>
-                                            </Trigger>
-                                            <Trigger Property="IsMouseOver" Value="True">
-                                                <Setter Property="Background" Value="{StaticResource LightBackground}"/>
-                                            </Trigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </DataGrid.Resources>
-                                <DataGrid.Columns>
-                                    <DataGridTemplateColumn Header="Type" Width="1*">
-                                        <DataGridTemplateColumn.CellTemplate>
-                                            <DataTemplate>
-                                                <ComboBox ItemsSource="{Binding Options}" SelectedItem="{Binding Selected}"/>
-                                            </DataTemplate>
-                                        </DataGridTemplateColumn.CellTemplate>
-                                    </DataGridTemplateColumn>
-
-                                    <DataGridTextColumn Header="Content" Binding="{Binding Content}" Width="4*">
-
-                                    </DataGridTextColumn>
-
-                                    <DataGridTemplateColumn Header="Remove" Width="1*">
-                                        <DataGridTemplateColumn.CellTemplate>
-                                            <DataTemplate>
-                                                <Button Tag="{Binding Index}" Style="{StaticResource RoundButton}" Click="RemoveButton_Click">
-                                                    Remove
-                                                </Button>
-                                            </DataTemplate>
-                                        </DataGridTemplateColumn.CellTemplate>
-                                    </DataGridTemplateColumn>
-                                </DataGrid.Columns>
-                            </DataGrid>
-                        </DockPanel>
-                    </TabItem>
                 </TabControl>
             </TabItem>
             <TabItem Header="Utilities">
@@ -300,6 +386,28 @@
                     </TabControl.Resources>
                     <TabItem Style="{StaticResource LockTab}">
                         <StackPanel Background="{StaticResource DarkBackground}">
+                            <StackPanel Margin="10" DockPanel.Dock="Top">
+                                <TextBlock Foreground="White" TextWrapping="Wrap" FontSize="20" Margin="0,0,0,10">
+                                    Lock Tags
+                                </TextBlock>
+                                <TextBlock Foreground="White" TextWrapping="Wrap">
+                                    This operation instruct the Tappy to lock every tag it encounters until
+                                    you either issue a stop command or another instruction. Tag locking is an
+                                    irreversible operation that prevents the locked memory from ever being
+                                    rewritten, so it is advisable to make certain that any tags you lock
+                                    contain the information you desire. For more details on tag locking and 
+                                    NFC tag write protection in general, please read the 
+                                    <Hyperlink NavigateUri="http://www.taptrack.com/nfc-tag-write-protection/">NFC Tag Write Protection</Hyperlink>
+                                    whitepaper. Additionally, once you issue this
+                                    command, the Tappy will immediately start locking all tags it encounters,
+                                    so make sure there are not any tags you do not want locked in proximity to
+                                    the Tappy before initiating batch locking. Some tag technologies will allow
+                                    themselves to be 'locked' again when they are already locked, while others
+                                    will refuse to undergo locking a second time. Therefore, if you attempt to lock a tag
+                                    that is already locked, the Tappy will either report success or failure depending
+                                    on the type of tag that was presented.
+                                </TextBlock>
+                            </StackPanel>
                             <Button HorizontalAlignment="Right" Style="{StaticResource RoundButton}" Click="LockButton_Click">
                                 Lock
                             </Button>
@@ -307,6 +415,19 @@
                     </TabItem>
                     <TabItem Style="{StaticResource LaunchUrl}">
                         <StackPanel Background="{StaticResource DarkBackground}">
+                            <StackPanel Margin="10" DockPanel.Dock="Top">
+                                <TextBlock Foreground="White" TextWrapping="Wrap" FontSize="20" Margin="0,0,0,10">
+                                    Launch URLs
+                                </TextBlock>
+                                <TextBlock Foreground="White" TextWrapping="Wrap">
+                                    This operation instruct the Tappy to scan for NDEF-formatted tags.
+                                    When an NDEF-formatted tag is found, the first record will be checked
+                                    to determine if it is an NDEF URL record. If the first record is a URL
+                                    record, the utility will then launch the URL in your default browser.
+                                    This operation will continue until you stop it, perform another operation,
+                                    or a fatal error occurs.
+                                </TextBlock>
+                            </StackPanel>
                             <Button HorizontalAlignment="Right" Style="{StaticResource RoundButton}" Click="launchUrlButton_Click">
                                 Launch
                             </Button>
@@ -314,9 +435,40 @@
                     </TabItem>
                     <TabItem Style="{StaticResource PlatformConfig}">
                         <StackPanel Background="{StaticResource DarkBackground}">
+                            <StackPanel Margin="10" DockPanel.Dock="Top">
+                                <TextBlock Foreground="White" TextWrapping="Wrap" FontSize="20" Margin="0,0,0,10">
+                                    Configure Tags for TapTrack Platform
+                                </TextBlock>
+                                <TextBlock Foreground="White" TextWrapping="Wrap">
+                                    This operation instruct the Tappy to write the appropriate data
+                                    to every tag it encounters in order to enable it to be used with the
+                                    TapTrack Platform. Note, you will need to log into your platform account
+                                    in your default browser prior to using this tool. This tool also does not
+                                    make sure that you performed the second step of associating the tag with your
+                                    account, it only write the appropriate data to the tag and launches the 
+                                    appropriate URL, so please make sure to complete the association in your browser.
+                                </TextBlock>
+                            </StackPanel>
                             <Button HorizontalAlignment="Right" Style="{StaticResource RoundButton}" Click="configureTagForPlatform_Click">
                                 Start writing
                             </Button>
+                        </StackPanel>
+                    </TabItem>
+                    <TabItem Style="{StaticResource VersionTab}">
+                        <StackPanel Background="{StaticResource DarkBackground}" Orientation="Vertical">
+                            <TextBlock Margin="10" Foreground="White">Firmware Version</TextBlock>
+                            <TextBox Name="firmwareTextBox" Style="{StaticResource TextBox}"/>
+                            <Button Margin="0,0,10,0" Style="{StaticResource RoundButton}" HorizontalAlignment="Right" Click="firmwareVersionButton_Click">Get Firmware Version</Button>
+                            <TextBlock Margin="10" Foreground="White">Hardware Version</TextBlock>
+                            <TextBox Name="hardwareTextBox" Style="{StaticResource TextBox}"/>
+                            <Button Margin="0,0,10,0" Style="{StaticResource RoundButton}" HorizontalAlignment="Right" Click="hardwareVersionButton_Click">Get Hardware Version</Button>
+                        </StackPanel>
+                    </TabItem>
+                    <TabItem Name="batteryTab" Style="{StaticResource BatteryTab}">
+                        <StackPanel Background="{StaticResource DarkBackground}">
+                            <TextBlock Margin="10" Foreground="White">Battery Level</TextBlock>
+                            <TextBox Name="batteryTextBox" Style="{StaticResource TextBox}"/>
+                            <Button Margin="0,0,10,0" Style="{StaticResource RoundButton}" HorizontalAlignment="Right" Click="batteryButton_Click">Get Battery Level</Button>
                         </StackPanel>
                     </TabItem>
                 </TabControl>
