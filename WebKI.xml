@@ -14,7 +14,7 @@
   <HelpKINode Title="ApplicationErrorFrame.ErrorCode property" Url="html/b38d10dd-a092-fc86-8863-ac6ab6e83c2f.htm" />
   <HelpKINode Title="ApplicationErrorFrame.ErrorString property" Url="html/2db79699-960b-ecf7-ce77-4ce36c0fbd78.htm" />
   <HelpKINode Title="ApplicationErrorFrame.NfcStatus property" Url="html/e3307447-0b0d-5069-311d-8d2a6b1585f9.htm" />
-  <HelpKINode Title="AutoDetect method" Url="html/7e2d4518-f0ec-ebfe-bd49-456471adb613.htm" />
+  <HelpKINode Title="AutoDetect method" Url="html/c6c4d35e-36d1-99f3-319d-718d371c8558.htm" />
   <HelpKINode Title="BasicNfcCommand class">
     <HelpKINode Title="BasicNfcCommand Class" Url="html/0db69164-48cd-2d72-2c13-05f599140411.htm" />
     <HelpKINode Title="about BasicNfcCommand class" Url="html/0db69164-48cd-2d72-2c13-05f599140411.htm" />
@@ -26,7 +26,9 @@
   <HelpKINode Title="BasicNfcCommand.BasicNfcCommand constructor" Url="html/c2bb20cf-a770-0f3a-3a21-87acb6628bbf.htm" />
   <HelpKINode Title="BasicNfcCommand.commandFamily field" Url="html/ec574e0e-c98d-c033-7b6f-39b61ca579c6.htm" />
   <HelpKINode Title="BasicNfcCommand.CommandFamily property" Url="html/f57809c8-b5ce-483f-90cd-78710a083b5b.htm" />
+  <HelpKINode Title="Bluetooth enumeration member" Url="html/87f928cc-dbb1-91ff-713e-689ecd7af0fd.htm" />
   <HelpKINode Title="Buffer property" Url="html/dd4584f7-a291-9ce1-f1ba-3621d0a5e6f3.htm" />
+  <HelpKINode Title="BYTE_LOOKUP field" Url="html/78ba7056-dc5f-7525-e1fb-a48cc38ca046.htm" />
   <HelpKINode Title="CalculateCrc method" Url="html/1fa4cec0-dc9b-b1bf-8813-2bb6a578f7a2.htm" />
   <HelpKINode Title="CalculateLcs method" Url="html/0b12d17e-c46c-20c4-c2e8-d27dd2431df6.htm" />
   <HelpKINode Title="Callback delegate" Url="html/8e1a7610-7619-9b87-8572-afc409e43215.htm" />
@@ -45,6 +47,7 @@
   <HelpKINode Title="Command.Parameters property" Url="html/e0a6e024-6126-de59-feb2-15d3ddba2f04.htm" />
   <HelpKINode Title="CommandCode property">
     <HelpKINode Title="Command.CommandCode Property " Url="html/7a56e54e-05b3-6be7-b713-a028a4d1b652.htm" />
+    <HelpKINode Title="ConfigureSetting.CommandCode Property " Url="html/b4a3fafc-96da-45d1-a038-aa44463abb51.htm" />
     <HelpKINode Title="DetectMifare.CommandCode Property " Url="html/71c5c54d-a341-223a-9f4c-900fda16050b.htm" />
     <HelpKINode Title="DetectSingleNdef.CommandCode Property " Url="html/61172a39-b690-b64e-169b-950122167b7d.htm" />
     <HelpKINode Title="DetectSingleTagUid.CommandCode Property " Url="html/1f85ff2f-cf28-2c01-6fa4-90e0afb6fdbb.htm" />
@@ -94,7 +97,17 @@
   <HelpKINode Title="CommandFrame.CommandFrame constructor" Url="html/cb2ebb9e-fc09-5141-6ad0-16e8eb0fe95b.htm" />
   <HelpKINode Title="CommunicationProtocol enumeration" Url="html/87f928cc-dbb1-91ff-713e-689ecd7af0fd.htm" />
   <HelpKINode Title="CompareCommandFamilies method" Url="html/6a32c550-504f-fc85-5261-a9eeef244d1d.htm" />
-  <HelpKINode Title="ConfigurePlatform method" Url="html/e54b4e14-1481-86c6-8837-cdc42d9efb7e.htm" />
+  <HelpKINode Title="ConfigureSetting class">
+    <HelpKINode Title="ConfigureSetting Class" Url="html/bf77e23c-1f64-7137-a9b3-d25463a730b1.htm" />
+    <HelpKINode Title="about ConfigureSetting class" Url="html/bf77e23c-1f64-7137-a9b3-d25463a730b1.htm" />
+    <HelpKINode Title="constructor" Url="html/f45ecf4b-8847-6358-f705-87fde4a4c92c.htm" />
+    <HelpKINode Title="fields" Url="html/229490bd-904a-2844-4ae7-a1e786afd106.htm" />
+    <HelpKINode Title="methods" Url="html/ba0899a5-62db-077c-b89a-1cacc4e9ea6a.htm" />
+    <HelpKINode Title="properties" Url="html/adad94af-a36e-8e69-100f-6c1d96a922e0.htm" />
+  </HelpKINode>
+  <HelpKINode Title="ConfigureSetting.CommandCode property" Url="html/b4a3fafc-96da-45d1-a038-aa44463abb51.htm" />
+  <HelpKINode Title="ConfigureSetting.ConfigureSetting constructor" Url="html/f45ecf4b-8847-6358-f705-87fde4a4c92c.htm" />
+  <HelpKINode Title="Connect method" Url="html/7dd43da1-f9d7-4bfc-f90c-64c51993c198.htm" />
   <HelpKINode Title="contents field" Url="html/536fe769-eefd-f147-6819-11fe653e9aa0.htm" />
   <HelpKINode Title="Crc property" Url="html/0538d825-3c13-7415-feb6-7b7e73443683.htm" />
   <HelpKINode Title="Data property" Url="html/7065bf8d-ca0d-b1af-eae8-34e3a2e0c292.htm" />
@@ -168,24 +181,25 @@
   </HelpKINode>
   <HelpKINode Title="DetectType4BAfi.CommandCode property" Url="html/7f4112c8-511b-fcd4-7622-82b9703e7963.htm" />
   <HelpKINode Title="DetectType4BAfi.DetectType4BAfi constructor" Url="html/79c9c7ce-2cca-b0ef-a4dc-0e555f439b94.htm" />
-  <HelpKINode Title="Driver class">
-    <HelpKINode Title="Driver Class" Url="html/9d967ac6-997a-8074-791f-58b2622c3a63.htm" />
-    <HelpKINode Title="about Driver class" Url="html/9d967ac6-997a-8074-791f-58b2622c3a63.htm" />
-    <HelpKINode Title="constructor" Url="html/7a83e20b-5102-e4fa-a541-0e7a73cf6ced.htm" />
-    <HelpKINode Title="methods" Url="html/39af5a3e-19d8-7e79-7a9b-a945e162d1ff.htm" />
+  <HelpKINode Title="DeviceName property" Url="html/9ada99f4-9589-5137-147e-cbe6ed985226.htm" />
+  <HelpKINode Title="Disconnect method" Url="html/03ac9058-1f06-b62e-c747-e40ff257e7f1.htm" />
+  <HelpKINode Title="Dispose method" Url="html/ad0f08f1-deb5-cb54-3ccf-4d24d5bf483e.htm" />
+  <HelpKINode Title="EnableDataThrottling class">
+    <HelpKINode Title="EnableDataThrottling Class" Url="html/dc0c006f-f562-781c-af2d-c74d82984d6b.htm" />
+    <HelpKINode Title="about EnableDataThrottling class" Url="html/dc0c006f-f562-781c-af2d-c74d82984d6b.htm" />
+    <HelpKINode Title="constructor" Url="html/acd6e340-619c-6c1e-8407-3a3804bc0f92.htm" />
+    <HelpKINode Title="fields" Url="html/181ba418-47f3-41c2-73ba-addc523f2a7e.htm" />
+    <HelpKINode Title="methods" Url="html/9bf7a679-2b17-a43e-16e8-1495c44717f1.htm" />
+    <HelpKINode Title="properties" Url="html/0426bb79-1088-63f0-4043-390afeea24da.htm" />
   </HelpKINode>
-  <HelpKINode Title="Driver.AutoDetect method" Url="html/7e2d4518-f0ec-ebfe-bd49-456471adb613.htm" />
-  <HelpKINode Title="Driver.ConfigurePlatform method" Url="html/e54b4e14-1481-86c6-8837-cdc42d9efb7e.htm" />
-  <HelpKINode Title="Driver.Driver constructor" Url="html/7a83e20b-5102-e4fa-a541-0e7a73cf6ced.htm" />
-  <HelpKINode Title="Driver.FlushBuffer method" Url="html/d3c4e07b-9d13-2055-548d-8ef20cd57d1a.htm" />
-  <HelpKINode Title="Driver.GetAvailableDevices method" Url="html/d0c52751-890e-0744-6756-dc3ea48c9ce8.htm" />
-  <HelpKINode Title="Driver.SendCommand method" Url="html/1f693e9a-9176-ffba-f9dd-06b1cbadd3f6.htm" />
+  <HelpKINode Title="EnableDataThrottling enumeration member" Url="html/8f0beb62-44b0-2a8f-a103-07eb06bb01df.htm" />
+  <HelpKINode Title="EnableDataThrottling.EnableDataThrottling constructor" Url="html/acd6e340-619c-6c1e-8407-3a3804bc0f92.htm" />
   <HelpKINode Title="ErrorByte property" Url="html/8604b4f4-f99d-642f-6e9f-f27098c53a51.htm" />
   <HelpKINode Title="ErrorCode property" Url="html/b38d10dd-a092-fc86-8863-ac6ab6e83c2f.htm" />
   <HelpKINode Title="ErrorString property" Url="html/2db79699-960b-ecf7-ce77-4ce36c0fbd78.htm" />
-  <HelpKINode Title="FlushBuffer method" Url="html/d3c4e07b-9d13-2055-548d-8ef20cd57d1a.htm" />
+  <HelpKINode Title="FlushBuffer method" Url="html/4e49df87-077d-9ae9-d723-3dce4005fae5.htm" />
   <HelpKINode Title="FrameLength property" Url="html/9914a352-3881-0f92-427a-3a8661dde3b4.htm" />
-  <HelpKINode Title="GetAvailableDevices method" Url="html/d0c52751-890e-0744-6756-dc3ea48c9ce8.htm" />
+  <HelpKINode Title="GetAvailableDevices method" Url="html/d9735f42-fb85-7fc6-b997-a67489759447.htm" />
   <HelpKINode Title="GetBasicCmdFamilyVersion class">
     <HelpKINode Title="GetBasicCmdFamilyVersion Class" Url="html/bfafafda-9a52-9b4e-fa61-3218d03315ed.htm" />
     <HelpKINode Title="about GetBasicCmdFamilyVersion class" Url="html/bfafafda-9a52-9b4e-fa61-3218d03315ed.htm" />
@@ -206,6 +220,7 @@
   </HelpKINode>
   <HelpKINode Title="GetBatteryLevel.CommandCode property" Url="html/ecd4e495-ccff-c3b2-47a1-dcb7f29a4a12.htm" />
   <HelpKINode Title="GetBatteryLevel.GetBatteryLevel constructor" Url="html/5ac50c2b-b582-07a4-b160-ad552fe0d61c.htm" />
+  <HelpKINode Title="GetCode method" Url="html/ae903827-d235-5b48-47f1-8418d4da0cde.htm" />
   <HelpKINode Title="GetFirmwareVersion class">
     <HelpKINode Title="GetFirmwareVersion Class" Url="html/dd3895a1-1e6c-7115-85b4-603e5bbefbfd.htm" />
     <HelpKINode Title="about GetFirmwareVersion class" Url="html/dd3895a1-1e6c-7115-85b4-603e5bbefbfd.htm" />
@@ -291,9 +306,26 @@
   <HelpKINode Title="MifareClassicCommand.commandFamily field" Url="html/b06fd9f1-ce26-d7a8-32da-7f55d6d65fa7.htm" />
   <HelpKINode Title="MifareClassicCommand.CommandFamily property" Url="html/c448d314-701a-ee36-6b76-ad1acc0ea658.htm" />
   <HelpKINode Title="MifareClassicCommand.MifareClassicCommand constructor" Url="html/079e38eb-3d08-0920-5e96-ae1ebc043434.htm" />
+  <HelpKINode Title="NdefUri class">
+    <HelpKINode Title="NdefUri Class" Url="html/a76fd994-3bc2-c9f5-5dcc-5ad2eff45c70.htm" />
+    <HelpKINode Title="about NdefUri class" Url="html/a76fd994-3bc2-c9f5-5dcc-5ad2eff45c70.htm" />
+    <HelpKINode Title="constructor" Url="html/d6e9540f-140a-f385-d203-652da2cca36a.htm" />
+    <HelpKINode Title="fields" Url="html/855b2270-cd98-7e5b-639e-d345d0e3b74a.htm" />
+    <HelpKINode Title="methods" Url="html/178b54fe-33f9-7dd9-d3d1-561a6d118ecb.htm" />
+    <HelpKINode Title="properties" Url="html/c9b33ccb-f023-24ff-9649-2c767ecb212f.htm" />
+  </HelpKINode>
+  <HelpKINode Title="NdefUri.BYTE_LOOKUP field" Url="html/78ba7056-dc5f-7525-e1fb-a48cc38ca046.htm" />
+  <HelpKINode Title="NdefUri.GetCode method" Url="html/ae903827-d235-5b48-47f1-8418d4da0cde.htm" />
+  <HelpKINode Title="NdefUri.NdefUri constructor" Url="html/d6e9540f-140a-f385-d203-652da2cca36a.htm" />
+  <HelpKINode Title="NdefUri.Path property" Url="html/88878bff-33c1-2538-ac80-16a802759637.htm" />
+  <HelpKINode Title="NdefUri.RemoveScheme method" Url="html/cb6d83b4-4fc0-7025-023d-052cd30cf726.htm" />
+  <HelpKINode Title="NdefUri.Scheme property" Url="html/ded82be3-6f63-1673-5a87-2d06f7512551.htm" />
+  <HelpKINode Title="NdefUri.STRING_LOOKUP field" Url="html/b3525636-8b35-2a94-aa42-86221afeb7f6.htm" />
+  <HelpKINode Title="NdefUri.ToString method" Url="html/54fcc7c1-083c-c53e-466e-150e81afda63.htm" />
   <HelpKINode Title="NfcStatus property" Url="html/e3307447-0b0d-5069-311d-8d2a6b1585f9.htm" />
   <HelpKINode Title="parameters field" Url="html/8e273a9e-c9d3-7c30-c418-852c32bfbbc2.htm" />
   <HelpKINode Title="Parameters property" Url="html/e0a6e024-6126-de59-feb2-15d3ddba2f04.htm" />
+  <HelpKINode Title="Path property" Url="html/88878bff-33c1-2538-ac80-16a802759637.htm" />
   <HelpKINode Title="Ping class">
     <HelpKINode Title="Ping Class" Url="html/cd48ed57-9b50-1a62-03d3-7d5aa2c1103d.htm" />
     <HelpKINode Title="about Ping class" Url="html/cd48ed57-9b50-1a62-03d3-7d5aa2c1103d.htm" />
@@ -315,6 +347,7 @@
   <HelpKINode Title="ReadBlock.CommandCode property" Url="html/7c080d56-d37d-fc8b-5b46-a1939871b0b3.htm" />
   <HelpKINode Title="ReadBlock.ReadBlock constructor" Url="html/0af8c853-acd7-9416-4a71-040199229a12.htm" />
   <HelpKINode Title="RemoveEscapseCharacters method" Url="html/d74b3d04-f6e0-60e1-c93b-177548b471e9.htm" />
+  <HelpKINode Title="RemoveScheme method" Url="html/cb6d83b4-4fc0-7025-023d-052cd30cf726.htm" />
   <HelpKINode Title="ResponseCode property" Url="html/7c39dac2-7e99-2a6e-73bc-a02f3e99b7e6.htm" />
   <HelpKINode Title="ResponseFrame class">
     <HelpKINode Title="ResponseFrame Class" Url="html/dbc4b78d-7218-5c0c-0073-3ae5746a248e.htm" />
@@ -327,7 +360,17 @@
   <HelpKINode Title="ResponseFrame.IsApplicationErrorFrame method" Url="html/24dfb85f-8527-bd45-7a4b-681d7a19c406.htm" />
   <HelpKINode Title="ResponseFrame.ResponseCode property" Url="html/7c39dac2-7e99-2a6e-73bc-a02f3e99b7e6.htm" />
   <HelpKINode Title="ResponseFrame.ResponseFrame constructor" Url="html/ebb40cfb-e3bf-25f9-6a3b-e1ea8beb0541.htm" />
-  <HelpKINode Title="SendCommand method" Url="html/1f693e9a-9176-ffba-f9dd-06b1cbadd3f6.htm" />
+  <HelpKINode Title="Scheme property" Url="html/ded82be3-6f63-1673-5a87-2d06f7512551.htm" />
+  <HelpKINode Title="SendCommand method" Url="html/648d1274-e118-01fb-8740-d3631fc8d378.htm" />
+  <HelpKINode Title="SetType2TagIdentification class">
+    <HelpKINode Title="SetType2TagIdentification Class" Url="html/f469c4a4-5ed6-0d33-fcef-f2270e5f1810.htm" />
+    <HelpKINode Title="about SetType2TagIdentification class" Url="html/f469c4a4-5ed6-0d33-fcef-f2270e5f1810.htm" />
+    <HelpKINode Title="constructor" Url="html/2d6a8a1e-0db8-aba4-3bb1-7cf3ffe2f51f.htm" />
+    <HelpKINode Title="fields" Url="html/463eb40f-818d-569f-8176-3816a4819304.htm" />
+    <HelpKINode Title="methods" Url="html/f1424f79-bc48-eebc-52fa-a59f4b9d6535.htm" />
+    <HelpKINode Title="properties" Url="html/2be54b1c-7a57-595e-7af0-21f137f26555.htm" />
+  </HelpKINode>
+  <HelpKINode Title="SetType2TagIdentification.SetType2TagIdentification constructor" Url="html/2d6a8a1e-0db8-aba4-3bb1-7cf3ffe2f51f.htm" />
   <HelpKINode Title="Stop class">
     <HelpKINode Title="Stop Class" Url="html/2c1d456b-30c2-2739-260f-64657629749a.htm" />
     <HelpKINode Title="about Stop class" Url="html/2c1d456b-30c2-2739-260f-64657629749a.htm" />
@@ -358,6 +401,8 @@
   </HelpKINode>
   <HelpKINode Title="StreamUid.CommandCode property" Url="html/12d32f73-34bf-333e-35b0-c712711ffe1f.htm" />
   <HelpKINode Title="StreamUid.StreamUid constructor" Url="html/248246d2-c791-e961-1360-4d1cd2517590.htm" />
+  <HelpKINode Title="STRING_LOOKUP field" Url="html/b3525636-8b35-2a94-aa42-86221afeb7f6.htm" />
+  <HelpKINode Title="SwitchProtocol method" Url="html/90b65cbe-4d3f-d910-749b-8204e9023a4c.htm" />
   <HelpKINode Title="SystemCommand class">
     <HelpKINode Title="SystemCommand Class" Url="html/f342a532-1f2e-1bd1-ea92-4516bc0f602e.htm" />
     <HelpKINode Title="about SystemCommand class" Url="html/f342a532-1f2e-1bd1-ea92-4516bc0f602e.htm" />
@@ -378,8 +423,10 @@
   </HelpKINode>
   <HelpKINode Title="Tag.Length property" Url="html/5d48f96b-264c-ad0b-2e6d-6ec3ecae0627.htm" />
   <HelpKINode Title="Tag.Tag constructor" Url="html/84f26e35-8cd4-2a45-5cee-56a06607d2e5.htm" />
+  <HelpKINode Title="Tag.TypeLookUp method" Url="html/8c407528-5ac2-fb42-c8f0-b497ef770023.htm" />
   <HelpKINode Title="Tag.TypeOfTag property" Url="html/702a3700-9233-0478-bece-68a7573fc642.htm" />
   <HelpKINode Title="Tag.UID property" Url="html/9e4d7811-bcfe-6de3-53ce-d7c8d924983b.htm" />
+  <HelpKINode Title="Tag.UidToString method" Url="html/c2dfeb7b-620f-1af4-7cb3-ca7a6768ccba.htm" />
   <HelpKINode Title="TappyError class">
     <HelpKINode Title="TappyError Class" Url="html/150e0aa0-f6f1-d141-fd7a-40ae45905afc.htm" />
     <HelpKINode Title="about TappyError class" Url="html/150e0aa0-f6f1-d141-fd7a-40ae45905afc.htm" />
@@ -388,6 +435,26 @@
   </HelpKINode>
   <HelpKINode Title="TappyError.LookUp method" Url="html/72aa77d9-599c-e6f5-f348-8059054c751e.htm" />
   <HelpKINode Title="TappyError.TappyError constructor" Url="html/94fc8a5c-0641-10da-7e77-179b9505b130.htm" />
+  <HelpKINode Title="TappyReader class">
+    <HelpKINode Title="TappyReader Class" Url="html/4942dd89-0f4d-c5b4-52a7-2885022aeb6a.htm" />
+    <HelpKINode Title="about TappyReader class" Url="html/4942dd89-0f4d-c5b4-52a7-2885022aeb6a.htm" />
+    <HelpKINode Title="constructor" Url="html/432d1fa9-b4d1-7e91-80f2-7eb78d16b3a4.htm" />
+    <HelpKINode Title="methods" Url="html/69716b89-685b-9c9e-6eee-72726e1249ce.htm" />
+    <HelpKINode Title="properties" Url="html/e327205e-1a40-7527-efcb-334a13e8ec63.htm" />
+  </HelpKINode>
+  <HelpKINode Title="TappyReader.AutoDetect method" Url="html/c6c4d35e-36d1-99f3-319d-718d371c8558.htm" />
+  <HelpKINode Title="TappyReader.Connect method" Url="html/7dd43da1-f9d7-4bfc-f90c-64c51993c198.htm" />
+  <HelpKINode Title="TappyReader.DeviceName property" Url="html/9ada99f4-9589-5137-147e-cbe6ed985226.htm" />
+  <HelpKINode Title="TappyReader.Disconnect method" Url="html/03ac9058-1f06-b62e-c747-e40ff257e7f1.htm" />
+  <HelpKINode Title="TappyReader.Dispose method" Url="html/ad0f08f1-deb5-cb54-3ccf-4d24d5bf483e.htm" />
+  <HelpKINode Title="TappyReader.FlushBuffer method" Url="html/4e49df87-077d-9ae9-d723-3dce4005fae5.htm" />
+  <HelpKINode Title="TappyReader.GetAvailableDevices method" Url="html/d9735f42-fb85-7fc6-b997-a67489759447.htm" />
+  <HelpKINode Title="TappyReader.SendCommand method" Url="html/648d1274-e118-01fb-8740-d3631fc8d378.htm" />
+  <HelpKINode Title="TappyReader.SwitchProtocol method" Url="html/90b65cbe-4d3f-d910-749b-8204e9023a4c.htm" />
+  <HelpKINode Title="TappyReader.TappyReader constructor" Url="html/432d1fa9-b4d1-7e91-80f2-7eb78d16b3a4.htm" />
+  <HelpKINode Title="TappySetting enumeration" Url="html/8f0beb62-44b0-2a8f-a103-07eb06bb01df.htm" />
+  <HelpKINode Title="TapTrack.Ndef namespace" Url="html/1ca3b56e-f8cd-6b37-fddc-5a6a55ef875a.htm" />
+  <HelpKINode Title="TapTrack.Ndef.NdefUri class" Url="html/a76fd994-3bc2-c9f5-5dcc-5ad2eff45c70.htm" />
   <HelpKINode Title="TapTrack.Tcmp namespace" Url="html/ad60ec6c-f16b-9c28-1d86-548eaf4ba58a.htm" />
   <HelpKINode Title="TapTrack.Tcmp.CommandFamilies namespace" Url="html/31813a0f-1f84-8544-04ba-8da49038e4a1.htm" />
   <HelpKINode Title="TapTrack.Tcmp.CommandFamilies.BasicNfc namespace" Url="html/54ea79a3-bced-385b-4399-aadaab3c177c.htm" />
@@ -411,11 +478,15 @@
   <HelpKINode Title="TapTrack.Tcmp.CommandFamilies.MifareClassic.MifareClassicCommand class" Url="html/9ab09294-3ba3-a20d-0e00-80290bba004c.htm" />
   <HelpKINode Title="TapTrack.Tcmp.CommandFamilies.MifareClassic.ReadBlock class" Url="html/966e6b0c-1c1f-4632-52ce-79018e59e347.htm" />
   <HelpKINode Title="TapTrack.Tcmp.CommandFamilies.System namespace" Url="html/51825c70-4d04-4392-249b-8e6e957e2625.htm" />
+  <HelpKINode Title="TapTrack.Tcmp.CommandFamilies.System.ConfigureSetting class" Url="html/bf77e23c-1f64-7137-a9b3-d25463a730b1.htm" />
+  <HelpKINode Title="TapTrack.Tcmp.CommandFamilies.System.EnableDataThrottling class" Url="html/dc0c006f-f562-781c-af2d-c74d82984d6b.htm" />
   <HelpKINode Title="TapTrack.Tcmp.CommandFamilies.System.GetBatteryLevel class" Url="html/fa1c8f8a-1e39-9191-099c-57727c84c474.htm" />
   <HelpKINode Title="TapTrack.Tcmp.CommandFamilies.System.GetFirmwareVersion class" Url="html/dd3895a1-1e6c-7115-85b4-603e5bbefbfd.htm" />
   <HelpKINode Title="TapTrack.Tcmp.CommandFamilies.System.GetHardwareVersion class" Url="html/fa99a6c5-758e-7426-5ba5-0c78736683fb.htm" />
   <HelpKINode Title="TapTrack.Tcmp.CommandFamilies.System.Ping class" Url="html/cd48ed57-9b50-1a62-03d3-7d5aa2c1103d.htm" />
+  <HelpKINode Title="TapTrack.Tcmp.CommandFamilies.System.SetType2TagIdentification class" Url="html/f469c4a4-5ed6-0d33-fcef-f2270e5f1810.htm" />
   <HelpKINode Title="TapTrack.Tcmp.CommandFamilies.System.SystemCommand class" Url="html/f342a532-1f2e-1bd1-ea92-4516bc0f602e.htm" />
+  <HelpKINode Title="TapTrack.Tcmp.CommandFamilies.System.TappySetting enumeration" Url="html/8f0beb62-44b0-2a8f-a103-07eb06bb01df.htm" />
   <HelpKINode Title="TapTrack.Tcmp.CommandFamilies.Type4 namespace" Url="html/de021956-f734-f8c1-5ce4-528a252a21d3.htm" />
   <HelpKINode Title="TapTrack.Tcmp.CommandFamilies.Type4.DetectType4A class" Url="html/5a557a91-e190-8436-34b2-5d527c877d59.htm" />
   <HelpKINode Title="TapTrack.Tcmp.CommandFamilies.Type4.DetectType4B class" Url="html/eeb1e7d1-6b1f-03f2-8a52-5c517501189f.htm" />
@@ -428,12 +499,12 @@
   <HelpKINode Title="TapTrack.Tcmp.Communication.Callback delegate" Url="html/8e1a7610-7619-9b87-8572-afc409e43215.htm" />
   <HelpKINode Title="TapTrack.Tcmp.Communication.CommandFrame class" Url="html/f22702b8-ff38-db12-c8be-3c9009fea94c.htm" />
   <HelpKINode Title="TapTrack.Tcmp.Communication.CommunicationProtocol enumeration" Url="html/87f928cc-dbb1-91ff-713e-689ecd7af0fd.htm" />
-  <HelpKINode Title="TapTrack.Tcmp.Communication.Driver class" Url="html/9d967ac6-997a-8074-791f-58b2622c3a63.htm" />
   <HelpKINode Title="TapTrack.Tcmp.Communication.Exceptions namespace" Url="html/710bf013-fbaa-256a-8f3c-8f5b0aaadc9c.htm" />
   <HelpKINode Title="TapTrack.Tcmp.Communication.Exceptions.HardwareException class" Url="html/5601ae16-d79a-3c58-eae1-facccb71c128.htm" />
   <HelpKINode Title="TapTrack.Tcmp.Communication.LcsException class" Url="html/6444ae40-588c-95cc-807f-edfc7f51dd4f.htm" />
   <HelpKINode Title="TapTrack.Tcmp.Communication.ResponseFrame class" Url="html/dbc4b78d-7218-5c0c-0073-3ae5746a248e.htm" />
   <HelpKINode Title="TapTrack.Tcmp.Communication.TappyError class" Url="html/150e0aa0-f6f1-d141-fd7a-40ae45905afc.htm" />
+  <HelpKINode Title="TapTrack.Tcmp.Communication.TappyReader class" Url="html/4942dd89-0f4d-c5b4-52a7-2885022aeb6a.htm" />
   <HelpKINode Title="TapTrack.Tcmp.Communication.TcmpFrame class" Url="html/f59470a6-6179-4170-1202-746b04bbc378.htm" />
   <HelpKINode Title="TapTrack.Tcmp.Tag class" Url="html/d1702ef2-70fc-cec2-07fd-f68fe2f37ef9.htm" />
   <HelpKINode Title="TcmpFrame class">
@@ -467,6 +538,7 @@
   <HelpKINode Title="TcmpFrame.ToArray method" Url="html/d476929c-db59-e232-f71d-182c5e42ee4e.htm" />
   <HelpKINode Title="TcmpFrame.UpdateCrc method" Url="html/49749f04-eded-4f03-3c81-a2f94367de67.htm" />
   <HelpKINode Title="ToArray method" Url="html/d476929c-db59-e232-f71d-182c5e42ee4e.htm" />
+  <HelpKINode Title="ToString method" Url="html/54fcc7c1-083c-c53e-466e-150e81afda63.htm" />
   <HelpKINode Title="TransceiveAPDU class">
     <HelpKINode Title="TransceiveAPDU Class" Url="html/c9518b71-3e52-afdb-a6d6-aa8c4e23cee0.htm" />
     <HelpKINode Title="about TransceiveAPDU class" Url="html/c9518b71-3e52-afdb-a6d6-aa8c4e23cee0.htm" />
@@ -478,6 +550,7 @@
   <HelpKINode Title="TransceiveAPDU.CommandCode property" Url="html/6f11f153-bd14-cf34-c172-d7a084475425.htm" />
   <HelpKINode Title="TransceiveAPDU.TransceiveAPDU constructor" Url="html/340ffbd6-0bb8-43a1-3b86-f69445fe2af9.htm" />
   <HelpKINode Title="Type1 enumeration member" Url="html/e63baa77-2f86-a68b-47ec-27a9124b3032.htm" />
+  <HelpKINode Title="Type2TagIdentification enumeration member" Url="html/8f0beb62-44b0-2a8f-a103-07eb06bb01df.htm" />
   <HelpKINode Title="Type2Type4AandMifare enumeration member" Url="html/e63baa77-2f86-a68b-47ec-27a9124b3032.htm" />
   <HelpKINode Title="Type4B enumeration member" Url="html/e63baa77-2f86-a68b-47ec-27a9124b3032.htm" />
   <HelpKINode Title="Type4Command class">
@@ -491,8 +564,10 @@
   <HelpKINode Title="Type4Command.commandFamily field" Url="html/1b873bc4-3de7-3883-9441-a25f4e882ff5.htm" />
   <HelpKINode Title="Type4Command.CommandFamily property" Url="html/1c26cfd9-8d02-3e24-246d-8dd9ce1cf3a5.htm" />
   <HelpKINode Title="Type4Command.Type4Command constructor" Url="html/9ea78fcd-8d97-925a-6d27-9feb81de6659.htm" />
+  <HelpKINode Title="TypeLookUp method" Url="html/8c407528-5ac2-fb42-c8f0-b497ef770023.htm" />
   <HelpKINode Title="TypeOfTag property" Url="html/702a3700-9233-0478-bece-68a7573fc642.htm" />
   <HelpKINode Title="UID property" Url="html/9e4d7811-bcfe-6de3-53ce-d7c8d924983b.htm" />
+  <HelpKINode Title="UidToString method" Url="html/c2dfeb7b-620f-1af4-7cb3-ca7a6768ccba.htm" />
   <HelpKINode Title="UpdateCrc method" Url="html/49749f04-eded-4f03-3c81-a2f94367de67.htm" />
   <HelpKINode Title="Usb enumeration member" Url="html/87f928cc-dbb1-91ff-713e-689ecd7af0fd.htm" />
   <HelpKINode Title="WriteCustomNdef class">
