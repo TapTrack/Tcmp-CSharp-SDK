@@ -487,7 +487,7 @@
                                 <GroupBox Header="Type 2 Tag identification" Foreground="White">
                                     <StackPanel Orientation="Vertical" Margin="10">
                                         <TextBlock TextWrapping="Wrap">
-                                            Enabling this setting causes the detect tag command to find the exact manufacturer and model of the chip of a Type 2 Tag
+                                            Enabling this setting causes the detect tag command to find the exact manufacturer and model of a Type 2 Tag
                                         </TextBlock>
                                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                                             <Button VerticalAlignment="Center" Style="{StaticResource RoundButton}" Click="enableType2Button_Click">
