@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace TapTrack.Tcmp.Communication
 {
-    internal abstract class Connection
+    internal abstract class Connection : IDisposable
     {
         public event EventHandler DataReceived;
 
@@ -23,5 +23,6 @@ namespace TapTrack.Tcmp.Communication
         public abstract string[] GetAvailableDevices();
         public abstract bool IsOpen();
         public abstract void Flush();
+        public abstract void Dispose();
     }
 }

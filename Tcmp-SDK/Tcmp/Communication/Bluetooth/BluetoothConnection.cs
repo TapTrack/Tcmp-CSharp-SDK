@@ -32,6 +32,7 @@ namespace TapTrack.Tcmp.Communication.Bluetooth
         private BluetoothDevice device;
         private List<BluetoothDevice> discoveredDevices;
         private bool isConnected;
+        private object bufferLock;
 
         public BluetoothConnection()
         {
@@ -49,6 +50,8 @@ namespace TapTrack.Tcmp.Communication.Bluetooth
             tappyBuffer = new List<byte>();
             isConnected = false;
 
+            bufferLock = new object();
+
             // Bluegiga Events
 
             bluetooth.BLEEventATTClientAttributeValue += DataReceivedFromTappy;
@@ -57,6 +60,9 @@ namespace TapTrack.Tcmp.Communication.Bluetooth
 
         private void DataReceivedHandler(object sender, SerialDataReceivedEventArgs e)
         {
+            if (!port.IsOpen)
+                return;
+
             byte[] inData = new byte[port.BytesToRead];
 
             port.Read(inData, 0, inData.Length);
@@ -72,7 +78,9 @@ namespace TapTrack.Tcmp.Communication.Bluetooth
             if (e.value == null)
                 return;
 
-            tappyBuffer.AddRange(e.value);
+            lock (bufferLock)
+                tappyBuffer.AddRange(e.value);
+
             OnDataReceived(e);
         }
 
@@ -167,11 +175,11 @@ namespace TapTrack.Tcmp.Communication.Bluetooth
                 if (device.Name.Equals(deviceName))
                 {
                     this.device = device;
-                    this.device.ConnectionHandle = connectionHandle;
                     bluetooth.SendCommand(this.port, bluetooth.BLECommandGAPConnectDirect(device.BluetoothAddress, 0, 20, 40, 100, 1));
                     resp.WaitOne(200);
                     if (commandStarted)
                     {
+                        this.device.ConnectionHandle = connectionHandle;
                         resp.WaitOne(1000);
                     }
                     break;
@@ -285,12 +293,15 @@ namespace TapTrack.Tcmp.Communication.Bluetooth
 
         public override int Read(List<byte> data)
         {
-            int count = this.tappyBuffer.Count;
-            Debug.WriteLine($"   received: {BitConverter.ToString(this.tappyBuffer.ToArray())}");
-            data.AddRange(this.tappyBuffer);
-            this.tappyBuffer.Clear();
+            lock (bufferLock)
+            {
+                int count = this.tappyBuffer.Count;
+                Debug.WriteLine($"   received: {BitConverter.ToString(this.tappyBuffer.ToArray())}");
+                data.AddRange(this.tappyBuffer);
+                this.tappyBuffer.Clear();
 
-            return count;
+                return count;
+            }
         }
 
         public override void Send(byte[] data)
@@ -354,6 +365,11 @@ namespace TapTrack.Tcmp.Communication.Bluetooth
                 port.DiscardOutBuffer();
             }
             tappyBuffer.Clear();
+        }
+
+        public override void Dispose()
+        {
+            port.Dispose();
         }
     }
 }

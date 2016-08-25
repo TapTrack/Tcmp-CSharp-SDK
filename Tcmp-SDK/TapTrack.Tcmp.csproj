@@ -11,6 +11,8 @@
     <AssemblyName>TapTrack.Tcmp</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -64,6 +66,9 @@
     <Compile Include="Tcmp\CommandFamilies\MifareClassic\KeySetting.cs" />
     <Compile Include="Tcmp\CommandFamilies\MifareClassic\MifareClassicCommand.cs" />
     <Compile Include="Tcmp\CommandFamilies\MifareClassic\ReadBlock.cs" />
+    <Compile Include="Tcmp\CommandFamilies\System\ConfigureSetting.cs" />
+    <Compile Include="Tcmp\CommandFamilies\System\EnableDataThrottling.cs" />
+    <Compile Include="Tcmp\CommandFamilies\System\SetType2TagIdentification.cs" />
     <Compile Include="Tcmp\CommandFamilies\Type4\DetectType4B.cs" />
     <Compile Include="Tcmp\CommandFamilies\Type4\DetectType4A.cs" />
     <Compile Include="Tcmp\CommandFamilies\Type4\DetectType4BAfi.cs" />
@@ -75,7 +80,7 @@
     <Compile Include="Tcmp\Communication\CommandFrame.cs" />
     <Compile Include="Tcmp\Communication\CommunicationProtocol.cs" />
     <Compile Include="Tcmp\Communication\Connection.cs" />
-    <Compile Include="Tcmp\Communication\Driver.cs" />
+    <Compile Include="Tcmp\Communication\TappyReader.cs" />
     <Compile Include="Tcmp\CommandFamilies\System\GetBatteryLevel.cs" />
     <Compile Include="Tcmp\CommandFamilies\System\GetFirmwareVersion.cs" />
     <Compile Include="Tcmp\CommandFamilies\System\GetHardwareVersion.cs" />

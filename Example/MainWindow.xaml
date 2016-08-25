@@ -9,7 +9,7 @@
         xmlns:gif="http://wpfanimatedgif.codeplex.com"
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
-        Title="Tappy Demo 2.1" Height="650" Width="800" Foreground="{x:Null}" Background="{StaticResource LightBackground}">
+        Title="Tappy Demo 2.2" Height="650" Width="800" Foreground="{x:Null}" Background="{StaticResource LightBackground}">
     <Grid Background="{StaticResource LightBackground}">
         <Grid.RowDefinitions>
             <RowDefinition Height="50"/>
@@ -117,6 +117,9 @@
                                     unable to determine the specific tag technology to a sufficient level of confidence.
                                     Additionally, for security reasons, some advanced tags can be configured to report 
                                     a dynamic UID, in which case the UID detected will change with every scan.
+                                    <LineBreak/><LineBreak/>
+                                    If you need the exact manufacturer and model of the chip inside an NFC Forum Type 2 compliant tag go to the Utilities tab 
+                                    then Configure Settings and enable Type 2 Tag Identification.
                                 </TextBlock>
                             </StackPanel>
                             <Label Margin="10,10,0,0" Padding="0,0,0,10" Foreground="White" Content="UID"/>
@@ -179,12 +182,16 @@
                                     to a webpage that is subsequently opened in the user's browser (http:// or https://), but it can
                                     also be one of many other types of URI including email addresses (mailto:), 
                                     telephone numbers (tel:), sms text messagest (sms:), or even custom URIs
-                                    unique to certain apps.
+                                    unique to certain apps.<LineBreak/><LineBreak/>
+                                    Write with Tag Mirror: If "[uid]" is contained in the URL, it will be replaced with the UID of the tag that was tapped when writing.
                                 </TextBlock>
                             </StackPanel>
                             <Label Margin="10,10,0,0" Padding="0,0,0,10" Foreground="White" Target="{Binding ElementName=urlTextBox}" Content="URL"/>
                             <TextBox Name="urlTextBox" Margin="10,0,20,20" Foreground="White" Background="{StaticResource LightBackground}" BorderBrush="#595959" BorderThickness="0,0,0,1" Text="http://"/>
-                            <Button Name="writeURLButton" Margin="10" HorizontalAlignment="Right" Style="{StaticResource RoundButton}" Click="WriteURLButton_Click">Write</Button>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                <Button Name="writeURLButton" HorizontalAlignment="Right" Style="{StaticResource RoundButton}" Click="WriteURLButton_Click">Write</Button>
+                                <Button HorizontalAlignment="Right" Style="{StaticResource RoundButton}" Click="WriteUrlWithTagMirror_Click">Write with Tag Mirror</Button>
+                            </StackPanel>
                         </StackPanel>
                     </TabItem>
                     <TabItem Style="{StaticResource WriteText}">
@@ -441,7 +448,7 @@
                                 </TextBlock>
                                 <TextBlock Foreground="White" TextWrapping="Wrap">
                                     This operation instruct the Tappy to write the appropriate data
-                                    to every tag it encounters in order to enable it to be used with the
+                                    to a tag it encounter in order to enable it to be used with the
                                     TapTrack Platform. Note, you will need to log into your platform account
                                     in your default browser prior to using this tool. This tool also does not
                                     make sure that you performed the second step of associating the tag with your
@@ -469,6 +476,30 @@
                             <TextBlock Margin="10" Foreground="White">Battery Level</TextBlock>
                             <TextBox Name="batteryTextBox" Style="{StaticResource TextBox}"/>
                             <Button Margin="0,0,10,0" Style="{StaticResource RoundButton}" HorizontalAlignment="Right" Click="batteryButton_Click">Get Battery Level</Button>
+                        </StackPanel>
+                    </TabItem>
+                    <TabItem Name="configureSettingTab" Style="{StaticResource SettingTab}">
+                        <StackPanel Background="{StaticResource DarkBackground}">
+                            <StackPanel Margin="10" DockPanel.Dock="Top" Orientation="Vertical">
+                                <TextBlock Foreground="White" TextWrapping="Wrap" FontSize="20" Margin="0,0,0,10">
+                                    Configure Tappy Settings
+                                </TextBlock>
+                                <GroupBox Header="Type 2 Tag identification" Foreground="White">
+                                    <StackPanel Orientation="Vertical" Margin="10">
+                                        <TextBlock TextWrapping="Wrap">
+                                            Enabling this setting causes the detect tag command to find the exact manufacturer and model of the chip of a Type 2 Tag
+                                        </TextBlock>
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                            <Button VerticalAlignment="Center" Style="{StaticResource RoundButton}" Click="enableType2Button_Click">
+                                                Enable
+                                            </Button>
+                                            <Button VerticalAlignment="Center" Style="{StaticResource RoundButton}" Click="disableType2Button_Click">
+                                                Disable
+                                            </Button>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </GroupBox>
+                            </StackPanel>
                         </StackPanel>
                     </TabItem>
                 </TabControl>

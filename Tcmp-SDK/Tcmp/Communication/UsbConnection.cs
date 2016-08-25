@@ -99,5 +99,10 @@ namespace TapTrack.Tcmp.Communication
                 port.DiscardOutBuffer();
             }
         }
+
+        public override void Dispose()
+        {
+            port.Dispose();
+        }
     }
 }

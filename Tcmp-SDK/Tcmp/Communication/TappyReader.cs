@@ -39,9 +39,9 @@ namespace TapTrack.Tcmp.Communication
     ///     {
     ///         static void Main(string[] args)
     ///         {
-    ///             Driver tappyDriver = new Driver(CommunicationProtocol.Usb); // Only USB is currently supported on Windows
+    ///             TappyReader tappyReader = new TappyReader(CommunicationProtocol.Usb);
     /// 
-    ///             if (tappyDriver.AutoDetect())                               // Find and connect to a Tappy
+    ///             if (tappyReader.AutoDetect())                               // Find and connect to a Tappy
     ///             {
     ///                 Command readUid = new DetectSingleTagUid(0, DetectTagSetting.Type2Type4AandMifare); // No time out and no locking detect uid command    
     /// 
@@ -58,7 +58,7 @@ namespace TapTrack.Tcmp.Communication
     ///                 };
     /// 
     ///                 Console.WriteLine("Waiting for a tag");
-    ///                 tappyDriver.SendCommand(readUid, responseCallback);
+    ///                 tappyReader.SendCommand(readUid, responseCallback);
     ///             }
     ///             else
     ///             {
@@ -86,9 +86,9 @@ namespace TapTrack.Tcmp.Communication
     ///     {
     ///         static void Main(string[] args)
     ///         {
-    ///             Driver tappyDriver = new Driver(CommunicationProtocol.Usb); // Only USB is currently supported on Windows
+    ///             TappyReader tappyReader = new TappyReader(CommunicationProtocol.Usb);
     /// 
-    ///             if (tappyDriver.AutoDetect())                               // Find and connect to a Tappy
+    ///             if (tappyReader.AutoDetect())                               // Find and connect to a Tappy
     ///             {
     ///                 Command cmd = new WriteText(0, false, "Hello world!");  // No time out and no locking write command
     /// 
@@ -101,7 +101,7 @@ namespace TapTrack.Tcmp.Communication
     ///                 };
     /// 
     ///                 Console.WriteLine("Waiting for a tag");
-    ///                 tappyDriver.SendCommand(cmd, responseCallback);
+    ///                 tappyReader.SendCommand(cmd, responseCallback);
     ///             }
     ///             else
     ///             {
@@ -114,7 +114,7 @@ namespace TapTrack.Tcmp.Communication
     /// }
     /// </code>
     /// </example>
-    public class Driver
+    public class TappyReader : IDisposable
     {
         private Connection conn;
         private List<byte> buffer;
@@ -125,7 +125,7 @@ namespace TapTrack.Tcmp.Communication
         /// 
         /// </summary>
         /// <param name="protocol">Which protocol the driver should communicate over</param>
-        public Driver(CommunicationProtocol protocol)
+        public TappyReader(CommunicationProtocol protocol)
         {
             if (protocol == CommunicationProtocol.Usb)
             {
@@ -255,6 +255,10 @@ namespace TapTrack.Tcmp.Communication
             return false;
         }
 
+        /// <summary>
+        /// Switch between USB or Bluetooth modes
+        /// </summary>
+        /// <param name="protocol"></param>
         public void SwitchProtocol(CommunicationProtocol protocol)
         {
             conn?.Disconnect();
@@ -269,6 +273,11 @@ namespace TapTrack.Tcmp.Communication
             conn.DataReceived += new EventHandler(DataReceivedHandler);
         }
 
+        /// <summary>
+        /// Connect to a given reader or port.
+        /// </summary>
+        /// <param name="deviceName"></param>
+        /// <returns></returns>
         public bool Connect(string deviceName)
         {
             Command cmd = new Ping();
@@ -294,6 +303,9 @@ namespace TapTrack.Tcmp.Communication
             return success;
         }
 
+        /// <summary>
+        /// Disconnect from the current reader
+        /// </summary>
         public void Disconnect()
         {
             conn.Disconnect();
@@ -310,7 +322,7 @@ namespace TapTrack.Tcmp.Communication
         }
 
         /// <summary>
-        /// Gets the name of the device the driver is currently connected to (USB port name or bluetooth device name depending on the current communcation protocal).
+        /// Gets the name of the device the driver is currently connected to (USB port name or bluetooth device name depending on the current communcation protocol).
         /// Returns null if there is no device connected.
         /// </summary>
         public string DeviceName
@@ -367,32 +379,9 @@ namespace TapTrack.Tcmp.Communication
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="timeout"></param>
-        /// <param name="willLock"></param>
-        /// <param name="url"></param>
-        /// <param name="responseCallback"></param>
-        public void WriteUrlWithTagMirror(byte timeout, bool willLock, string url, Callback responseCallback = null)
+        public void Dispose()
         {
-            Command detectTag = new DetectSingleTagUid(timeout, DetectTagSetting.Type2Type4AandMifare);
-
-            Callback detectTagCallback = (ResponseFrame frame, Exception e) =>
-            {
-                if (e == null && !frame.IsApplicationErrorFrame() && frame.ResponseCode == 0x01)
-                {
-                    Tag tag = new Tag(frame.Data);
-                    Command write = new WriteUri(timeout, willLock, url.Replace("[uid]", tag.UidToString()));
-                    Task.Run(() => SendCommand(write, responseCallback));
-                }
-                else
-                {
-                    responseCallback.Invoke(frame, e);
-                }
-            };
-
-            SendCommand(detectTag, detectTagCallback);
+            conn.Dispose();
         }
     }
 }

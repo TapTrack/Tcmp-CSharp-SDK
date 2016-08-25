@@ -26,6 +26,7 @@
     <BitmapImage x:Key="VCard_highlight" UriSource="/Resources/vcard_highlight.png"/>
     <BitmapImage x:Key="Settings" UriSource="/Resources/settings.png"/>
     <BitmapImage x:Key="Settings_highlight" UriSource="/Resources/settings_highlight.png"/>
+    <BitmapImage x:Key="Settings_dark" UriSource="/Resources/settings_dark.png"/>
     <BitmapImage x:Key="Website" UriSource="/Resources/website.png"/>
     <BitmapImage x:Key="SmartPhone" UriSource="/Resources/smartphone.png"/>
     <BitmapImage x:Key="Phone" UriSource="/Resources/phone.png"/>
@@ -404,6 +405,25 @@
                     <Grid Name="Container" ToolTip="Get version info of Tappy" Background="White" Margin="10">
                         <Image Width="30" Height="30" Stretch="Fill" Name="Pressed" Visibility="Hidden" Source="{StaticResource Version_highlight}"/>
                         <Image Width="30" Height="30" Stretch="Fill" Name="Unpressed" Visibility="Visible" Source="{StaticResource Version}"/>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger SourceName="Container"  Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Pressed" Property="Visibility" Value="Visible"/>
+                            <Setter TargetName="Unpressed" Property="Visibility" Value="Hidden"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="SettingTab" TargetType="{x:Type TabItem}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <Grid Name="Container" ToolTip="Confiure Tappy Settings" Background="White" Margin="10">
+                        <Image Width="30" Height="30" Stretch="Fill" Name="Pressed" Visibility="Hidden" Source="{StaticResource Settings_highlight}"/>
+                        <Image Width="30" Height="30" Stretch="Fill" Name="Unpressed" Visibility="Visible" Source="{StaticResource Settings_dark}"/>
                     </Grid>
                     <ControlTemplate.Triggers>
                         <Trigger SourceName="Container"  Property="IsMouseOver" Value="True">

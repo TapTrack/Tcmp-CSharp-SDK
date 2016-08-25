@@ -26,14 +26,14 @@ namespace TapTrack.Demo
     /// </summary>
     public partial class MainWindow : Window
     {
-        Driver tappyDriver;
-        public ObservableCollection<Row> table;
+        TappyReader tappy;
+        private ObservableCollection<Row> table;
         GridLength zeroHeight = new GridLength(0);
 
         public MainWindow()
         {
             InitializeComponent();
-            tappyDriver = new Driver(CommunicationProtocol.Usb);
+            tappy = new TappyReader(CommunicationProtocol.Usb);
             table = new ObservableCollection<Row>();
             records.ItemsSource = table;
             this.Closed += MainWindow_Closed;
@@ -41,7 +41,7 @@ namespace TapTrack.Demo
 
         private void MainWindow_Closed(object sender, EventArgs e)
         {
-            tappyDriver.Disconnect();
+            tappy.Disconnect();
         }
 
         //
@@ -54,7 +54,7 @@ namespace TapTrack.Demo
 
             ndefData.Text = "";
             DetectSingleNdef detect = new DetectSingleNdef((byte)timeout.Value, DetectTagSetting.Type2Type4AandMifare);
-            tappyDriver.SendCommand(detect, AddNdefContent);
+            tappy.SendCommand(detect, AddNdefContent);
         }
 
         private void AddNdefContent(ResponseFrame frame, Exception e)
@@ -66,49 +66,53 @@ namespace TapTrack.Demo
 
             byte[] temp = new byte[data.Length - data[1] - 2];
 
-            Array.Copy(data, 2 + data[1], temp, 0, temp.Length);
-
-            NdefMessage message = NdefMessage.FromByteArray(temp);
-
-            Action update = () =>
+            if (temp.Length > 0)
             {
-                foreach (NdefRecord record in message)
+                Array.Copy(data, 2 + data[1], temp, 0, temp.Length);
+
+                NdefMessage message = NdefMessage.FromByteArray(temp);
+
+                Action update = () =>
                 {
-                    ndefData.AppendText("Ndef Record:\n\n");
-
-                    string type = Encoding.UTF8.GetString(record.Type);
-                    ndefData.AppendText($"TNF: {record.TypeNameFormat.ToString()} ({(byte)record.TypeNameFormat})\n");
-                    ndefData.AppendText($"Type: {type}\n");
-
-                    if (record.Id != null)
-                        ndefData.AppendText($"Type: {BitConverter.ToString(record.Id)}\n");
-
-                    if (type.Equals("U"))
+                    foreach (NdefRecord record in message)
                     {
-                        NdefUriRecord uriRecord = new NdefUriRecord(record);
-                        ndefData.AppendText($"Payload: {uriRecord.Uri}\n");
-                    }
-                    else if (type.Equals("T"))
-                    {
-                        NdefTextRecord textRecord = new NdefTextRecord(record);
-                        ndefData.AppendText($"Encoding: {textRecord.TextEncoding.ToString()}\n");
-                        ndefData.AppendText($"Language: {textRecord.LanguageCode}\n");
-                        ndefData.AppendText($"Payload: {textRecord.Text}\n");
-                    }
-                    else if (type.Contains("text"))
-                    {
-                        ndefData.AppendText($"Payload: {Encoding.UTF8.GetString(record.Payload)}\n");
-                    }
-                    else
-                    {
-                        ndefData.AppendText($"Payload: {BitConverter.ToString(record.Payload)}");
-                    }
+                        ndefData.AppendText("Ndef Record:\n\n");
 
-                    ndefData.AppendText($"----------\n");
-                }
-            };
+                        string type = Encoding.UTF8.GetString(record.Type);
+                        ndefData.AppendText($"TNF: {record.TypeNameFormat.ToString()} ({(byte)record.TypeNameFormat})\n");
+                        ndefData.AppendText($"Type: {type}\n");
 
-            Dispatcher.BeginInvoke(update);
+                        if (record.Id != null)
+                            ndefData.AppendText($"Type: {BitConverter.ToString(record.Id)}\n");
+
+                        if (type.Equals("U"))
+                        {
+                            NdefUriRecord uriRecord = new NdefUriRecord(record);
+                            ndefData.AppendText($"Payload: {uriRecord.Uri}\n");
+                        }
+                        else if (type.Equals("T"))
+                        {
+                            NdefTextRecord textRecord = new NdefTextRecord(record);
+                            ndefData.AppendText($"Encoding: {textRecord.TextEncoding.ToString()}\n");
+                            ndefData.AppendText($"Language: {textRecord.LanguageCode}\n");
+                            ndefData.AppendText($"Payload: {textRecord.Text}\n");
+                        }
+                        else if (type.Contains("text"))
+                        {
+                            ndefData.AppendText($"Payload: {Encoding.UTF8.GetString(record.Payload)}\n");
+                        }
+                        else
+                        {
+                            ndefData.AppendText($"Payload: {BitConverter.ToString(record.Payload)}");
+                        }
+
+                        ndefData.AppendText($"----------\n");
+                    }
+                };
+
+                Dispatcher.BeginInvoke(update);
+            }
+
             ShowSuccessStatus();
         }
 
@@ -120,7 +124,7 @@ namespace TapTrack.Demo
         {
             ShowPendingStatus("Waiting for tap");
             Command cmd = new DetectSingleTagUid((byte)timeout.Value, DetectTagSetting.Type2Type4AandMifare);
-            tappyDriver.SendCommand(cmd, AddUID);
+            tappy.SendCommand(cmd, AddUID);
         }
 
         private void AddUID(ResponseFrame frame, Exception e)
@@ -152,7 +156,35 @@ namespace TapTrack.Demo
 
             Command cmd = new WriteUri((byte)timeout.Value, (bool)lockCheckBox.IsChecked, new NdefUri(url));
 
-            tappyDriver.SendCommand(cmd, ResponseCallback);
+            tappy.SendCommand(cmd, ResponseCallback);
+        }
+
+        private void WriteUrlWithTagMirror_Click(object sender, RoutedEventArgs e)
+        {
+            string temp = string.Copy(urlTextBox.Text);
+            bool willLock = (bool)lockCheckBox.IsChecked;
+            byte timeoutValue = (byte)timeout.Value;
+            Command detectTag = new DetectSingleTagUid(timeoutValue, DetectTagSetting.Type2Type4AandMifare);
+            ShowPendingStatus("Waiting for tap");
+
+            Callback writeCallback = (ResponseFrame frame, Exception exc) =>
+            {
+                if (CheckForErrorsOrTimeout(frame, exc))
+                    return;
+                ShowSuccessStatus();
+            };
+
+            Callback detectTagCallback = (ResponseFrame frame, Exception exc) =>
+            {
+                if (CheckForErrorsOrTimeout(frame, exc))
+                    return;
+
+                Tag tag = new Tag(frame.Data);
+                Command write = new WriteUri(timeoutValue, willLock, temp.Replace("[uid]", tag.UidToString()));
+                Task.Run(() => tappy.SendCommand(write, writeCallback));
+            };
+
+            tappy.SendCommand(detectTag, detectTagCallback);
         }
 
         //
@@ -165,7 +197,7 @@ namespace TapTrack.Demo
 
             Command cmd = new WriteText((byte)timeout.Value, (bool)lockCheckBox.IsChecked, TextBox.Text);
 
-            tappyDriver.SendCommand(cmd, ResponseCallback);
+            tappy.SendCommand(cmd, ResponseCallback);
         }
 
         //
@@ -198,7 +230,7 @@ namespace TapTrack.Demo
 
             Command cmd = new WriteCustomNdef((byte)timeout.Value, (bool)lockCheckBox.IsChecked, message);
 
-            tappyDriver.SendCommand(cmd, ResponseCallback);
+            tappy.SendCommand(cmd, ResponseCallback);
         }
 
         private void AddTextRowButton_Click(object sender, RoutedEventArgs e)
@@ -302,7 +334,7 @@ namespace TapTrack.Demo
                 Dispatcher.BeginInvoke(update);
             };
 
-            tappyDriver.SendCommand(cmd, responseCallback);
+            tappy.SendCommand(cmd, responseCallback);
         }
 
         private void UpdateDetTypeBForm(byte[] data)
@@ -330,12 +362,12 @@ namespace TapTrack.Demo
         // Lock Tag Tab
         //
 
-        public void LockButton_Click(object sender, RoutedEventArgs e)
+        private void LockButton_Click(object sender, RoutedEventArgs e)
         {
             ShowPendingStatus("Waiting for tap");
             Command readCommand = new DetectSingleTagUid((byte)timeout.Value, DetectTagSetting.Type2Type4AandMifare);
 
-            tappyDriver.SendCommand(readCommand, delegate (ResponseFrame frame, Exception exc)
+            tappy.SendCommand(readCommand, delegate (ResponseFrame frame, Exception exc)
             {
                 if (CheckForErrorsOrTimeout(frame, exc))
                     return;
@@ -346,7 +378,7 @@ namespace TapTrack.Demo
                 {
                     Command lockCommand = new LockTag((byte)timeout.Value, tag.UID);
 
-                    tappyDriver.SendCommand(lockCommand, ResponseCallback);
+                    tappy.SendCommand(lockCommand, ResponseCallback);
                 };
 
                 Dispatcher.BeginInvoke(Lock);
@@ -360,7 +392,7 @@ namespace TapTrack.Demo
         private void StopButton_Click(object sender, RoutedEventArgs e)
         {
             HideStatus();
-            tappyDriver.SendCommand<Stop>();
+            tappy.SendCommand<Stop>();
         }
 
         private void AutoDetectButton_Click(object sender, RoutedEventArgs e)
@@ -374,14 +406,21 @@ namespace TapTrack.Demo
                 else if (window.Protocol == CommunicationProtocol.Bluetooth)
                     batteryTab.Visibility = Visibility.Visible;
 
-                tappyDriver.SwitchProtocol(window.Protocol);
+                tappy.SwitchProtocol(window.Protocol);
 
                 ShowPendingStatus("Searching for a Tappy");
 
                 Task.Run(() =>
                 {
-                    if (tappyDriver.AutoDetect())
-                        ShowSuccessStatus($"Connected to {tappyDriver.DeviceName}");
+                    if (tappy.AutoDetect())
+                    {
+                        ShowSuccessStatus($"Connected to {tappy.DeviceName}");
+                        if (window.Protocol == CommunicationProtocol.Bluetooth)
+                        {
+                            Command cmd = new EnableDataThrottling(10, 5);
+                            tappy.SendCommand(cmd);
+                        }
+                    }
                     else
                         ShowFailStatus("No Tappy found");
                 });
@@ -455,14 +494,14 @@ namespace TapTrack.Demo
             dismissButtonContainer.Height = zeroHeight;
         }
 
-        public void ResponseCallback(ResponseFrame frame, Exception e)
+        private void ResponseCallback(ResponseFrame frame, Exception e)
         {
             if (CheckForErrorsOrTimeout(frame, e))
                 return;
             ShowSuccessStatus();
         }
 
-        public bool CheckForErrorsOrTimeout(ResponseFrame frame, Exception e)
+        private bool CheckForErrorsOrTimeout(ResponseFrame frame, Exception e)
         {
             if (e != null)
             {
@@ -509,7 +548,7 @@ namespace TapTrack.Demo
         private void DetectandLaunch()
         {
             Command cmd = new DetectSingleNdef(0, DetectTagSetting.Type2Type4AandMifare);
-            tappyDriver.SendCommand(cmd, LaunchCallback);
+            tappy.SendCommand(cmd, LaunchCallback);
         }
 
         private void LaunchCallback(ResponseFrame frame, Exception e)
@@ -547,7 +586,7 @@ namespace TapTrack.Demo
         {
             Command readCommand = new DetectSingleTagUid(0, DetectTagSetting.Type2Type4AandMifare);
 
-            tappyDriver.SendCommand(readCommand, delegate (ResponseFrame frame, Exception exc)
+            tappy.SendCommand(readCommand, delegate (ResponseFrame frame, Exception exc)
             {
                 if (CheckForErrorsOrTimeout(frame, exc))
                     return;
@@ -559,7 +598,7 @@ namespace TapTrack.Demo
 
                 Task.Run(() =>
                 {
-                    tappyDriver.SendCommand(write, ConfigSuccess);
+                    tappy.SendCommand(write, ConfigSuccess);
                 });
             });
         }
@@ -589,7 +628,7 @@ namespace TapTrack.Demo
 
         private void disconnectButton_Click(object sender, RoutedEventArgs e)
         {
-            tappyDriver.Disconnect();
+            tappy.Disconnect();
         }
 
         private void firmwareVersionButton_Click(object sender, RoutedEventArgs e)
@@ -616,7 +655,7 @@ namespace TapTrack.Demo
                 ShowSuccessStatus();
             };
 
-            tappyDriver.SendCommand(cmd, callback);
+            tappy.SendCommand(cmd, callback);
         }
 
         private void hardwareVersionButton_Click(object sender, RoutedEventArgs e)
@@ -643,7 +682,7 @@ namespace TapTrack.Demo
                 ShowSuccessStatus();
             };
 
-            tappyDriver.SendCommand(cmd, callback);
+            tappy.SendCommand(cmd, callback);
         }
 
         private void batteryButton_Click(object sender, RoutedEventArgs e)
@@ -671,7 +710,32 @@ namespace TapTrack.Demo
                 ShowSuccessStatus();
             };
 
-            tappyDriver.SendCommand(cmd, callback);
+            tappy.SendCommand(cmd, callback);
+        }
+
+        private void Type2Callback(ResponseFrame frame, Exception e)
+        {
+            if (CheckForErrorsOrTimeout(frame, e))
+                return;
+
+            if (frame.ResponseCode == 0x07)
+            {
+                ShowSuccessStatus();
+            }
+        }
+
+        private void enableType2Button_Click(object sender, RoutedEventArgs e)
+        {
+            Command cmd = new SetType2TagIdentification(true);
+
+            tappy.SendCommand(cmd, Type2Callback);
+        }
+
+        private void disableType2Button_Click(object sender, RoutedEventArgs e)
+        {
+            Command cmd = new SetType2TagIdentification(false);
+
+            tappy.SendCommand(cmd, Type2Callback);
         }
     }
 }
