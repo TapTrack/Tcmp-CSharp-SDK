@@ -17,5 +17,5 @@ Documentation of classes and methods can be found [here](https://taptrack.github
 
 ## Examples
 
-Examples can be found [here](https://taptrack.github.io/Tcmp-CSharp-SDK/html/9d967ac6-997a-8074-791f-58b2622c3a63.htm), examples are at the bottom of the page
+Examples can be found [here](https://taptrack.github.io/Tcmp-CSharp-SDK/html/4942dd89-0f4d-c5b4-52a7-2885022aeb6a.htm), examples are at the bottom of the page
 
