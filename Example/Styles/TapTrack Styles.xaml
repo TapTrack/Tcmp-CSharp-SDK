@@ -155,7 +155,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Button}">
-                    <Grid ToolTip="Settings">
+                    <Grid ToolTip="Settings (Tag locking, timeout)">
                         <Image Name="Pressed" Visibility="Hidden" Source="{StaticResource Settings_highlight}"/>
                         <Image Name="Unpressed" Visibility="Visible" Source="{StaticResource Settings}"/>
                     </Grid>
@@ -421,7 +421,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate>
-                    <Grid Name="Container" ToolTip="Confiure Tappy Settings" Background="White" Margin="10">
+                    <Grid Name="Container" ToolTip="Configure Tappy Settings" Background="White" Margin="10">
                         <Image Width="30" Height="30" Stretch="Fill" Name="Pressed" Visibility="Hidden" Source="{StaticResource Settings_highlight}"/>
                         <Image Width="30" Height="30" Stretch="Fill" Name="Unpressed" Visibility="Visible" Source="{StaticResource Settings_dark}"/>
                     </Grid>

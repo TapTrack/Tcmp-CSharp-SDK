@@ -21,6 +21,9 @@ namespace TapTrack.Demo
     using NdefLibrary.Ndef;
     using System.Text;
     using Tcmp.CommandFamilies.System;
+    using System.Management;
+    using System.Text.RegularExpressions;
+
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
@@ -151,36 +154,60 @@ namespace TapTrack.Demo
         private void WriteURLButton_Click(object sender, RoutedEventArgs e)
         {
             string url = string.Copy(urlTextBox.Text);
+            Command cmd = new WriteUri((byte)timeout.Value, (bool)lockCheckBox.IsChecked, new NdefUri(url));
+            Callback repeatCommand = null;
+            bool repeat = (bool)repeatUrlWrite.IsChecked;
+            Action sendCommand = () => tappy.SendCommand(cmd, ResponseCallback + repeatCommand);
 
             ShowPendingStatus("Waiting for tap");
 
-            Command cmd = new WriteUri((byte)timeout.Value, (bool)lockCheckBox.IsChecked, new NdefUri(url));
+            repeatCommand = (ResponseFrame frame, Exception exc) =>
+            {
+                if (repeat)
+                {
+                    if (CheckForErrorsOrTimeout(frame, exc))
+                        return;
+                    Thread.Sleep(800);
+                    ShowPendingStatus("Waiting for tap");
+                    Dispatcher.BeginInvoke(sendCommand);
+                }
+            };
 
-            tappy.SendCommand(cmd, ResponseCallback);
+            tappy.SendCommand(cmd, ResponseCallback + repeatCommand);
         }
 
         private void WriteUrlWithTagMirror_Click(object sender, RoutedEventArgs e)
         {
             string temp = string.Copy(urlTextBox.Text);
             bool willLock = (bool)lockCheckBox.IsChecked;
+            bool repeat = (bool)repeatUrlWrite.IsChecked;
             byte timeoutValue = (byte)timeout.Value;
             Command detectTag = new DetectSingleTagUid(timeoutValue, DetectTagSetting.Type2Type4AandMifare);
             ShowPendingStatus("Waiting for tap");
+            Callback detectTagCallback = null;
 
             Callback writeCallback = (ResponseFrame frame, Exception exc) =>
             {
                 if (CheckForErrorsOrTimeout(frame, exc))
                     return;
                 ShowSuccessStatus();
+
+                if (repeat)
+                {
+                    Thread.Sleep(1000);
+                    ShowPendingStatus("Waiting for tap");
+                    Task.Run(() => tappy.SendCommand(detectTag, detectTagCallback));
+                }
             };
 
-            Callback detectTagCallback = (ResponseFrame frame, Exception exc) =>
+            detectTagCallback = (ResponseFrame frame, Exception exc) =>
             {
                 if (CheckForErrorsOrTimeout(frame, exc))
                     return;
 
                 Tag tag = new Tag(frame.Data);
                 Command write = new WriteUri(timeoutValue, willLock, temp.Replace("[uid]", tag.UidToString()));
+                ShowPendingStatus("Tag detected, please hold steady while tag is written");
                 Task.Run(() => tappy.SendCommand(write, writeCallback));
             };
 
@@ -193,11 +220,26 @@ namespace TapTrack.Demo
 
         private void WriteTextButton_Click(object sender, RoutedEventArgs e)
         {
+            Command cmd = new WriteText((byte)timeout.Value, (bool)lockCheckBox.IsChecked, TextBox.Text ?? "");
             ShowPendingStatus("Waiting for tap");
 
-            Command cmd = new WriteText((byte)timeout.Value, (bool)lockCheckBox.IsChecked, TextBox.Text);
+            Callback repeatCommand = null;
+            bool repeat = (bool)repeatTextWrite.IsChecked;
+            Action sendCommand = () => tappy.SendCommand(cmd, ResponseCallback + repeatCommand);
 
-            tappy.SendCommand(cmd, ResponseCallback);
+            repeatCommand = (ResponseFrame frame, Exception exc) =>
+            {
+                if (repeat)
+                {
+                    if (CheckForErrorsOrTimeout(frame, exc))
+                        return;
+                    Thread.Sleep(1000);
+                    ShowPendingStatus("Waiting for tap");
+                    Dispatcher.BeginInvoke(sendCommand);
+                }
+            };
+
+            tappy.SendCommand(cmd, ResponseCallback + repeatCommand);
         }
 
         //
@@ -229,8 +271,23 @@ namespace TapTrack.Demo
             ShowPendingStatus("Waiting for tap");
 
             Command cmd = new WriteCustomNdef((byte)timeout.Value, (bool)lockCheckBox.IsChecked, message);
+            Callback repeatCommand = null;
+            bool repeat = (bool)repeatMultiNdefWrite.IsChecked;
+            Action sendCommand = () => tappy.SendCommand(cmd, ResponseCallback + repeatCommand);
 
-            tappy.SendCommand(cmd, ResponseCallback);
+            repeatCommand = (ResponseFrame frame, Exception exc) =>
+            {
+                if (repeat)
+                {
+                    if (CheckForErrorsOrTimeout(frame, exc))
+                        return;
+                    Thread.Sleep(1000);
+                    ShowPendingStatus("Waiting for tap");
+                    Dispatcher.BeginInvoke(sendCommand);
+                }
+            };
+
+            tappy.SendCommand(cmd, ResponseCallback + repeatCommand);
         }
 
         private void AddTextRowButton_Click(object sender, RoutedEventArgs e)
@@ -404,7 +461,14 @@ namespace TapTrack.Demo
                 if (window.Protocol == CommunicationProtocol.Usb)
                     batteryTab.Visibility = Visibility.Hidden;
                 else if (window.Protocol == CommunicationProtocol.Bluetooth)
+                {
                     batteryTab.Visibility = Visibility.Visible;
+                    if (GetBluegigaDevice() == null)
+                    {
+                        ShowFailStatus("Please insert BLED112 dongle");
+                        return;
+                    }
+                }
 
                 tappy.SwitchProtocol(window.Protocol);
 
@@ -417,8 +481,15 @@ namespace TapTrack.Demo
                         ShowSuccessStatus($"Connected to {tappy.DeviceName}");
                         if (window.Protocol == CommunicationProtocol.Bluetooth)
                         {
-                            Command cmd = new EnableDataThrottling(10, 5);
-                            tappy.SendCommand(cmd);
+                            try
+                            {
+                                Command cmd = new EnableDataThrottling(10, 5);
+                                tappy.SendCommand(cmd);
+                            }
+                            catch
+                            {
+
+                            }
                         }
                     }
                     else
@@ -437,10 +508,15 @@ namespace TapTrack.Demo
 
         private void ShowPendingStatus(string message)
         {
-            statusPopup.IsOpen = true;
-            statusText.Content = "Pending";
-            statusMessage.Content = message;
-            ImageBehavior.SetAnimatedSource(statusImage, (BitmapImage)FindResource("Pending"));
+            Action show = () =>
+            {
+                statusPopup.IsOpen = true;
+                statusText.Content = "Pending";
+                statusMessage.Content = message;
+                ImageBehavior.SetAnimatedSource(statusImage, (BitmapImage)FindResource("Pending"));
+            };
+
+            Dispatcher.BeginInvoke(show);
         }
 
         private void ShowSuccessStatus(string message = "")
@@ -628,7 +704,15 @@ namespace TapTrack.Demo
 
         private void disconnectButton_Click(object sender, RoutedEventArgs e)
         {
-            tappy.Disconnect();
+            try
+            {
+                tappy.Disconnect();
+                ShowSuccessStatus("Disconnect was successful");
+            }
+            catch
+            {
+                ShowFailStatus("Disconnect was unsuccessful");
+            }
         }
 
         private void firmwareVersionButton_Click(object sender, RoutedEventArgs e)
@@ -736,6 +820,33 @@ namespace TapTrack.Demo
             Command cmd = new SetType2TagIdentification(false);
 
             tappy.SendCommand(cmd, Type2Callback);
+        }
+
+        private string Search(string searchLocation)
+        {
+            ManagementObjectCollection comPortDevices;
+            ManagementObjectSearcher searcher = new ManagementObjectSearcher($"Select * From {searchLocation}");
+            comPortDevices = searcher.Get();
+
+            foreach (ManagementObject device in comPortDevices)
+            {
+                string name = device["Name"] as string;
+
+                if (name?.Contains("Bluegiga Bluetooth Low Energy") ?? false)
+                {
+                    Debug.WriteLine($"Found {device["Name"]}");
+                    Match match = Regex.Match(name, @"\(([^)]*)\)");
+                    if (match.Groups.Count > 1)
+                        return match.Groups[1].Value;
+                }
+            }
+
+            return null;
+        }
+
+        private string GetBluegigaDevice()
+        {
+            return Search("Win32_SerialPort") ?? Search("Win32_pnpEntity");
         }
     }
 }

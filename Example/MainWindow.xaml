@@ -191,13 +191,15 @@
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                                 <Button Name="writeURLButton" HorizontalAlignment="Right" Style="{StaticResource RoundButton}" Click="WriteURLButton_Click">Write</Button>
                                 <Button HorizontalAlignment="Right" Style="{StaticResource RoundButton}" Click="WriteUrlWithTagMirror_Click">Write with Tag Mirror</Button>
+                                <CheckBox Name="repeatUrlWrite" IsChecked="False" VerticalAlignment="Center"/>
+                                <TextBlock Foreground="White" Margin="5,0,10,0" VerticalAlignment="Center">Repeat Write</TextBlock>
                             </StackPanel>
                         </StackPanel>
                     </TabItem>
                     <TabItem Style="{StaticResource WriteText}">
                         <StackPanel  Background="{StaticResource DarkBackground}" Orientation="Vertical">
                             <StackPanel Margin="10">
-                                <TextBlock Foreground="White" TextWrapping="Wrap" FontSize="20" Margin="0,0,0,10">
+                                <TextBlock Foreground="White" TextWrapping="Wrap" FontSize="20">
                                     Write Text
                                 </TextBlock>
                                 <TextBlock Foreground="White" TextWrapping="Wrap">
@@ -209,7 +211,11 @@
                             </StackPanel>
                             <Label Margin="10,10,0,0" Padding="0,0,0,10" Foreground="White" Target="{Binding ElementName=TextBox}" Content="Text"/>
                             <TextBox Name="TextBox" Margin="10,0,20,20" Foreground="White" Background="{StaticResource LightBackground}" BorderBrush="#595959" BorderThickness="0,0,0,1"/>
-                            <Button Name="writeTextButton" Margin="10" HorizontalAlignment="Right" Style="{StaticResource RoundButton}" Click="WriteTextButton_Click">Write</Button>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                <Button Name="writeTextButton" Style="{StaticResource RoundButton}" Click="WriteTextButton_Click">Write</Button>
+                                <CheckBox Name="repeatTextWrite" IsChecked="False" VerticalAlignment="Center"/>
+                                <TextBlock Foreground="White" Margin="5,0,10,0" VerticalAlignment="Center">Repeat Write</TextBlock>
+                            </StackPanel>
                         </StackPanel>
                     </TabItem>
                     <TabItem Style="{StaticResource WriteMultiTab}">
@@ -221,7 +227,11 @@
                                     <Button Style="{StaticResource RoundButton}" Click="ClearButton_Click">Clear</Button>
                                 </WrapPanel>
                                 <WrapPanel HorizontalAlignment="Right" VerticalAlignment="Center">
-                                    <Button Style="{StaticResource RoundButton}" Click="WriteMultNdef">Write</Button>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Button Style="{StaticResource RoundButton}" Click="WriteMultNdef">Write</Button>
+                                        <CheckBox Name="repeatMultiNdefWrite" IsChecked="False" VerticalAlignment="Center"/>
+                                        <TextBlock Foreground="White" Margin="5,0,10,0" VerticalAlignment="Center">Repeat Write</TextBlock>
+                                    </StackPanel>
                                 </WrapPanel>
                             </Grid>
                             <StackPanel Margin="10" DockPanel.Dock="Top">
@@ -398,7 +408,7 @@
                                     Lock Tags
                                 </TextBlock>
                                 <TextBlock Foreground="White" TextWrapping="Wrap">
-                                    This operation instruct the Tappy to lock every tag it encounters until
+                                    This operation instruct the Tappy to lock a tag it encounters until
                                     you either issue a stop command or another instruction. Tag locking is an
                                     irreversible operation that prevents the locked memory from ever being
                                     rewritten, so it is advisable to make certain that any tags you lock
