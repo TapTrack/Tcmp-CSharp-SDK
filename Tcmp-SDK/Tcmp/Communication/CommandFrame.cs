@@ -29,9 +29,10 @@ namespace TapTrack.Tcmp.Communication
             contents.AddRange(command.Parameters);
 
             crc = CalculateCrc(contents);
+            contents.AddRange(crc);
 
             contents = AddEscapeChars(contents);
-            contents.AddRange(crc);
+     
             contents.Insert(0, 0x7E);
             contents.Add(0x7E);
         }
