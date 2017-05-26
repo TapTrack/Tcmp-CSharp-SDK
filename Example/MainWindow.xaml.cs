@@ -851,7 +851,9 @@ namespace TapTrack.Demo
             return Search("Win32_SerialPort") ?? Search("Win32_pnpEntity");
         }
 
-
+		//
+		//Keyboard entry mode feature
+		//
 
 		#region Keyboard Feature
 
@@ -877,15 +879,7 @@ namespace TapTrack.Demo
 		{
 			if (CheckForErrorsOrTimeout(frame, e))
 			{
-
-				//Action uncheck = () =>
-				//{
-				//	tgbtnLaunchKeyboardFeature.IsChecked = false;
-				//	this.UpdateLayout();
-				//};
-
-				//Dispatcher.Invoke(uncheck);
-				//return;
+				return;
 			}
 			else
 			{
@@ -913,9 +907,6 @@ namespace TapTrack.Demo
 									System.Windows.Forms.SendKeys.SendWait("{ENTER}");
 							}
 
-
-
-
 						}
 					};
 
@@ -923,12 +914,7 @@ namespace TapTrack.Demo
 				}
 			}
 
-
-
 		}
-
-
-		
 
 		private void tgbtnLaunchKeyboardFeature_Unchecked(object sender, RoutedEventArgs e)
 		{			
