@@ -12,8 +12,8 @@
         /// </summary>
         /// <param name="timeout">Maximum time the Tappy will wait for a tag. Time out is in seconds. 0 = No time out</param>
         /// <param name="tagType">Type of tag to detect</param>
-        public StreamUid(byte timeout, DetectTagSetting tagType) : base(timeout, tagType)
-        {
+        public StreamUid(byte timeout, DetectTagSetting tagType, int blah=0) : base(timeout, tagType)
+        {          
         }
 
         public override byte CommandCode

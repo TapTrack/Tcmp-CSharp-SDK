@@ -450,35 +450,7 @@
                             </Button>
                         </StackPanel>
                     </TabItem>
-					<TabItem Header="Test" Style="{StaticResource KeyboardWedge}">
-						<StackPanel Background="{StaticResource DarkBackground}">
-							<StackPanel Margin="10" DockPanel.Dock="Top">
-								<TextBlock Foreground="White" TextWrapping="Wrap" FontSize="20" Margin="0,0,0,10">
-                                    Keyboard Entry Mode
-								</TextBlock>
-								<TextBlock Foreground="White" TextWrapping="Wrap">
-                                    This utlity will allow the NFC scans to be entered as keyboard characters.  This allows a keyboard wedge functionality.
-									The Tappy will scan for NDEF-formatted tags, and any text records will be entered as keyboard entry.  Ideal for spreadsheet applications.                             
-								</TextBlock>
-								<StackPanel Margin="10">
-									<CheckBox Style="{StaticResource SimpleCheckBox}" Name="chbxAddlineBreak" Content="  Add CR, LF after each record" Foreground="White" Margin="2" 
-											  Checked="chbxAddlineBreak_Checked" Unchecked="chbxAddlineBreak_Unchecked"/>
-								</StackPanel>
-							</StackPanel>
-							<Grid Background="{StaticResource DarkBackground}">
-								<Grid.ColumnDefinitions>
-									<ColumnDefinition Width="1*"/>
-									<ColumnDefinition Width="1*"/>
-								</Grid.ColumnDefinitions>
-								<TextBlock Grid.Column="1" Foreground="White" Text="Activate keyboard wedge mode"/>
-								<ToggleButton Grid.Column="1" HorizontalAlignment="Right" Name="tgbtnLaunchKeyboardFeature" 
-											  Width="50" Height="30" Margin="0,0,20,0" Style="{StaticResource AnimatedSwitch }" 
-											  Checked="tgbtnLaunchKeyboardFeature_Checked" Unchecked="tgbtnLaunchKeyboardFeature_Unchecked"/>
-								<!--Checked="tgbtnLaunchKeyboardFeature_Checked"-->
-							</Grid>
-						</StackPanel>
-					</TabItem>
-					<TabItem Style="{StaticResource PlatformConfig}">
+                    <TabItem Style="{StaticResource PlatformConfig}">
                         <StackPanel Background="{StaticResource DarkBackground}">
                             <StackPanel Margin="10" DockPanel.Dock="Top">
                                 <TextBlock Foreground="White" TextWrapping="Wrap" FontSize="20" Margin="0,0,0,10">

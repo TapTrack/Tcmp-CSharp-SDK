@@ -24,15 +24,15 @@ namespace TapTrack.Demo
     using System.Management;
     using System.Text.RegularExpressions;
 
-	/// <summary>
-	/// Interaction logic for MainWindow.xaml
-	/// </summary>
-	public partial class MainWindow : Window
+
+    /// <summary>
+    /// Interaction logic for MainWindow.xaml
+    /// </summary>
+    public partial class MainWindow : Window
     {
         TappyReader tappy;
         private ObservableCollection<Row> table;
         GridLength zeroHeight = new GridLength(0);
-		bool KeyboardModeLineBreak = false;
 
         public MainWindow()
         {
@@ -126,6 +126,7 @@ namespace TapTrack.Demo
 
         private void ReadUIDButton_Click(object sender, RoutedEventArgs e)
         {
+    
             ShowPendingStatus("Waiting for tap");
             Command cmd = new DetectSingleTagUid((byte)timeout.Value, DetectTagSetting.Type2Type4AandMifare);
             tappy.SendCommand(cmd, AddUID);
@@ -569,7 +570,6 @@ namespace TapTrack.Demo
             HideStatus();
             dismissButton.Visibility = Visibility.Hidden;
             dismissButtonContainer.Height = zeroHeight;
-			tgbtnLaunchKeyboardFeature.IsChecked = false;
         }
 
         private void ResponseCallback(ResponseFrame frame, Exception e)
@@ -850,90 +850,5 @@ namespace TapTrack.Demo
         {
             return Search("Win32_SerialPort") ?? Search("Win32_pnpEntity");
         }
-
-
-
-		#region Keyboard Feature
-
-		private void chbxAddlineBreak_Checked(object sender, RoutedEventArgs e)
-		{
-			KeyboardModeLineBreak = true;
-		}
-
-		private void chbxAddlineBreak_Unchecked(object sender, RoutedEventArgs e)
-		{
-			KeyboardModeLineBreak = false;
-		}
-
-		private void tgbtnLaunchKeyboardFeature_Checked(object sender, RoutedEventArgs e)
-		{
-
-			StreamNdef stream = new StreamNdef(0, DetectTagSetting.Type2Type4AandMifare);
-			tappy.SendCommand(stream, InvokeKeyboardFeature);
-
-		}
-
-		private void InvokeKeyboardFeature(ResponseFrame frame, Exception e)
-		{
-			if (CheckForErrorsOrTimeout(frame, e))
-			{
-
-				//Action uncheck = () =>
-				//{
-				//	tgbtnLaunchKeyboardFeature.IsChecked = false;
-				//	this.UpdateLayout();
-				//};
-
-				//Dispatcher.Invoke(uncheck);
-				//return;
-			}
-			else
-			{
-
-				byte[] data = frame.Data;
-
-				byte[] temp = new byte[data.Length - data[1] - 2];
-
-				if (temp.Length > 0)
-				{
-					Array.Copy(data, 2 + data[1], temp, 0, temp.Length);
-
-					NdefMessage message = NdefMessage.FromByteArray(temp);
-
-					Action EnterKeystrokes = () =>
-					{
-						foreach (NdefRecord record in message)
-						{
-							string type = Encoding.UTF8.GetString(record.Type);
-							if (type.Equals("T"))
-							{
-								NdefTextRecord textRecord = new NdefTextRecord(record);
-								System.Windows.Forms.SendKeys.SendWait(textRecord.Text);
-								if (KeyboardModeLineBreak)
-									System.Windows.Forms.SendKeys.SendWait("{ENTER}");
-							}
-
-
-
-
-						}
-					};
-
-					Dispatcher.BeginInvoke(EnterKeystrokes);
-				}
-			}
-
-
-
-		}
-
-
-		
-
-		private void tgbtnLaunchKeyboardFeature_Unchecked(object sender, RoutedEventArgs e)
-		{			
-			tappy.SendCommand<Stop>();
-		}
-		#endregion
-	}
+    }
 }

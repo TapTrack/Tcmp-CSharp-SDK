@@ -13,10 +13,10 @@
     <BitmapImage x:Key="Usb_highlight" UriSource="/Resources/usb_highlight.png"/>
     <BitmapImage x:Key="Stop_highlight" UriSource="/Resources/stop_highlight.png"/>
     <BitmapImage x:Key="Detect_tag" UriSource="/Resources/detect.png"/>
-	<BitmapImage x:Key="Text" UriSource="/Resources/text.png"/>
-	<BitmapImage x:Key="Text_highlight" UriSource="/Resources/text_highlight.png"/>
-	<BitmapImage x:Key="URL" UriSource="/Resources/link.png"/>
-	<BitmapImage x:Key="URL_highlight" UriSource="/Resources/link_highlight.png"/>
+    <BitmapImage x:Key="URL" UriSource="/Resources/link.png"/>
+    <BitmapImage x:Key="Text" UriSource="/Resources/text.png"/>
+    <BitmapImage x:Key="Text_highlight" UriSource="/Resources/text_highlight.png"/>
+    <BitmapImage x:Key="URL_highlight" UriSource="/Resources/link_highlight.png"/>
     <BitmapImage x:Key="Detect_tag_hightlight" UriSource="/Resources/detect_highlight.png"/>
     <BitmapImage x:Key="Detect_type_B" UriSource="/Resources/typeB.png"/>
     <BitmapImage x:Key="Detect_type_B_highlight" UriSource="/Resources/typeB_highlight.png"/>
@@ -50,10 +50,8 @@
     <BitmapImage x:Key="Battery_highlight" UriSource="/Resources/battery_highlight.png"/>
     <BitmapImage x:Key="Version" UriSource="/Resources/firmware.png"/>
     <BitmapImage x:Key="Version_highlight" UriSource="/Resources/firmware_highlight.png"/>
-	<BitmapImage x:Key="Keyboard" UriSource="/Resources/keyboard.png"/>
-	<BitmapImage x:Key="Keyboard_highlight" UriSource="/Resources/keyboard_highlight.png"/>
 
-	<Style x:Key="TextBox" TargetType="{x:Type TextBox}">
+    <Style x:Key="TextBox" TargetType="{x:Type TextBox}">
         <Setter Property="Margin" Value="10,0,20,20"/>
         <Setter Property="Foreground" Value="White"/>
         <Setter Property="Background" Value="{StaticResource LightBackground}"/>
@@ -362,26 +360,7 @@
         </Setter>
     </Style>
 
-	<Style x:Key="KeyboardWedge" TargetType="{x:Type TabItem}">
-		<Setter Property="Template">
-			<Setter.Value>
-				<ControlTemplate>
-					<Grid Name="Container" ToolTip="Enables keyboard entry mode" Background="White" Margin="10">
-						<Image Width="30" Height="30" Stretch="Fill" Name="Pressed" Visibility="Hidden" Source="{StaticResource Keyboard_highlight}"/>
-						<Image Width="30" Height="30" Stretch="Fill" Name="Unpressed" Visibility="Visible" Source="{StaticResource Keyboard}"/>
-					</Grid>
-					<ControlTemplate.Triggers>
-						<Trigger SourceName="Container"  Property="IsMouseOver" Value="True">
-							<Setter TargetName="Pressed" Property="Visibility" Value="Visible"/>
-							<Setter TargetName="Unpressed" Property="Visibility" Value="Hidden"/>
-						</Trigger>
-					</ControlTemplate.Triggers>
-				</ControlTemplate>
-			</Setter.Value>
-		</Setter>
-	</Style>
-
-	<Style x:Key="PlatformConfig" TargetType="{x:Type TabItem}">
+    <Style x:Key="PlatformConfig" TargetType="{x:Type TabItem}">
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate>
@@ -456,61 +435,4 @@
             </Setter.Value>
         </Setter>
     </Style>
-
-	<!--Animated Switch ToggleButton - resource: marcangers.com -->
-	<Style x:Key="AnimatedSwitch" TargetType="{x:Type ToggleButton}">
-		<Setter Property="Foreground" Value="Black" />
-		<Setter Property="Background" Value="#FAFAFB" />
-		<Setter Property="BorderBrush" Value="#EAEAEB" />
-		<Setter Property="Template">
-			<Setter.Value>
-				<ControlTemplate TargetType="ToggleButton">
-					<Viewbox Stretch="Uniform">
-						<Canvas Name="Layer_1" Width="20" Height="20" Canvas.Left="10" Canvas.Top="0">
-							<Ellipse  Canvas.Left="0" Width="20" Height="20" Fill="{TemplateBinding Background}" Stroke="{TemplateBinding BorderBrush}" StrokeThickness="0.5"/>
-							<Ellipse  Canvas.Left="15" Width="20" Height="20" Fill="{TemplateBinding Background}" Stroke="{TemplateBinding BorderBrush}" StrokeThickness="0.5"/>
-							<Border Canvas.Left="10" Width="15" Height="20" Name="rect416927" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="0,0.5,0,0.5"/>
-							<Ellipse x:Name="ellipse"  Canvas.Left="0" Width="20" Height="20" Fill="White" Stroke="{TemplateBinding BorderBrush}" StrokeThickness="0.3">
-								<Ellipse.RenderTransform>
-									<TranslateTransform X="0" Y="0" />
-								</Ellipse.RenderTransform>
-								<Ellipse.BitmapEffect>
-									<DropShadowBitmapEffect Softness="0.1" ShadowDepth="0.7" Direction="270" Color="#BBBBBB"/>
-								</Ellipse.BitmapEffect>
-							</Ellipse>
-						</Canvas>
-					</Viewbox>
-					<ControlTemplate.Triggers>
-						<Trigger Property="IsChecked" Value="True" >
-							<Trigger.EnterActions>
-								<BeginStoryboard>
-									<Storyboard>
-										<ColorAnimation Storyboard.TargetProperty="Background.Color" To="#30B4FF" Duration="0:0:0.2" /> <!--#52D468-->
-										<ColorAnimation Storyboard.TargetProperty="BorderBrush.Color" To="#404040" Duration="0:0:0.2" /> <!--#41C955-->
-										<DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(Ellipse.RenderTransform).(TranslateTransform.X)" Storyboard.TargetName="ellipse">
-											<SplineDoubleKeyFrame KeyTime="0" Value="0"/>
-											<SplineDoubleKeyFrame KeyTime="0:0:0.4" Value="15" KeySpline="0, 1, 0.6, 1"/>
-										</DoubleAnimationUsingKeyFrames>
-									</Storyboard>
-								</BeginStoryboard>
-							</Trigger.EnterActions>
-							<Trigger.ExitActions>
-								<BeginStoryboard>
-									<Storyboard>
-										<ColorAnimation Storyboard.TargetProperty="Background.Color" To="#FAFAFB" Duration="0:0:0.2" />
-										<ColorAnimation Storyboard.TargetProperty="BorderBrush.Color" To="#EAEAEB" Duration="0:0:0.2" />
-										<DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(Ellipse.RenderTransform).(TranslateTransform.X)" Storyboard.TargetName="ellipse">
-											<SplineDoubleKeyFrame KeyTime="0" Value="15"/>
-											<SplineDoubleKeyFrame KeyTime="0:0:0.3" Value="0" KeySpline="0, 0.5, 0.5, 1"/>
-										</DoubleAnimationUsingKeyFrames>
-									</Storyboard>
-								</BeginStoryboard>
-							</Trigger.ExitActions>
-						</Trigger>
-					</ControlTemplate.Triggers>
-				</ControlTemplate>
-			</Setter.Value>
-		</Setter>
-	</Style>
-
 </ResourceDictionary>
