@@ -3793,10 +3793,33 @@ namespace Bluegiga
 
         public UInt16 SendCommand(System.IO.Ports.SerialPort port, Byte[] cmd)
         {
-            SetBusy(true);
-            if (bgapiPacketMode) port.Write(new Byte[] { (Byte)cmd.Length }, 0, 1);
-            port.Write(cmd, 0, cmd.Length);
-            return 0; // no error handling yet
+			if (port == null) //needed now that port is nullable (better than having it set to a random invalid port name on instantiation) 
+			{
+				return 1;
+			}
+			else
+			{
+				SetBusy(true);
+				if (bgapiPacketMode) port.Write(new Byte[] { (Byte)cmd.Length }, 0, 1);
+				if (port != null)
+				{
+					try
+					{
+						port.Write(cmd, 0, cmd.Length);
+						return 0; // no error handling yet
+					}
+					catch
+					{
+						return 1;
+					}
+
+				}
+				else
+				{
+					return 1;
+				}
+			}
+            
         }
 
     }

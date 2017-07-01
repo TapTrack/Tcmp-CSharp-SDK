@@ -33,17 +33,11 @@ namespace TapTrack.Tcmp.Communication.Bluetooth
         private List<BluetoothDevice> discoveredDevices;
         private bool isConnected;
         private object bufferLock;
+		private Bluegiga.BLE.Events.Connection.DisconnectedEventHandler disconnectCallback;
 
         public BluetoothConnection()
         {
-            port = new SerialPort();
-            port.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
-            port.Handshake = Handshake.RequestToSend;
-            port.BaudRate = 115200;
-            port.DataBits = 8;
-            port.StopBits = StopBits.One;
-            port.Parity = Parity.None;
-
+			port = null; //if a new SerialPort is instantiated here for some reason the portName is always "COM1" even if that's not a valid port on the PC so we make this nullable instead.	
             bluetooth = new Bluegiga.BGLib();
 
             discoveredDevices = new List<BluetoothDevice>();
@@ -56,9 +50,30 @@ namespace TapTrack.Tcmp.Communication.Bluetooth
 
             bluetooth.BLEEventATTClientAttributeValue += DataReceivedFromTappy;
             bluetooth.BLEEventConnectionDisconnected += Bluetooth_BLEEventConnectionDisconnected;
-        }
 
-        private void DataReceivedHandler(object sender, SerialDataReceivedEventArgs e)
+		}
+
+		public BluetoothConnection(Bluegiga.BLE.Events.Connection.DisconnectedEventHandler callback)
+		{
+			port = null; //if a new SerialPort is instantiated here for some reason the portName is always "COM1" even if that's not a valid port on the PC so we make this nullable instead.	
+			bluetooth = new Bluegiga.BGLib();
+
+			discoveredDevices = new List<BluetoothDevice>();
+			tappyBuffer = new List<byte>();
+			isConnected = false;
+
+			bufferLock = new object();
+
+			// Bluegiga Events
+
+			bluetooth.BLEEventATTClientAttributeValue += DataReceivedFromTappy;
+			bluetooth.BLEEventConnectionDisconnected += Bluetooth_BLEEventConnectionDisconnected;
+			bluetooth.BLEEventConnectionDisconnected += callback;
+		   disconnectCallback += callback;
+
+		}
+
+		private void DataReceivedHandler(object sender, SerialDataReceivedEventArgs e)
         {
             if (!port.IsOpen)
                 return;
@@ -88,9 +103,18 @@ namespace TapTrack.Tcmp.Communication.Bluetooth
         {
             isConnected = false;
             Debug.WriteLine($"Disconnected: {e.reason}");
-        }
+		    if(disconnectCallback != null)
+				disconnectCallback(sender, e);
 
-        private string Search(string searchLocation)
+		}
+
+		private void nullDisconnectEventHandler(object sender, DisconnectedEventArgs e)
+		{
+		}
+
+
+
+		private string Search(string searchLocation)
         {
             ManagementObjectCollection comPortDevices;
             ManagementObjectSearcher searcher = new ManagementObjectSearcher($"Select * From {searchLocation}");
@@ -119,28 +143,49 @@ namespace TapTrack.Tcmp.Communication.Bluetooth
 
         public bool ConnectToBluegiga()
         {
-            string portName = GetBluegigaDevice();
+			if (getBlueGigaStatus())
+				return true;
 
-            if (portName == null)
-                return false;
+			string portName = GetBluegigaDevice();
 
-            try
-            {
-                if (port.IsOpen)
-                    port.Close();
-                port.PortName = portName;
-                port.Open();
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
-        }
+			if (portName == null)
+				return false;
+
+			try
+			{
+				if (port == null) // no port assigned yet
+				{
+					port = new SerialPort();
+					port.PortName = portName;
+					port.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
+					port.Handshake = Handshake.RequestToSend;
+					port.BaudRate = 115200;
+					port.DataBits = 8;
+					port.StopBits = StopBits.One;
+					port.Parity = Parity.None;
+					port.Open();
+					return true;
+				}
+				else if (port.IsOpen)
+				{
+					return true;  //this method should not be switching ports, probably best to creat a separate method for that. 
+				}
+				else //port is assigned but closed
+				{
+					port.Open();
+					return true;
+				}
+			}
+			catch (Exception e)
+			{
+				return false;
+			}
+
+		}
 
         public override bool Connect(string deviceName)
         {
-            if (!port.IsOpen)
+           if (!port.IsOpen)
             {
                 if (!ConnectToBluegiga())
                     return false;
@@ -195,94 +240,105 @@ namespace TapTrack.Tcmp.Communication.Bluetooth
             return connectionEst;
         }
 
-        public bool DisconnectBluegiga()
+		public override void DisconnectBlueGiga()
+		{
+			try
+			{
+				port?.Close();
+				port = null;
+			}
+			catch (Exception e)
+			{
+				return;
+			}
+		}
+
+		public override void Disconnect()
         {
-            try
-            {
-                port.Close();
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
-        }
+			if (device?.ConnectionHandle != null && (port?.IsOpen) != null)
+				bluetooth.SendCommand(port, bluetooth.BLECommandConnectionDisconnect((byte)device.ConnectionHandle));			
+		}
 
-        public override void Disconnect()
+		public override string[] GetAvailableDevices()
+		{
+			return GetAvailableDevices(3000);
+		}
+
+		public override string[] GetAvailableDevices(int scanTime)
         {
-            if (device?.ConnectionHandle != null && port.IsOpen)
-                bluetooth.SendCommand(port, bluetooth.BLECommandConnectionDisconnect((byte)device.ConnectionHandle));
-            DisconnectBluegiga();
-        }
 
-        public override string[] GetAvailableDevices()
-        {
-            return GetAvailableDevices(1500);
-        }
+			return GetAvailableDevices(scanTime, true);
 
-        public string[] GetAvailableDevices(int scanTime)
-        {
-            List<string> names = new List<string>();
-            bool commandStarted = false;
-            AutoResetEvent resp = new AutoResetEvent(false);
-            discoveredDevices.Clear();
+		}
 
-            if (!port.IsOpen)
-            {
-                if (!ConnectToBluegiga())
-                    return names.ToArray();
-            }
+		public override string[] GetAvailableDevices(int scanTime, bool detectBlueGiga)
+		{
+			List<string> names = new List<string>();
+			bool commandStarted = false;
+			AutoResetEvent resp = new AutoResetEvent(false);
+			discoveredDevices.Clear();
 
-            DiscoverEventHandler discoverResp = delegate (object sender, DiscoverEventArgs e)
-            {
-                if (e.result == 0)
-                    commandStarted = true;
-                resp.Set();
-            };
+			if (detectBlueGiga)
+			{
+				if (/*port == null ||*/ !getBlueGigaStatus()) //only try to find a BlueGiga dongle if one is not already assigned. 
+				{
+					if (!ConnectToBluegiga())
+						return names.ToArray();
+				}
+			}
+	
 
-            ScanResponseEventHandler deviceFound = delegate (object sender, ScanResponseEventArgs e)
-            {
-                if (e.data.Length < 8)
-                    return;
+			DiscoverEventHandler discoverResp = delegate (object sender, DiscoverEventArgs e)
+			{
+				if (e.result == 0)
+					commandStarted = true;
+				resp.Set();
+			};
 
-                string name = Encoding.UTF8.GetString(e.data, e.data.Length - 8, 8);
+			ScanResponseEventHandler deviceFound = delegate (object sender, ScanResponseEventArgs e)
+			{
+				if (e.data.Length < 8)
+					return;
 
-                if (!name.Contains("TAPPY"))
-                    return;
+				string name = Encoding.UTF8.GetString(e.data, e.data.Length - 8, 8);
 
-                foreach (BluetoothDevice device in discoveredDevices)
-                {
-                    if (device.Name.Equals(name))
-                        return;
-                }
+				if (!name.Contains("TAPPY"))
+					return;
 
-                discoveredDevices.Add(new BluetoothDevice(e.sender, e.bond, e.rssi, name));
-            };
+				foreach (BluetoothDevice device in discoveredDevices)
+				{
+					if (device.Name.Equals(name))
+						return;
+				}
 
-            bluetooth.BLEResponseGAPDiscover += discoverResp;
+				discoveredDevices.Add(new BluetoothDevice(e.sender, e.bond, e.rssi, name));
+			};
 
-            bluetooth.SendCommand(port, bluetooth.BLECommandGAPDiscover(2));
+			bluetooth.BLEResponseGAPDiscover += discoverResp;
 
-            resp.WaitOne(200);
+			bluetooth.SendCommand(port, bluetooth.BLECommandGAPDiscover(2));
 
-            bluetooth.BLEEventGAPScanResponse += deviceFound;
-            bluetooth.BLEResponseGAPDiscover -= discoverResp;
+			resp.WaitOne(200);
 
-            if (!commandStarted)
-                return names.ToArray();
+			bluetooth.BLEEventGAPScanResponse += deviceFound;
+			bluetooth.BLEResponseGAPDiscover -= discoverResp;
 
-            Thread.Sleep(scanTime);
-            bluetooth.SendCommand(port, bluetooth.BLECommandGAPEndProcedure());
+			if (!commandStarted)
+				return names.ToArray();
 
-            bluetooth.BLEEventGAPScanResponse -= deviceFound;
+			Thread.Sleep(scanTime);
+			bluetooth.SendCommand(port, bluetooth.BLECommandGAPEndProcedure());
 
-            foreach (BluetoothDevice device in this.discoveredDevices)
-                names.Add(device.Name);
+			bluetooth.BLEEventGAPScanResponse -= deviceFound;
 
-            return names.ToArray();
-        }
+			foreach (BluetoothDevice device in this.discoveredDevices)
+				names.Add(device.Name);
 
-        public override bool IsOpen()
+			return names.ToArray();
+		}
+
+
+		public override bool IsOpen()
         {
             if (!port.IsOpen)
                 return false;
@@ -357,9 +413,28 @@ namespace TapTrack.Tcmp.Communication.Bluetooth
             }
         }
 
+		public override bool getConnectionStatus()
+		{
+			return isConnected;
+		}
+
+		public override  bool getBlueGigaStatus()
+		{
+			if (port == null)
+				return false;
+			else
+				return true;										
+
+		}
+
+		public override void setDisconnectCallback(Bluegiga.BLE.Events.Connection.DisconnectedEventHandler callback)
+		{
+			disconnectCallback += callback;	
+		}
+
         public override void Flush()
         {
-            if (port.IsOpen)
+            if (port?.IsOpen != null)
             {
                 port.DiscardInBuffer();
                 port.DiscardOutBuffer();

@@ -464,37 +464,54 @@ namespace TapTrack.Demo
                 else if (window.Protocol == CommunicationProtocol.Bluetooth)
                 {
                     batteryTab.Visibility = Visibility.Visible;
-                    if (GetBluegigaDevice() == null)
-                    {
-                        ShowFailStatus("Please insert BLED112 dongle");
-                        return;
-                    }
-                }
+					if (GetBluegigaDevice() == null)
+					{
+						ShowFailStatus("Please insert BLED112 dongle");
+						return;
+					}
 
+                }
+				
                 tappy.SwitchProtocol(window.Protocol);
 
-                ShowPendingStatus("Searching for a Tappy");
+					ShowPendingStatus("Searching for a Tappy");
 
                 Task.Run(() =>
                 {
-                    if (tappy.AutoDetect())
-                    {
-                        ShowSuccessStatus($"Connected to {tappy.DeviceName}");
-                        if (window.Protocol == CommunicationProtocol.Bluetooth)
-                        {
-                            try
-                            {
-                                Command cmd = new EnableDataThrottling(10, 5);
-                                tappy.SendCommand(cmd);
-                            }
-                            catch
-                            {
+					if (tappy.AutoDetect())
+					{
+						ShowSuccessStatus($"Connected to {tappy.DeviceName}");
+						if (window.Protocol == CommunicationProtocol.Bluetooth)
+						{
+							try
+							{
+								Command cmd = new EnableDataThrottling(10, 5);
+								tappy.SendCommand(cmd);
+							}
+							catch
+							{
 
-                            }
-                        }
-                    }
-                    else
-                        ShowFailStatus("No Tappy found");
+							}
+						}
+					}
+					else
+					{
+						ShowFailStatus("No Tappy found");
+						if (window.Protocol == CommunicationProtocol.Bluetooth)
+						{
+							try
+							{
+								tappy.DisconnectBlueGiga();
+							}
+							catch 
+							{								
+								return;
+
+							}
+
+						}
+				
+					}
                 });
             }
         }
@@ -709,6 +726,7 @@ namespace TapTrack.Demo
             try
             {
                 tappy.Disconnect();
+				tappy.DisconnectBlueGiga();
                 ShowSuccessStatus("Disconnect was successful");
             }
             catch

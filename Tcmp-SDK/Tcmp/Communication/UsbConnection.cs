@@ -55,7 +55,17 @@ namespace TapTrack.Tcmp.Communication
             return SerialPort.GetPortNames();
         }
 
-        public override void Send(byte[] data)
+		public override string[] GetAvailableDevices(int timeout)
+		{
+			return SerialPort.GetPortNames();
+		}
+
+		public override string[] GetAvailableDevices(int timeout, bool scanForBlueGiga)
+		{
+			return SerialPort.GetPortNames();
+		}
+
+		public override void Send(byte[] data)
         {
             Debug.Write("   sending: ");
             Debug.Write(BitConverter.ToString(data));
@@ -91,7 +101,30 @@ namespace TapTrack.Tcmp.Communication
             return count;
         }
 
-        public override void Flush()
+		public override bool getConnectionStatus()
+		{
+			throw new System.NotImplementedException();
+
+		}
+
+		public override bool getBlueGigaStatus()
+		{
+			throw new System.NotImplementedException();
+
+		}
+
+
+		public override void setDisconnectCallback(Bluegiga.BLE.Events.Connection.DisconnectedEventHandler disconnectCallback)
+		{
+			throw new System.NotImplementedException();
+		}
+
+		public override void DisconnectBlueGiga()
+		{
+			throw new NotImplementedException();
+		}
+
+		public override void Flush()
         {
             if (port.IsOpen)
             {

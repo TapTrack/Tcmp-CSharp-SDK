@@ -5,7 +5,7 @@
     /// </summary>
     public class Ping : SystemCommand
     {
-        private const byte commandCode = 0xFD;
+        public const byte commandCode = 0xFD;
 
         public override byte CommandCode
         {

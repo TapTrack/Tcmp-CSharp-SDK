@@ -140,12 +140,30 @@ namespace TapTrack.Tcmp.Communication
             conn.DataReceived += new EventHandler(DataReceivedHandler);
             DeviceName = null;
         }
+		public TappyReader(CommunicationProtocol protocol, Bluegiga.BLE.Events.Connection.DisconnectedEventHandler disconnectCallback)
+		{
+			if (protocol == CommunicationProtocol.Usb)
+			{
+				conn = new UsbConnection();
+			}
+			else if (protocol == CommunicationProtocol.Bluetooth)
+			{
+				conn = new BluetoothConnection(disconnectCallback);
+			}
 
-        private void DataReceivedHandler(object sender, EventArgs e)
+			buffer = new List<byte>();
+			conn.DataReceived += new EventHandler(DataReceivedHandler);
+			DeviceName = null;
+			
+		}
+
+		private void DataReceivedHandler(object sender, EventArgs e)
         {
             Debug.WriteLine("Data is being recieve");
-            if (!conn.IsOpen())
-                responseCallback(null, new HardwareException("Connection to device is not open"));
+			if (!conn.IsOpen() && responseCallback != null)
+				responseCallback(null, new HardwareException("Connection to device is not open"));
+			else
+				Console.WriteLine("Bluegiga dongle receiving but no responseCallback assigned");
 
             Debug.WriteLine($"     Before: {BitConverter.ToString(buffer.ToArray())}");
 
@@ -238,11 +256,50 @@ namespace TapTrack.Tcmp.Communication
             this.conn.Flush();
         }
 
-        /// <summary>
-        /// Connect to the first Tappy device the driver finds
-        /// </summary>
-        /// <returns>True if connection to a Tappy device was successful, false otherwise</returns>
-        public bool AutoDetect()
+		/// <summary>
+		/// Connect to a Tappy device by the device name (TAPPY123)
+		/// </summary>
+		/// <returns>True if connection to a Tappy device was successful, false otherwise</returns>
+
+		public bool ConnectByName(string tappyName)
+		{
+			foreach (string name in conn.GetAvailableDevices())
+			{
+				if (name.ToUpper() == tappyName.ToUpper())
+				{
+					return Connect(tappyName);
+				}
+			}
+			return false;
+
+		}
+
+
+		/// <summary>
+		/// Connect to a Tappy device by the device name (TAPPY123) when it is in kiosk/keyboard wedge mode
+		/// </summary>
+		/// <returns>True if connection to a Tappy device was successful, false otherwise</returns>
+
+		public bool ConnectKioskKeyboardWedgeByName(string tappyName)
+		{
+			foreach (string name in conn.GetAvailableDevices())
+			{
+				if (name.ToUpper() == tappyName.ToUpper())
+				{
+					return ConnectKioskKeyboardWedge(tappyName);
+				}
+			}
+			return false;
+
+		}
+
+
+
+		/// <summary>
+		/// Connect to the first Tappy device the driver finds
+		/// </summary>
+		/// <returns>True if connection to a Tappy device was successful, false otherwise</returns>
+		public bool AutoDetect()
         {
             bool success;
             foreach (string name in conn.GetAvailableDevices())
@@ -255,11 +312,26 @@ namespace TapTrack.Tcmp.Communication
             return false;
         }
 
-        /// <summary>
-        /// Switch between USB or Bluetooth modes
-        /// </summary>
-        /// <param name="protocol"></param>
-        public void SwitchProtocol(CommunicationProtocol protocol)
+		/// <summary>
+		/// Return a list of strings representing TappyBLEs nearby
+		/// </summary>
+		/// <returns>A list of strings representing TappyBLE device names</returns>
+		///  /// <param name="timeout">Amount of time to scan for in ms</param>		
+		public string[] FindNearbyTappyBLEs(int timeout)
+		{
+			if (conn.getBlueGigaStatus())
+				return conn.GetAvailableDevices(timeout,false);
+			else
+				return conn.GetAvailableDevices(timeout, true);
+
+			
+		}
+
+		/// <summary>
+		/// Switch between USB or Bluetooth modes
+		/// </summary>
+		/// <param name="protocol"></param>
+		public void SwitchProtocol(CommunicationProtocol protocol)
         {
             conn?.Disconnect();
 
@@ -280,33 +352,55 @@ namespace TapTrack.Tcmp.Communication
         /// <returns></returns>
         public bool Connect(string deviceName)
         {
-            Command cmd = new Ping();
-            AutoResetEvent receivedResp = new AutoResetEvent(false);
-            bool success = false;
-
-            if (!conn.Connect(deviceName))
-                return false;
-
-            Callback resp = (ResponseFrame frame, Exception e) =>
-            {
-                if (TcmpFrame.IsValidFrame(frame))
-                    success = true;
-                receivedResp.Set();
-            };
-
-            SendCommand(cmd, resp);
-            receivedResp.WaitOne(250);
-
-            if (success)
-                DeviceName = deviceName;
-
-            return success;
+			return ConnectWithTimeout(deviceName, 250);
         }
 
-        /// <summary>
-        /// Disconnect from the current reader
-        /// </summary>
-        public void Disconnect()
+		/// <summary>
+		/// Connect to a given reader or port when it is in kiosk/keyboard wedge mode where it will send heartbeat pings
+		/// </summary>
+		/// <param name="deviceName"></param>
+		/// <returns></returns>
+		public bool ConnectKioskKeyboardWedge(string deviceName)
+		{
+			return ConnectWithTimeout(deviceName,12000);
+		}
+		/// <summary>
+		/// Connect to a given reader or port with a specified timeout on the ping response
+		/// </summary>
+		/// <param name="deviceName">Name of Device</param>
+		/// <param name="timeout">Timeout in ms</param>
+		/// <returns></returns>
+		public bool ConnectWithTimeout(string deviceName,int timeout)
+		{
+			Command cmd = new Ping();
+			AutoResetEvent receivedResp = new AutoResetEvent(false);
+			bool success = false;
+
+			if (!conn.Connect(deviceName))
+				return false;
+
+			Callback resp = (ResponseFrame frame, Exception e) =>
+			{
+				if (TcmpFrame.IsValidFrame(frame))
+					success = true;
+				receivedResp.Set();
+			};
+
+			SendCommand(cmd, resp);
+			receivedResp.WaitOne(timeout);
+
+			if (success)
+				DeviceName = deviceName;
+
+			return success;
+		}
+
+
+
+		/// <summary>
+		/// Disconnect from the current reader
+		/// </summary>
+		public void Disconnect()
         {
             conn.Disconnect();
             DeviceName = null;
@@ -328,7 +422,7 @@ namespace TapTrack.Tcmp.Communication
         public string DeviceName
         {
             get;
-            internal set;
+            set;
         }
 
         /// <summary>
@@ -379,7 +473,39 @@ namespace TapTrack.Tcmp.Communication
             }
         }
 
-        public void Dispose()
+		/// <summary>
+		/// Get the BLE connetion status of the TappyBLE
+		/// </summary>
+		public bool isConnected()
+		{
+			return conn.getConnectionStatus();
+		}
+		/// <summary>
+		/// Get a boolean indicating if the Bluegiga dongle is connected
+		/// </summary>
+
+		public bool isBlueGigaConnected()
+		{
+			return conn.getBlueGigaStatus();
+		}
+
+		/// <summary>
+		/// Add a method to be called if the BLE is disconnected
+		/// </summary>
+		public void setDisconnectCallback(Bluegiga.BLE.Events.Connection.DisconnectedEventHandler disconnectCallback)
+		{
+			conn.setDisconnectCallback(disconnectCallback);
+		}
+
+		/// <summary>
+		/// Disconnect the BlueGiga dongle
+		/// </summary>
+		public void DisconnectBlueGiga()
+		{
+			conn.DisconnectBlueGiga();
+		}
+
+		public void Dispose()
         {
             conn.Dispose();
         }

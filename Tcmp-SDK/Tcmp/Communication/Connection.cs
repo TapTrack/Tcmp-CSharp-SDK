@@ -21,8 +21,15 @@ namespace TapTrack.Tcmp.Communication
         public abstract void Send(byte[] data);
         public abstract int Read(List<byte> data);
         public abstract string[] GetAvailableDevices();
-        public abstract bool IsOpen();
+		public abstract string[] GetAvailableDevices(int timeout);
+		public abstract string[] GetAvailableDevices(int timeou, bool scanForBlueGiga);
+		public abstract bool IsOpen();
         public abstract void Flush();
         public abstract void Dispose();
-    }
+		public abstract bool getConnectionStatus();
+		public abstract bool getBlueGigaStatus();
+		public abstract void setDisconnectCallback(Bluegiga.BLE.Events.Connection.DisconnectedEventHandler disconnectCallback);
+		public abstract void DisconnectBlueGiga();
+
+	}
 }
