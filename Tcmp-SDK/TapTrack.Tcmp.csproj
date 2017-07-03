@@ -66,6 +66,7 @@
     <Compile Include="Tcmp\CommandFamilies\MifareClassic\KeySetting.cs" />
     <Compile Include="Tcmp\CommandFamilies\MifareClassic\MifareClassicCommand.cs" />
     <Compile Include="Tcmp\CommandFamilies\MifareClassic\ReadBlock.cs" />
+    <Compile Include="Tcmp\CommandFamilies\System\ConfigureKioskKeyboardWedgeMode.cs" />
     <Compile Include="Tcmp\CommandFamilies\System\ConfigureSetting.cs" />
     <Compile Include="Tcmp\CommandFamilies\System\EnableDataThrottling.cs" />
     <Compile Include="Tcmp\CommandFamilies\System\SetType2TagIdentification.cs" />
