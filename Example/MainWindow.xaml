@@ -9,7 +9,7 @@
         xmlns:gif="http://wpfanimatedgif.codeplex.com"
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
-        Title="Tappy Demo 2.3" Height="650" Width="800" Foreground="{x:Null}" Background="{StaticResource LightBackground}">
+        Title="Tappy Demo 2.4" Height="650" Width="800" Foreground="{x:Null}" Background="{StaticResource LightBackground}">
     <Grid Background="{StaticResource LightBackground}">
         <Grid.RowDefinitions>
             <RowDefinition Height="50"/>
@@ -211,7 +211,7 @@
                                 </TextBlock>
                             </StackPanel>
                             <Label Margin="10,10,0,0" Padding="0,0,0,10" Foreground="White" Target="{Binding ElementName=TextBox}" Content="Text"/>
-                            <TextBox Name="TextBox" Margin="10,0,20,20" Foreground="White" Background="{StaticResource LightBackground}" BorderBrush="#595959" BorderThickness="0,0,0,1"/>
+							<TextBox Name="TextBox" Margin="10,0,20,20" Foreground="White" Background="{StaticResource LightBackground}" BorderBrush="#595959" BorderThickness="0,0,0,1" AcceptsTab="True" AcceptsReturn="True" KeyUp="TextBox_KeyPressed"/>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                                 <Button Name="writeTextButton" Style="{StaticResource RoundButton}" Click="WriteTextButton_Click">Write</Button>
                                 <CheckBox Name="repeatTextWrite" IsChecked="False" VerticalAlignment="Center"/>
@@ -464,6 +464,10 @@
 								<StackPanel Margin="10">
 									<CheckBox Style="{StaticResource SimpleCheckBox}" Name="chbxAddlineBreak" Content="  Add CR, LF after each record" Foreground="White" Margin="2" 
 											  Checked="chbxAddlineBreak_Checked" Unchecked="chbxAddlineBreak_Unchecked"/>
+									<CheckBox Style="{StaticResource SimpleCheckBox}" Name="chbxAddTab" Content="  Add TAB after each record" Foreground="White" Margin="2" 
+											  Checked="chbxAddTab_Checked" Unchecked="chbxAddTab_Unchecked"/>
+									<CheckBox Style="{StaticResource SimpleCheckBox}" Name="chbxAddTabLineBreakLast" Content="  Add TAB after each record and CR,LF after final record" Foreground="White" Margin="2" 
+											  Checked="chbxAddTabLineBreakLast_Checked" Unchecked="chbxAddTabLineBreakLast_Unchecked"/>
 								</StackPanel>
 							</StackPanel>
 							<Grid Background="{StaticResource DarkBackground}">

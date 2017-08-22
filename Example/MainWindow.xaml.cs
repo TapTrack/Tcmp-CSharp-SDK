@@ -32,7 +32,9 @@ namespace TapTrack.Demo
         TappyReader tappy;
         private ObservableCollection<Row> table;
         GridLength zeroHeight = new GridLength(0);
-		bool KeyboardModeLineBreak = false;
+		bool keyboardModeLineBreak = false;
+		bool keyboardModeTab = false;
+		bool keyboardModeTabLineBreakLast = false;
 
         public MainWindow()
         {
@@ -41,7 +43,9 @@ namespace TapTrack.Demo
             table = new ObservableCollection<Row>();
             records.ItemsSource = table;
             this.Closed += MainWindow_Closed;
-        }
+	
+
+		}
 
         private void MainWindow_Closed(object sender, EventArgs e)
         {
@@ -82,35 +86,43 @@ namespace TapTrack.Demo
                     {
                         ndefData.AppendText("Ndef Record:\n\n");
 
-                        string type = Encoding.UTF8.GetString(record.Type);
-                        ndefData.AppendText($"TNF: {record.TypeNameFormat.ToString()} ({(byte)record.TypeNameFormat})\n");
-                        ndefData.AppendText($"Type: {type}\n");
+						if (record.TypeNameFormat == NdefRecord.TypeNameFormatType.Empty)
+						{
+							ndefData.AppendText("Empty NDEF Record");
+						}
+						else
+						{
 
-                        if (record.Id != null)
-                            ndefData.AppendText($"Type: {BitConverter.ToString(record.Id)}\n");
+							string type = Encoding.UTF8.GetString(record.Type);
+							ndefData.AppendText($"TNF: {record.TypeNameFormat.ToString()} ({(byte)record.TypeNameFormat})\n");
+							ndefData.AppendText($"Type: {type}\n");
 
-                        if (type.Equals("U"))
-                        {
-                            NdefUriRecord uriRecord = new NdefUriRecord(record);
-                            ndefData.AppendText($"Payload: {uriRecord.Uri}\n");
-                        }
-                        else if (type.Equals("T"))
-                        {
-                            NdefTextRecord textRecord = new NdefTextRecord(record);
-                            ndefData.AppendText($"Encoding: {textRecord.TextEncoding.ToString()}\n");
-                            ndefData.AppendText($"Language: {textRecord.LanguageCode}\n");
-                            ndefData.AppendText($"Payload: {textRecord.Text}\n");
-                        }
-                        else if (type.Contains("text"))
-                        {
-                            ndefData.AppendText($"Payload: {Encoding.UTF8.GetString(record.Payload)}\n");
-                        }
-                        else
-                        {
-                            ndefData.AppendText($"Payload: {BitConverter.ToString(record.Payload)}");
-                        }
+							if (record.Id != null)
+								ndefData.AppendText($"Type: {BitConverter.ToString(record.Id)}\n");
 
-                        ndefData.AppendText($"----------\n");
+							if (type.Equals("U"))
+							{
+								NdefUriRecord uriRecord = new NdefUriRecord(record);
+								ndefData.AppendText($"Payload: {uriRecord.Uri}\n");
+							}
+							else if (type.Equals("T"))
+							{
+								NdefTextRecord textRecord = new NdefTextRecord(record);
+								ndefData.AppendText($"Encoding: {textRecord.TextEncoding.ToString()}\n");
+								ndefData.AppendText($"Language: {textRecord.LanguageCode}\n");
+								ndefData.AppendText($"Payload: {textRecord.Text}\n");
+							}
+							else if (type.Contains("text"))
+							{
+								ndefData.AppendText($"Payload: {Encoding.UTF8.GetString(record.Payload)}\n");
+							}
+							else
+							{
+								ndefData.AppendText($"Payload: {BitConverter.ToString(record.Payload)}");
+							}
+
+							ndefData.AppendText($"----------\n");
+						}
                     }
                 };
 
@@ -877,12 +889,12 @@ namespace TapTrack.Demo
 
 		private void chbxAddlineBreak_Checked(object sender, RoutedEventArgs e)
 		{
-			KeyboardModeLineBreak = true;
+			keyboardModeLineBreak = true;
 		}
 
 		private void chbxAddlineBreak_Unchecked(object sender, RoutedEventArgs e)
 		{
-			KeyboardModeLineBreak = false;
+			keyboardModeLineBreak = false;
 		}
 
 		private void tgbtnLaunchKeyboardFeature_Checked(object sender, RoutedEventArgs e)
@@ -912,6 +924,9 @@ namespace TapTrack.Demo
 
 					NdefMessage message = NdefMessage.FromByteArray(temp);
 
+					int numRecords = message.Count;
+					int recordNum = 1;
+
 					Action EnterKeystrokes = () =>
 					{
 						foreach (NdefRecord record in message)
@@ -921,8 +936,20 @@ namespace TapTrack.Demo
 							{
 								NdefTextRecord textRecord = new NdefTextRecord(record);
 								System.Windows.Forms.SendKeys.SendWait(textRecord.Text);
-								if (KeyboardModeLineBreak)
+								if (keyboardModeLineBreak)
 									System.Windows.Forms.SendKeys.SendWait("{ENTER}");
+								if (keyboardModeTab)
+									System.Windows.Forms.SendKeys.SendWait("{TAB}");
+								if (keyboardModeTabLineBreakLast)
+								{
+									if (recordNum == numRecords)
+										System.Windows.Forms.SendKeys.SendWait("{ENTER}");
+									else
+										System.Windows.Forms.SendKeys.SendWait("{TAB}");
+
+								}
+									
+								recordNum++;
 							}
 
 						}
@@ -938,6 +965,37 @@ namespace TapTrack.Demo
 		{			
 			tappy.SendCommand<Stop>();
 		}
+
+		void TextBox_KeyPressed(object sender, System.Windows.Input.KeyEventArgs e)
+		{
+			if (e.Key.ToString() == "Tab")
+			{
+				ShowSuccessStatus("Tab key entered into text record");
+			}
+
+		}
+
+
 		#endregion
+
+		private void chbxAddTab_Unchecked(object sender, RoutedEventArgs e)
+		{
+			keyboardModeTab = false;
+		}
+
+		private void chbxAddTab_Checked(object sender, RoutedEventArgs e)
+		{
+			keyboardModeTab = true;
+		}
+
+		private void chbxAddTabLineBreakLast_Unchecked(object sender, RoutedEventArgs e)
+		{
+			keyboardModeTabLineBreakLast = false;
+		}
+
+		private void chbxAddTabLineBreakLast_Checked(object sender, RoutedEventArgs e)
+		{
+			keyboardModeTabLineBreakLast = true;
+		}
 	}
 }
