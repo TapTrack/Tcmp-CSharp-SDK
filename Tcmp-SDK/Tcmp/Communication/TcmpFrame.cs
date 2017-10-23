@@ -236,8 +236,12 @@ namespace TapTrack.Tcmp.Communication
 
             return temp.ToArray();
         }
+		public static List<byte> RemoveEscapseCharacters(byte[] data) //legacy incorrect spelling in case someone ever called this explicitly 
+		{
+			return RemoveEscapeCharacters(data);
+		}
 
-        public static List<byte> RemoveEscapseCharacters(byte[] data)
+		public static List<byte> RemoveEscapeCharacters(byte[] data)
         {
             List<byte> temp = new List<byte>(data);
 
@@ -285,14 +289,14 @@ namespace TapTrack.Tcmp.Communication
         {
             if (frame == null)
                 return false;
+		
+			byte[] contents = frame.ToArray();
 
-            byte[] contents = frame.ToArray();
-
-            if (contents.Length < 10)
+			if (contents.Length < 10)
                 return false;
 
-            if (contents[0] != 0x7E || contents[contents.Length - 1] != 0x7E)
-                return false;
+            if (contents[0] != 0x7E)
+				return false;
 
             if (HasLcsError(frame.Len1, frame.Len0, frame.Lcs))
                 return false;

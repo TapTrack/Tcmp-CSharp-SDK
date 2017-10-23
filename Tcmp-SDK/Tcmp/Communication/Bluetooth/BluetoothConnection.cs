@@ -256,7 +256,10 @@ namespace TapTrack.Tcmp.Communication.Bluetooth
 		public override void Disconnect()
         {
 			if (device?.ConnectionHandle != null && (port?.IsOpen) != null)
-				bluetooth.SendCommand(port, bluetooth.BLECommandConnectionDisconnect((byte)device.ConnectionHandle));			
+			{
+				bluetooth.SendCommand(port, bluetooth.BLECommandConnectionDisconnect((byte)device.ConnectionHandle));
+				DisconnectBlueGiga();
+			}
 		}
 
 		public override string[] GetAvailableDevices()

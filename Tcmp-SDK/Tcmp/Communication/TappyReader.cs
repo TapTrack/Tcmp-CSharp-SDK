@@ -174,7 +174,7 @@ namespace TapTrack.Tcmp.Communication
 
             ResponseFrame resp;
 
-            buffer = TcmpFrame.RemoveEscapseCharacters(buffer.ToArray());
+            buffer = TcmpFrame.RemoveEscapeCharacters(buffer.ToArray());
 
             for (int i = 0; i < buffer.Count; i++)
             {
@@ -263,15 +263,14 @@ namespace TapTrack.Tcmp.Communication
 
 		public bool ConnectByName(string tappyName)
 		{
-			foreach (string name in conn.GetAvailableDevices())
-			{
-				if (name.ToUpper() == tappyName.ToUpper())
+				foreach (string name in conn.GetAvailableDevices())
 				{
-					return Connect(tappyName);
+					if (name.ToUpper() == tappyName.ToUpper())
+					{
+						return Connect(tappyName);
+					}
 				}
-			}
-			return false;
-
+				return false;			
 		}
 
 
@@ -279,7 +278,7 @@ namespace TapTrack.Tcmp.Communication
 		/// Connect to a Tappy device by the device name (TAPPY123) when it is in kiosk/keyboard wedge mode
 		/// </summary>
 		/// <returns>True if connection to a Tappy device was successful, false otherwise</returns>
-
+		/// 
 		public bool ConnectKioskKeyboardWedgeByName(string tappyName)
 		{
 			foreach (string name in conn.GetAvailableDevices())
@@ -290,7 +289,6 @@ namespace TapTrack.Tcmp.Communication
 				}
 			}
 			return false;
-
 		}
 
 
@@ -326,6 +324,7 @@ namespace TapTrack.Tcmp.Communication
 
 			
 		}
+
 
 		/// <summary>
 		/// Switch between USB or Bluetooth modes
@@ -422,7 +421,7 @@ namespace TapTrack.Tcmp.Communication
         public string DeviceName
         {
             get;
-            set;
+            private set;
         }
 
         /// <summary>

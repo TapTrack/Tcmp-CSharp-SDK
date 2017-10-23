@@ -9,7 +9,7 @@
         xmlns:gif="http://wpfanimatedgif.codeplex.com"
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
-        Title="Tappy Demo 2.4" Height="650" Width="800" Foreground="{x:Null}" Background="{StaticResource LightBackground}">
+        Title="Tappy Demo 2.5" Height="650" Width="800" Foreground="{x:Null}" Background="{StaticResource LightBackground}">
     <Grid Background="{StaticResource LightBackground}">
         <Grid.RowDefinitions>
             <RowDefinition Height="50"/>

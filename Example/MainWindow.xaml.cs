@@ -166,7 +166,8 @@ namespace TapTrack.Demo
 
         private void WriteURLButton_Click(object sender, RoutedEventArgs e)
         {
-            string url = string.Copy(urlTextBox.Text);
+
+			string url = string.Copy(urlTextBox.Text);
             Command cmd = new WriteUri((byte)timeout.Value, (bool)lockCheckBox.IsChecked, new NdefUri(url));
             Callback repeatCommand = null;
             bool repeat = (bool)repeatUrlWrite.IsChecked;
@@ -486,7 +487,7 @@ namespace TapTrack.Demo
 				
                 tappy.SwitchProtocol(window.Protocol);
 
-					ShowPendingStatus("Searching for a Tappy");
+				ShowPendingStatus("Searching for a Tappy");
 
                 Task.Run(() =>
                 {
@@ -654,7 +655,7 @@ namespace TapTrack.Demo
 
         private void DetectandLaunch()
         {
-            Command cmd = new DetectSingleNdef(0, DetectTagSetting.Type2Type4AandMifare);
+            Command cmd = new StreamNdef(0, DetectTagSetting.Type2Type4AandMifare);
             tappy.SendCommand(cmd, LaunchCallback);
         }
 
@@ -737,12 +738,13 @@ namespace TapTrack.Demo
         {
             try
             {
-                tappy.Disconnect();
-				tappy.DisconnectBlueGiga();
-                ShowSuccessStatus("Disconnect was successful");
+                tappy.Disconnect();	
+				ShowSuccessStatus("Disconnect was successful");
             }
-            catch
-            {
+            catch(Exception exc)
+
+			{
+				Console.Write(exc.ToString());
                 ShowFailStatus("Disconnect was unsuccessful");
             }
         }

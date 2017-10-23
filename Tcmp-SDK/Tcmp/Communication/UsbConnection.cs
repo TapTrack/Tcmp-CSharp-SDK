@@ -29,13 +29,14 @@ namespace TapTrack.Tcmp.Communication
             try
             {
                 Disconnect();
-                port.PortName = portName;
-                port.Open();
-                return true;
+				port.PortName = portName;
+				port.Open();		
+				return true;
             }
             catch
             {
-                return false;
+				port.PortName = null;
+				return false;
             }
         }
 
