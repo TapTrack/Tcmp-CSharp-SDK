@@ -35,7 +35,7 @@ namespace TapTrack.Tcmp.Communication
             }
             catch
             {
-				port.PortName = null;
+				port.PortName= " ";            
 				return false;
             }
         }
@@ -104,8 +104,7 @@ namespace TapTrack.Tcmp.Communication
 
 		public override bool getConnectionStatus()
 		{
-			throw new System.NotImplementedException();
-
+            return IsOpen();			
 		}
 
 		public override bool getBlueGigaStatus()

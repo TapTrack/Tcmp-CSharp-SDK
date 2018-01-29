@@ -162,8 +162,6 @@ namespace TapTrack.Tcmp.Communication
             Debug.WriteLine("Data is being recieve");
 			if (!conn.IsOpen() && responseCallback != null)
 				responseCallback(null, new HardwareException("Connection to device is not open"));
-			else
-				Console.WriteLine("Bluegiga dongle receiving but no responseCallback assigned");
 
             Debug.WriteLine($"     Before: {BitConverter.ToString(buffer.ToArray())}");
 
