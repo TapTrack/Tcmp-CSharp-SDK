@@ -66,6 +66,11 @@
     <Compile Include="Tcmp\CommandFamilies\MifareClassic\KeySetting.cs" />
     <Compile Include="Tcmp\CommandFamilies\MifareClassic\MifareClassicCommand.cs" />
     <Compile Include="Tcmp\CommandFamilies\MifareClassic\ReadBlock.cs" />
+    <Compile Include="Tcmp\CommandFamilies\StandaloneCheckin\downloadCheckins.cs" />
+    <Compile Include="Tcmp\CommandFamilies\StandaloneCheckin\getNumCheckins.cs" />
+    <Compile Include="Tcmp\CommandFamilies\StandaloneCheckin\GetStationInfo.cs" />
+    <Compile Include="Tcmp\CommandFamilies\StandaloneCheckin\resetCheckins.cs" />
+    <Compile Include="Tcmp\CommandFamilies\StandaloneCheckin\StandaloneCheckin.cs" />
     <Compile Include="Tcmp\CommandFamilies\System\ConfigureKioskKeyboardWedgeMode.cs" />
     <Compile Include="Tcmp\CommandFamilies\System\ConfigureSetting.cs" />
     <Compile Include="Tcmp\CommandFamilies\System\EnableDataThrottling.cs" />
