@@ -52,8 +52,15 @@
     <BitmapImage x:Key="Version_highlight" UriSource="/Resources/firmware_highlight.png"/>
 	<BitmapImage x:Key="Keyboard" UriSource="/Resources/keyboard.png"/>
 	<BitmapImage x:Key="Keyboard_highlight" UriSource="/Resources/keyboard_highlight.png"/>
+    <BitmapImage x:Key="ImportContacts" UriSource="/Resources/import_contacts.png"/>
+    <BitmapImage x:Key="ImportContacts_highlight" UriSource="/Resources/import_contacts_highlight.png"/>
+    <BitmapImage x:Key="WriteTag" UriSource="/Resources/edit.png"/>
+    <BitmapImage x:Key="WriteTag_highlight" UriSource="/Resources/edit_highlight.png"/>
+    <BitmapImage x:Key="PriorityInformation" UriSource="/Resources/priority_high.png"/>
+    <BitmapImage x:Key="Assessment_highlight" UriSource="/Resources/assessment_highlight.png"/>
+    <BitmapImage x:Key="Assessment" UriSource="/Resources/assessment.png"/>
 
-	<Style x:Key="TextBox" TargetType="{x:Type TextBox}">
+    <Style x:Key="TextBox" TargetType="{x:Type TextBox}">
         <Setter Property="Margin" Value="10,0,20,20"/>
         <Setter Property="Foreground" Value="White"/>
         <Setter Property="Background" Value="{StaticResource LightBackground}"/>
@@ -457,7 +464,103 @@
         </Setter>
     </Style>
 
-	<!--Animated Switch ToggleButton - resource: marcangers.com -->
+    <Style x:Key="ImportNDEFRecords" TargetType="{x:Type TabItem}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <Grid Name="Container" ToolTip="Import List of URIs or Text from file" Background="White" Margin="10">
+                        <Image Width="30" Height="30" Stretch="Fill" Name="Pressed" Visibility="Hidden" Source="{StaticResource ImportContacts_highlight}"/>
+                        <Image Width="30" Height="30" Stretch="Fill" Name="Unpressed" Visibility="Visible" Source="{StaticResource ImportContacts}"/>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger SourceName="Container" Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Pressed" Property="Visibility" Value="Visible"/>
+                            <Setter TargetName="Unpressed" Property="Visibility" Value="Hidden"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    
+    <Style x:Key="ProtectTagBatchWrite" TargetType="{x:Type TabItem}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <Grid Name="Container" ToolTip="Write protect tags either by permanent locking or a password" Background="White" Margin="10">
+                        <Image Width="30" Height="30" Stretch="Fill" Name="Pressed" Visibility="Hidden" Source="{StaticResource Lock_highlight}"/>
+                        <Image Width="30" Height="30" Stretch="Fill" Name="Unpressed" Visibility="Visible" Source="{StaticResource Lock}"/>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger SourceName="Container" Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Pressed" Property="Visibility" Value="Visible"/>
+                            <Setter TargetName="Unpressed" Property="Visibility" Value="Hidden"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="ViewImportedBatchTable" TargetType="{x:Type TabItem}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <Grid Name="Container" ToolTip="View imported batch records" Background="White" Margin="10">
+                        <Image Width="30" Height="30" Stretch="Fill" Name="Pressed" Visibility="Hidden" Source="{StaticResource Multi_record_highlight}"/>
+                        <Image Width="30" Height="30" Stretch="Fill" Name="Unpressed" Visibility="Visible" Source="{StaticResource Multi_record}"/>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger SourceName="Container" Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Pressed" Property="Visibility" Value="Visible"/>
+                            <Setter TargetName="Unpressed" Property="Visibility" Value="Hidden"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="EncodeBatchOfTags" TargetType="{x:Type TabItem}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <Grid Name="Container" ToolTip="Begin or resume batch encoding" Background="White" Margin="10">
+                        <Image Width="30" Height="30" Stretch="Fill" Name="Pressed" Visibility="Hidden" Source="{StaticResource WriteTag_highlight}"/>
+                        <Image Width="30" Height="30" Stretch="Fill" Name="Unpressed" Visibility="Visible" Source="{StaticResource WriteTag}"/>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger SourceName="Container" Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Pressed" Property="Visibility" Value="Visible"/>
+                            <Setter TargetName="Unpressed" Property="Visibility" Value="Hidden"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+
+    <Style x:Key="ExportEncodingEvents" TargetType="{x:Type TabItem}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <Grid Name="Container" ToolTip="Export a list of all encoded tags" Background="White" Margin="10">
+                        <Image Width="30" Height="30" Stretch="Fill" Name="Pressed" Visibility="Hidden" Source="{StaticResource Assessment_highlight}"/>
+                        <Image Width="30" Height="30" Stretch="Fill" Name="Unpressed" Visibility="Visible" Source="{StaticResource Assessment}"/>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger SourceName="Container" Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Pressed" Property="Visibility" Value="Visible"/>
+                            <Setter TargetName="Unpressed" Property="Visibility" Value="Hidden"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--Animated Switch ToggleButton - resource: marcangers.com -->
 	<Style x:Key="AnimatedSwitch" TargetType="{x:Type ToggleButton}">
 		<Setter Property="Foreground" Value="Black" />
 		<Setter Property="Background" Value="#FAFAFB" />

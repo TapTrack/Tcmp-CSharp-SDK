@@ -12,9 +12,10 @@ namespace TapTrack.Demo
     using WpfAnimatedGif;
     using System.Diagnostics;
     using Tcmp.Communication;
-    using Tcmp.CommandFamilies;
+    using Tcmp.CommandFamilies;    
     using Tcmp.CommandFamilies.BasicNfc;
     using Tcmp.CommandFamilies.Type4;
+    using Tcmp.CommandFamilies.Ntag21x;
     using Ndef;
     using Tcmp.Communication.Exceptions;
     using Tcmp;
@@ -24,17 +25,27 @@ namespace TapTrack.Demo
     using System.Management;
     using System.Text.RegularExpressions;
 
-	/// <summary>
-	/// Interaction logic for MainWindow.xaml
-	/// </summary>
-	public partial class MainWindow : Window
+    using FileHelpers;
+    using Microsoft.Win32;
+
+
+
+    /// <summary>
+    /// Interaction logic for MainWindow.xaml
+    /// </summary>
+    public partial class MainWindow : Window
     {
         TappyReader tappy;
         private ObservableCollection<Row> table;
         GridLength zeroHeight = new GridLength(0);
-		bool keyboardModeLineBreak = false;
-		bool keyboardModeTab = false;
-		bool keyboardModeTabLineBreakLast = false;
+        bool keyboardModeLineBreak = false;
+        bool keyboardModeTab = false;
+        bool keyboardModeTabLineBreakLast = false;
+
+        int numTagsEncodedInThisBatch = 0;
+        string batchPassword = null;
+        BatchNDEF batchMessageBeingEncoded = null;
+        bool batchLockTagFlag = false;
 
         public MainWindow()
         {
@@ -43,9 +54,9 @@ namespace TapTrack.Demo
             table = new ObservableCollection<Row>();
             records.ItemsSource = table;
             this.Closed += MainWindow_Closed;
-	
 
-		}
+
+        }
 
         private void MainWindow_Closed(object sender, EventArgs e)
         {
@@ -86,43 +97,43 @@ namespace TapTrack.Demo
                     {
                         ndefData.AppendText("Ndef Record:\n\n");
 
-						if (record.TypeNameFormat == NdefRecord.TypeNameFormatType.Empty)
-						{
-							ndefData.AppendText("Empty NDEF Record");
-						}
-						else
-						{
+                        if (record.TypeNameFormat == NdefRecord.TypeNameFormatType.Empty)
+                        {
+                            ndefData.AppendText("Empty NDEF Record");
+                        }
+                        else
+                        {
 
-							string type = Encoding.UTF8.GetString(record.Type);
-							ndefData.AppendText($"TNF: {record.TypeNameFormat.ToString()} ({(byte)record.TypeNameFormat})\n");
-							ndefData.AppendText($"Type: {type}\n");
+                            string type = Encoding.UTF8.GetString(record.Type);
+                            ndefData.AppendText($"TNF: {record.TypeNameFormat.ToString()} ({(byte)record.TypeNameFormat})\n");
+                            ndefData.AppendText($"Type: {type}\n");
 
-							if (record.Id != null)
-								ndefData.AppendText($"Type: {BitConverter.ToString(record.Id)}\n");
+                            if (record.Id != null)
+                                ndefData.AppendText($"Type: {BitConverter.ToString(record.Id)}\n");
 
-							if (type.Equals("U"))
-							{
-								NdefUriRecord uriRecord = new NdefUriRecord(record);
-								ndefData.AppendText($"Payload: {uriRecord.Uri}\n");
-							}
-							else if (type.Equals("T"))
-							{
-								NdefTextRecord textRecord = new NdefTextRecord(record);
-								ndefData.AppendText($"Encoding: {textRecord.TextEncoding.ToString()}\n");
-								ndefData.AppendText($"Language: {textRecord.LanguageCode}\n");
-								ndefData.AppendText($"Payload: {textRecord.Text}\n");
-							}
-							else if (type.Contains("text"))
-							{
-								ndefData.AppendText($"Payload: {Encoding.UTF8.GetString(record.Payload)}\n");
-							}
-							else
-							{
-								ndefData.AppendText($"Payload: {BitConverter.ToString(record.Payload)}");
-							}
+                            if (type.Equals("U"))
+                            {
+                                NdefUriRecord uriRecord = new NdefUriRecord(record);
+                                ndefData.AppendText($"Payload: {uriRecord.Uri}\n");
+                            }
+                            else if (type.Equals("T"))
+                            {
+                                NdefTextRecord textRecord = new NdefTextRecord(record);
+                                ndefData.AppendText($"Encoding: {textRecord.TextEncoding.ToString()}\n");
+                                ndefData.AppendText($"Language: {textRecord.LanguageCode}\n");
+                                ndefData.AppendText($"Payload: {textRecord.Text}\n");
+                            }
+                            else if (type.Contains("text"))
+                            {
+                                ndefData.AppendText($"Payload: {Encoding.UTF8.GetString(record.Payload)}\n");
+                            }
+                            else
+                            {
+                                ndefData.AppendText($"Payload: {BitConverter.ToString(record.Payload)}");
+                            }
 
-							ndefData.AppendText($"----------\n");
-						}
+                            ndefData.AppendText($"----------\n");
+                        }
                     }
                 };
 
@@ -167,7 +178,7 @@ namespace TapTrack.Demo
         private void WriteURLButton_Click(object sender, RoutedEventArgs e)
         {
 
-			string url = string.Copy(urlTextBox.Text);
+            string url = string.Copy(urlTextBox.Text);
             Command cmd = new WriteUri((byte)timeout.Value, (bool)lockCheckBox.IsChecked, new NdefUri(url));
             Callback repeatCommand = null;
             bool repeat = (bool)repeatUrlWrite.IsChecked;
@@ -443,54 +454,54 @@ namespace TapTrack.Demo
                 else if (window.Protocol == CommunicationProtocol.Bluetooth)
                 {
                     batteryTab.Visibility = Visibility.Visible;
-					if (GetBluegigaDevice() == null)
-					{
-						ShowFailStatus("Please insert BLED112 dongle");
-						return;
-					}
+                    if (GetBluegigaDevice() == null)
+                    {
+                        ShowFailStatus("Please insert BLED112 dongle");
+                        return;
+                    }
 
                 }
-				
+
                 tappy.SwitchProtocol(window.Protocol);
 
-				ShowPendingStatus("Searching for a Tappy");
+                ShowPendingStatus("Searching for a Tappy");
 
                 Task.Run(() =>
                 {
-					if (tappy.AutoDetect())
-					{
-						ShowSuccessStatus($"Connected to {tappy.DeviceName}");
-						if (window.Protocol == CommunicationProtocol.Bluetooth)
-						{
-							try
-							{
-								Command cmd = new EnableDataThrottling(10, 5);
-								tappy.SendCommand(cmd);
-							}
-							catch
-							{
+                    if (tappy.AutoDetect())
+                    {
+                        ShowSuccessStatus($"Connected to {tappy.DeviceName}");
+                        if (window.Protocol == CommunicationProtocol.Bluetooth)
+                        {
+                            try
+                            {
+                                Command cmd = new EnableDataThrottling(10, 5);
+                                tappy.SendCommand(cmd);
+                            }
+                            catch
+                            {
 
-							}
-						}
-					}
-					else
-					{
-						ShowFailStatus("No Tappy found");
-						if (window.Protocol == CommunicationProtocol.Bluetooth)
-						{
-							try
-							{
-								tappy.DisconnectBlueGiga();
-							}
-							catch 
-							{								
-								return;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        ShowFailStatus("No Tappy found");
+                        if (window.Protocol == CommunicationProtocol.Bluetooth)
+                        {
+                            try
+                            {
+                                tappy.DisconnectBlueGiga();
+                            }
+                            catch
+                            {
+                                return;
 
-							}
+                            }
 
-						}
-				
-					}
+                        }
+
+                    }
                 });
             }
         }
@@ -516,7 +527,7 @@ namespace TapTrack.Demo
             Dispatcher.BeginInvoke(show);
         }
 
-        private void ShowSuccessStatus(string message = "")
+        private void ShowSuccessStatus(string message = "", int delay = 750)
         {
             Action show = () =>
             {
@@ -527,7 +538,26 @@ namespace TapTrack.Demo
 
                 Task.Run(() =>
                 {
-                    Thread.Sleep(750);
+                    Thread.Sleep(delay);
+                    HideStatus();
+                });
+            };
+
+            Dispatcher.BeginInvoke(show);
+        }
+
+        private void ShowInformation(string message = "", int delay = 1500)
+        {
+            Action show = () =>
+            {
+                statusPopup.IsOpen = true;
+                statusText.Content = "Information";
+                statusMessage.Content = message;
+                ImageBehavior.SetAnimatedSource(statusImage, (BitmapImage)FindResource("PriorityInformation"));
+
+                Task.Run(() =>
+                {
+                    Thread.Sleep(delay);
                     HideStatus();
                 });
             };
@@ -565,7 +595,7 @@ namespace TapTrack.Demo
             HideStatus();
             dismissButton.Visibility = Visibility.Hidden;
             dismissButtonContainer.Height = zeroHeight;
-			tgbtnLaunchKeyboardFeature.IsChecked = false;
+            tgbtnLaunchKeyboardFeature.IsChecked = false;
         }
 
         private void ResponseCallback(ResponseFrame frame, Exception e)
@@ -595,7 +625,7 @@ namespace TapTrack.Demo
             else if (frame.IsApplicationErrorFrame())
             {
                 ApplicationErrorFrame errorFrame = (ApplicationErrorFrame)frame;
-                ShowFailStatus(errorFrame.ErrorString);
+                ShowFailStatus(errorFrame.ErrorString.Substring(0, errorFrame.ErrorString.Length - 1));
                 return true;
             }
             else if (frame.CommandFamily0 == 0 && frame.CommandFamily1 == 0 && frame.ResponseCode < 0x05)
@@ -704,13 +734,13 @@ namespace TapTrack.Demo
         {
             try
             {
-                tappy.Disconnect();	
-				ShowSuccessStatus("Disconnect was successful");
+                tappy.Disconnect();
+                ShowSuccessStatus("Disconnect was successful");
             }
-            catch(Exception exc)
+            catch (Exception exc)
 
-			{
-				Console.Write(exc.ToString());
+            {
+                Console.Write(exc.ToString());
                 ShowFailStatus("Disconnect was unsuccessful");
             }
         }
@@ -849,121 +879,578 @@ namespace TapTrack.Demo
             return Search("Win32_SerialPort") ?? Search("Win32_pnpEntity");
         }
 
-		//
-		//Keyboard entry mode feature
-		//
+        //
+        //Keyboard entry mode feature
+        //
 
-		#region Keyboard Feature
+        #region Keyboard Feature
 
-		private void chbxAddlineBreak_Checked(object sender, RoutedEventArgs e)
-		{
-			keyboardModeLineBreak = true;
-		}
+        private void chbxAddlineBreak_Checked(object sender, RoutedEventArgs e)
+        {
+            keyboardModeLineBreak = true;
+        }
 
-		private void chbxAddlineBreak_Unchecked(object sender, RoutedEventArgs e)
-		{
-			keyboardModeLineBreak = false;
-		}
+        private void chbxAddlineBreak_Unchecked(object sender, RoutedEventArgs e)
+        {
+            keyboardModeLineBreak = false;
+        }
 
-		private void tgbtnLaunchKeyboardFeature_Checked(object sender, RoutedEventArgs e)
-		{
+        private void tgbtnLaunchKeyboardFeature_Checked(object sender, RoutedEventArgs e)
+        {
 
-			StreamNdef stream = new StreamNdef(0, DetectTagSetting.Type2Type4AandMifare);
-			tappy.SendCommand(stream, InvokeKeyboardFeature);
+            StreamNdef stream = new StreamNdef(0, DetectTagSetting.Type2Type4AandMifare);
+            tappy.SendCommand(stream, InvokeKeyboardFeature);
 
-		}
+        }
 
-		private void InvokeKeyboardFeature(ResponseFrame frame, Exception e)
-		{
-			if (CheckForErrorsOrTimeout(frame, e))
-			{
-				return;
-			}
-			else
-			{
+        private void InvokeKeyboardFeature(ResponseFrame frame, Exception e)
+        {
+            if (CheckForErrorsOrTimeout(frame, e))
+            {
+                return;
+            }
+            else
+            {
 
-				byte[] data = frame.Data;
+                byte[] data = frame.Data;
 
-				byte[] temp = new byte[data.Length - data[1] - 2];
+                byte[] temp = new byte[data.Length - data[1] - 2];
 
-				if (temp.Length > 0)
-				{
-					Array.Copy(data, 2 + data[1], temp, 0, temp.Length);
+                if (temp.Length > 0)
+                {
+                    Array.Copy(data, 2 + data[1], temp, 0, temp.Length);
 
-					NdefMessage message = NdefMessage.FromByteArray(temp);
+                    NdefMessage message = NdefMessage.FromByteArray(temp);
 
-					int numRecords = message.Count;
-					int recordNum = 1;
+                    int numRecords = message.Count;
+                    int recordNum = 1;
 
-					Action EnterKeystrokes = () =>
-					{
-						foreach (NdefRecord record in message)
-						{
-							string type = Encoding.UTF8.GetString(record.Type);
-							if (type.Equals("T"))
-							{
-								NdefTextRecord textRecord = new NdefTextRecord(record);
-								System.Windows.Forms.SendKeys.SendWait(textRecord.Text);
-								if (keyboardModeLineBreak)
-									System.Windows.Forms.SendKeys.SendWait("{ENTER}");
-								if (keyboardModeTab)
-									System.Windows.Forms.SendKeys.SendWait("{TAB}");
-								if (keyboardModeTabLineBreakLast)
-								{
-									if (recordNum == numRecords)
-										System.Windows.Forms.SendKeys.SendWait("{ENTER}");
-									else
-										System.Windows.Forms.SendKeys.SendWait("{TAB}");
+                    Action EnterKeystrokes = () =>
+                    {
+                        foreach (NdefRecord record in message)
+                        {
+                            string type = Encoding.UTF8.GetString(record.Type);
+                            if (type.Equals("T"))
+                            {
+                                NdefTextRecord textRecord = new NdefTextRecord(record);
+                                System.Windows.Forms.SendKeys.SendWait(textRecord.Text);
+                                if (keyboardModeLineBreak)
+                                    System.Windows.Forms.SendKeys.SendWait("{ENTER}");
+                                if (keyboardModeTab)
+                                    System.Windows.Forms.SendKeys.SendWait("{TAB}");
+                                if (keyboardModeTabLineBreakLast)
+                                {
+                                    if (recordNum == numRecords)
+                                        System.Windows.Forms.SendKeys.SendWait("{ENTER}");
+                                    else
+                                        System.Windows.Forms.SendKeys.SendWait("{TAB}");
 
-								}
-									
-								recordNum++;
-							}
+                                }
 
-						}
-					};
+                                recordNum++;
+                            }
 
-					Dispatcher.BeginInvoke(EnterKeystrokes);
-				}
-			}
+                        }
+                    };
 
-		}
+                    Dispatcher.BeginInvoke(EnterKeystrokes);
+                }
+            }
 
-		private void tgbtnLaunchKeyboardFeature_Unchecked(object sender, RoutedEventArgs e)
-		{			
-			tappy.SendCommand<Stop>();
-		}
+        }
 
-		void TextBox_KeyPressed(object sender, System.Windows.Input.KeyEventArgs e)
-		{
-			if (e.Key.ToString() == "Tab")
-			{
-				ShowSuccessStatus("Tab key entered into text record");
-			}
+        private void tgbtnLaunchKeyboardFeature_Unchecked(object sender, RoutedEventArgs e)
+        {
+            tappy.SendCommand<Stop>();
+        }
 
-		}
+        void TextBox_KeyPressed(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key.ToString() == "Tab")
+            {
+                ShowSuccessStatus("Tab key entered into text record");
+            }
+
+        }
+
+        private void chbxAddTab_Unchecked(object sender, RoutedEventArgs e)
+        {
+            keyboardModeTab = false;
+        }
+
+        private void chbxAddTab_Checked(object sender, RoutedEventArgs e)
+        {
+            keyboardModeTab = true;
+        }
+
+        private void chbxAddTabLineBreakLast_Unchecked(object sender, RoutedEventArgs e)
+        {
+            keyboardModeTabLineBreakLast = false;
+        }
+
+        private void chbxAddTabLineBreakLast_Checked(object sender, RoutedEventArgs e)
+        {
+            keyboardModeTabLineBreakLast = true;
+        }
+
+        #endregion
+
+        //
+        //Batch NDEF encoding feature
+        //
+
+        #region Batch NDEF Feature
+
+        private void ImportURI_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog dialog = new OpenFileDialog();
+            dialog.Filter = "CSV file (*.csv)|*.csv|Text file (*.txt)|*.txt";
+            List<ImportedUriNDEFMessage> import = new List<ImportedUriNDEFMessage>();
+
+            if (dialog.ShowDialog() == true)
+            {
+                try
+                {
+                    FileHelperEngine<ImportedUriNDEFMessage> engine = new FileHelperEngine<ImportedUriNDEFMessage>();
+                    import.AddRange(engine.ReadFile(dialog.FileName));
+                }
+                catch (Exception exc)
+                {
+                    ShowFailStatus($"There is a problem with the file. Import has been aborted.");
+                    return;
+                }
+
+                List<BatchNDEF> addToBatch = new List<BatchNDEF>();
+                int count = 0;
+
+                try
+                {
+                    foreach (ImportedUriNDEFMessage message in import)
+                    {
+                        BatchNDEF uri = new BatchNDEF(BatchNDEFType.URI, message.uri);
+                        addToBatch.Add(uri);
+                        count++;
+                    }
+                }
+                catch
+                {
+                    ShowFailStatus($"There is a problem processing these records. Import has been aborted.");
+                    return;
+                }
+
+                if (DatabaseUtility.InsertNDEFMessagesToEncodeSQL(addToBatch))
+                {
+                    ShowSuccessStatus($"Imported {addToBatch.Count} messages from {dialog.FileName}", 2500);
+                }
+                else
+                {
+                    ShowFailStatus($"There is a problem adding these records to the current batch. Import has been aborted.");
+                    return;
+                }
+
+            }
+
+        }
+
+        private void ImportText_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog dialog = new OpenFileDialog();
+            dialog.Filter = "CSV file (*.csv)|*.csv|Text file (*.txt)|*.txt";
+            List<ImportedTextNDEFMessage> import = new List<ImportedTextNDEFMessage>();
+
+            if (dialog.ShowDialog() == true)
+            {
+                try
+                {
+                    FileHelperEngine<ImportedTextNDEFMessage> engine = new FileHelperEngine<ImportedTextNDEFMessage>();
+                    import.AddRange(engine.ReadFile(dialog.FileName));
+                }
+                catch (Exception exc)
+                {
+                    ShowFailStatus($"There is a problem with the file. Import has been aborted.");
+                    return;
+                }
+
+                List<BatchNDEF> addToBatch = new List<BatchNDEF>();
+                int count = 0;
+                try
+                {
+                    foreach (ImportedTextNDEFMessage message in import)
+                    {
+                        BatchNDEF text = new BatchNDEF(BatchNDEFType.TEXT, message.text);
+                        addToBatch.Add(text);
+                        count++;
+                    }
+                }
+                catch
+                {
+                    ShowFailStatus($"There is a problem processing these records. Import has been aborted.");
+                    return;
+                }
+
+                if (DatabaseUtility.InsertNDEFMessagesToEncodeSQL(addToBatch))
+                {
+                    ShowSuccessStatus($"Imported {addToBatch.Count} messages from {dialog.FileName}", 2500);
+                }
+                else
+                {
+                    ShowFailStatus($"There is a problem adding these records to the current batch. Import has been aborted.");
+                    return;
+                }
+
+            }
+        }
+
+        private void BeginBatchEncoding(object sender, RoutedEventArgs e)
+        {
+            if (tappy.isConnected() == true)
+            {
+                if (batchPassword == null && batchLockTagFlag == false)
+                {
+                    ShowInformation("Password protection is NOT set for this batch", 2500);
+                }
+                else if (batchLockTagFlag == false)
+                {
+                    ShowInformation("Password protection IS ACTIVE for this batch, tags encoded will have the entered write access password applied", 2500);
+
+                }
+                BatchEncode();
+            }
+            else
+            {
+                ShowFailStatus("Tapy not connected");
+            }
+
+        }
+
+        private void BatchEncode()
+        {
+            List<BatchNDEF> currentBatch = DatabaseUtility.SelectCurrentBatch();
+            UpdateNumTagsUnEncodedDisplay(currentBatch.Count);
+            int timeout = 0;
+
+            if (batchLockTagFlag == true)
+            {
+                ShowInformation("Permanent tag locking is ACTIVE set for this batch", 2500);
+            }
+
+            if (currentBatch.Count == 0)
+            {
+                ShowFailStatus("No unencoded messages found in the current batch");
+                return;
+            }
+
+            UpdateMessageBeingEncodedDisplay(currentBatch[0].data);
+            batchMessageBeingEncoded = currentBatch[0];
+            if (batchPassword == null)
+            {
+                switch (currentBatch[0].type)
+                {
+                    case "U":
+                        {
+                            WriteUri writeUriCmd = new WriteUri((byte)timeout, batchLockTagFlag, currentBatch[0].data);
+                            tappy.SendCommand(writeUriCmd, BatchTagEncoded);
+                            break;
+                        }
+                    case "T":
+                        {
+                            WriteText writeTextCmd = new WriteText((byte)timeout, batchLockTagFlag, currentBatch[0].data);
+                            tappy.SendCommand(writeTextCmd, BatchTagEncoded);
+                            break;
+                        }
+                }
+            }
+            else
+            {
+                switch (currentBatch[0].type)
+                {
+                    case "U":
+                        {
+                            Tcmp.CommandFamilies.Ntag21x.WritePasswordUri writeUriCmd = new Tcmp.CommandFamilies.Ntag21x.WritePasswordUri(batchPassword, currentBatch[0].data, 0, PasswordProtectionMode.PASSWORD_FOR_WRITE);
+                            tappy.SendCommand(writeUriCmd, BatchTagEncoded);
+                            break;
+                        }
+                    case "T":
+                        {
+                            Tcmp.CommandFamilies.Ntag21x.WritePasswordText writeTextCmd = new Tcmp.CommandFamilies.Ntag21x.WritePasswordText(batchPassword, currentBatch[0].data, 0, PasswordProtectionMode.PASSWORD_FOR_WRITE);
+                            tappy.SendCommand(writeTextCmd, BatchTagEncoded);
+                            break;
+                        }
+                }
+            }
 
 
-		#endregion
 
-		private void chbxAddTab_Unchecked(object sender, RoutedEventArgs e)
-		{
-			keyboardModeTab = false;
-		}
+        }
 
-		private void chbxAddTab_Checked(object sender, RoutedEventArgs e)
-		{
-			keyboardModeTab = true;
-		}
+        private void BatchTagEncoded(ResponseFrame frame, Exception exc)
+        {
+            if (CheckForErrorsOrTimeout(frame, exc))
+            {
+                if (frame.CommandFamily0 == 6 && frame.CommandFamily1 == 0 && frame.IsApplicationErrorFrame() && frame.Data[0] == 0x08)
+                {
+                    //this is for an NTAG21X password that's too short, so this is a fatal error so the batch is stopped.
+                    return;
+                }
+            }
+            else if (frame.ResponseCode == 0x05) //0c05 = write success
+            {
+                //DB Update
+                if (batchMessageBeingEncoded != null)
+                {
+                    if (DatabaseUtility.UpdateMessagesToEncodedSQL(batchMessageBeingEncoded.id) == false)
+                    {
+                        ShowFailStatus("Failed update tag to encoded status, but the tag was encoded");
+                        return;
+                    }
+                }
+                else
+                {
+                    return;
+                }
 
-		private void chbxAddTabLineBreakLast_Unchecked(object sender, RoutedEventArgs e)
-		{
-			keyboardModeTabLineBreakLast = false;
-		}
+                //Insert into encodingEvent table, but parse out the UID first. 
+                Tag tag = new Tag(frame.Data);
+                BatchNDEFType typeEncoded;
+                switch (batchMessageBeingEncoded.type)
+                {
+                    case "U":
+                        {
+                            typeEncoded = BatchNDEFType.URI;
+                            break;
+                        }
+                    case "T":
+                        {
+                            typeEncoded = BatchNDEFType.TEXT;
+                            break;
+                        }
+                    default:
+                        {
+                            ShowFailStatus("Unrecognized NDEF Batch Encoding Type");
+                            return;
+                            break;
+                        }
+                }
 
-		private void chbxAddTabLineBreakLast_Checked(object sender, RoutedEventArgs e)
-		{
-			keyboardModeTabLineBreakLast = true;
-		}
-	}
+                EncodingEvent encodingEvent = new EncodingEvent(typeEncoded, batchMessageBeingEncoded.data, BitConverter.ToString(tag.UID), DateTime.Now.ToUniversalTime());
+
+                if (DatabaseUtility.InsertEncodingEventSQL(encodingEvent) == false)
+                {
+                    ShowFailStatus("Failed to insert encoding event into DB, but the tag was encoded");
+                    return;
+                }
+
+                ShowSuccessStatus("Successfully Encoded Tag", 250);
+                numTagsEncodedInThisBatch++;
+                UpdateNumTagsEncodedDisplay(numTagsEncodedInThisBatch);
+
+            }
+            else
+            {
+                ShowFailStatus("Unexpected response from Tappy, aborting batch");
+                return;
+            }
+
+            if (DatabaseUtility.GetNumberOfUnencodedTagsInCurrentBatch() != 0)
+            {
+                BatchEncode();
+            }
+            else
+            {
+                UpdateNumTagsUnEncodedDisplay(0);
+                tappy.SendCommand<Stop>();
+                Thread.Sleep(1000);
+                ShowSuccessStatus($"All messages in the batch have been encoded successfully!", 3500);
+            }
+
+        }
+
+        private void UpdateNumTagsEncodedDisplay(int numTagsEncoded)
+        {
+            Action update = () =>
+            {
+                numTagsEncodedThisBatchTextBox.Text = numTagsEncoded.ToString();
+            };
+
+            Dispatcher.BeginInvoke(update);
+
+        }
+
+        private void UpdateNumTagsUnEncodedDisplay(int numTagsUnEncoded)
+        {
+            Action update = () =>
+            {
+                numTagsRemainingThisBatch.Text = numTagsUnEncoded.ToString();
+            };
+
+            Dispatcher.BeginInvoke(update);
+
+        }
+
+        private void UpdateMessageBeingEncodedDisplay(string messageBeingEncoded)
+        {
+            Action update = () =>
+            {
+                currentMessage.Text = messageBeingEncoded;
+            };
+
+            Dispatcher.BeginInvoke(update);
+
+        }
+
+        private void UncheckBatchLockingCheckBox()
+        {
+            Action update = () =>
+            {
+                batchLockTagsChkBx.IsChecked = false;
+            };
+
+            Dispatcher.BeginInvoke(update);
+        }
+
+
+
+        private void SetBatchPassword_Click(object sender, RoutedEventArgs e)
+        {
+            BatchPasswordEntryForm window = new BatchPasswordEntryForm();
+
+            if (window.ShowDialog() == true)
+            {
+                if (window.enteredPassword != null)
+                {
+                    batchPassword = window.enteredPassword;
+                    UncheckBatchLockingCheckBox();
+                    ShowSuccessStatus("Batch password set successfully");
+                }
+            }
+        }
+
+        private void SetBatchLocking(object sender, RoutedEventArgs e)
+        {
+            batchLockTagFlag = true;
+            batchPassword = null;
+        }
+
+        private void ClearBatchLocking(object sender, RoutedEventArgs e)
+        {
+            batchLockTagFlag = false;
+        }
+
+        private void EncodeBatch_Focus(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                UpdateNumTagsUnEncodedDisplay(DatabaseUtility.GetNumberOfUnencodedTagsInCurrentBatch());
+            }
+            catch
+            {
+                ShowFailStatus("A problem occured querying the database of batch encoding records");
+            }
+
+        }
+
+        private void TestPWDPACKEncoding(object sender, RoutedEventArgs e)
+        {
+            byte[] pwd = { 0x01, 0x01, 0x01, 0x01 };
+            byte[] pack = { 0x02, 0x02 };
+
+            //Tcmp.CommandFamilies.Ntag21x.WritePasswordUriPwdPack writeUriCmd = new WritePasswordUriPwdPack("http://www.google.ca", 5, PasswordProtectionMode.PASSWORD_FOR_WRITE, pwd, pack);
+            //tappy.SendCommand(writeUriCmd, BatchTagEncoded);
+
+            Tcmp.CommandFamilies.Ntag21x.WritePasswordTextPwdPack writeTextCmd = new WritePasswordTextPwdPack("Ola Mundo!", 5, PasswordProtectionMode.PASSWORD_FOR_READWRITE, pwd, pack);
+            tappy.SendCommand(writeTextCmd, BatchTagEncoded);
+
+        }
+
+        private void TestNDEFPasswordRead(object sender, RoutedEventArgs e)
+        {
+            ReadPasswordNdef readPwdNdefCmd = new ReadPasswordNdef(5, "password");
+            //ReadPasswordNdefPwdPack readPwdNdefCmd = new ReadPasswordNdefPwdPack(5, new byte[] { 0x01, 0x01, 0x01, 0x01 }, new byte[] { 0x02, 0x02 });
+            tappy.SendCommand(readPwdNdefCmd, AddNdefContent);
+        }
+
+        private void TestCustomEncode(object sender, RoutedEventArgs e)
+        {
+            NdefMessage ndef = new NdefMessage();
+            NdefTextRecord text = new NdefTextRecord()
+            {
+                TextEncoding = NdefTextRecord.TextEncodingType.Utf8,
+                LanguageCode = "es",
+                Text = "Ola Mundo! contraseña"
+            };
+            ndef.Add(text);
+            WritePasswordNdefCustom writePasswordNdefCustomCmd = new WritePasswordNdefCustom("password", ndef, 5, PasswordProtectionMode.PASSWORD_FOR_WRITE);
+            tappy.SendCommand(writePasswordNdefCustomCmd, BatchTagEncoded);
+        }
+
+        private void TestCustomEncodePwdPack(object sender, RoutedEventArgs e)
+        {
+            NdefMessage ndef = new NdefMessage();
+            NdefTextRecord text = new NdefTextRecord()
+            {
+                TextEncoding = NdefTextRecord.TextEncodingType.Utf8,
+                LanguageCode = "es",
+                Text = "Ola Mundo! PWD/PACK"
+            };
+            ndef.Add(text);
+            WritePasswordNdefCustomPwdPack writePasswordNdefCustomPwdPackCmd = new WritePasswordNdefCustomPwdPack(new byte[] { 0x01, 0x01, 0x01, 0x01 }, new byte[] { 0x02, 0x02 }, ndef, 5, PasswordProtectionMode.PASSWORD_FOR_WRITE);
+            tappy.SendCommand(writePasswordNdefCustomPwdPackCmd, BatchTagEncoded);
+
+        }
+
+        private void ViewImportedBatchTable_Loaded(object sender, RoutedEventArgs e)
+        {
+            List<BatchNDEF> currentBatch = DatabaseUtility.SelectAllImportedBatch();
+            dgImportedBatch.DataContext = currentBatch;
+        }
+
+        private void ClearImportedBatch(object sender, RoutedEventArgs e)
+        {
+            if (DatabaseUtility.ClearImportedBatchTable() == true)
+            {
+                ShowSuccessStatus("Imported batch cleared");
+                ViewImportedBatchTable_Loaded(null, null);
+            }
+            else
+            {
+                ShowFailStatus("Could not clear the current imorted batch");
+            }
+        }
+
+        private void ExportEncodingEvents(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog dialog = new SaveFileDialog();
+            dialog.Filter = "CSV file (*.csv)|*.csv|Text file (*.txt)|*.txt";
+            List<EncodingEvent> export = DatabaseUtility.SelectAllEncodingEvents();
+
+
+            if (dialog.ShowDialog() == true)
+            {
+                FileHelperEngine<EncodingEvent> engine = new FileHelperEngine<EncodingEvent>();
+                engine.HeaderText = engine.GetFileHeader();
+                engine.WriteFile(dialog.FileName, export);
+            }
+        }
+
+        private void ExportImportedBatch(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog dialog = new SaveFileDialog();
+            dialog.Filter = "CSV file (*.csv)|*.csv|Text file (*.txt)|*.txt";
+            List<BatchNDEF> export = DatabaseUtility.SelectAllImportedBatch();
+
+
+            if (dialog.ShowDialog() == true)
+            {
+                FileHelperEngine<BatchNDEF> engine = new FileHelperEngine<BatchNDEF>();
+                engine.HeaderText = engine.GetFileHeader();
+                engine.WriteFile(dialog.FileName, export);
+            }
+
+        }
+
+        #endregion
+
+
+    }
+
 }

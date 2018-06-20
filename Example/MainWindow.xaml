@@ -7,9 +7,10 @@
         xmlns:ed="http://schemas.microsoft.com/expression/2010/drawing" x:Class="TapTrack.Demo.MainWindow"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:gif="http://wpfanimatedgif.codeplex.com"
-        mc:Ignorable="d"
+    xmlns:demo="clr-namespace:TapTrack.Demo"
+    mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
-        Title="Tappy Demo 2.5" Height="650" Width="800" Foreground="{x:Null}" Background="{StaticResource LightBackground}">
+        Title="Tappy Demo 3.0" Height="650" Width="800" Foreground="{x:Null}" Background="{StaticResource LightBackground}">
     <Grid Background="{StaticResource LightBackground}">
         <Grid.RowDefinitions>
             <RowDefinition Height="50"/>
@@ -211,7 +212,7 @@
                                 </TextBlock>
                             </StackPanel>
                             <Label Margin="10,10,0,0" Padding="0,0,0,10" Foreground="White" Target="{Binding ElementName=TextBox}" Content="Text"/>
-							<TextBox Name="TextBox" Margin="10,0,20,20" Foreground="White" Background="{StaticResource LightBackground}" BorderBrush="#595959" BorderThickness="0,0,0,1" AcceptsTab="True" AcceptsReturn="True" KeyUp="TextBox_KeyPressed"/>
+                            <TextBox Name="TextBox" Margin="10,0,20,20" Foreground="White" Background="{StaticResource LightBackground}" BorderBrush="#595959" BorderThickness="0,0,0,1" AcceptsTab="True" AcceptsReturn="True" KeyUp="TextBox_KeyPressed"/>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                                 <Button Name="writeTextButton" Style="{StaticResource RoundButton}" Click="WriteTextButton_Click">Write</Button>
                                 <CheckBox Name="repeatTextWrite" IsChecked="False" VerticalAlignment="Center"/>
@@ -357,39 +358,39 @@
                             </Button>
                         </StackPanel>
                     </TabItem>
-					<TabItem Header="Test" Style="{StaticResource KeyboardWedge}">
-						<StackPanel Background="{StaticResource DarkBackground}">
-							<StackPanel Margin="10" DockPanel.Dock="Top">
-								<TextBlock Foreground="White" TextWrapping="Wrap" FontSize="20" Margin="0,0,0,10">
+                    <TabItem Header="Test" Style="{StaticResource KeyboardWedge}">
+                        <StackPanel Background="{StaticResource DarkBackground}">
+                            <StackPanel Margin="10" DockPanel.Dock="Top">
+                                <TextBlock Foreground="White" TextWrapping="Wrap" FontSize="20" Margin="0,0,0,10">
                                     Keyboard Entry Mode
-								</TextBlock>
-								<TextBlock Foreground="White" TextWrapping="Wrap">
+                                </TextBlock>
+                                <TextBlock Foreground="White" TextWrapping="Wrap">
                                     This utlity will allow the NFC scans to be entered as keyboard characters.  This allows a keyboard wedge functionality.
-									The Tappy will scan for NDEF-formatted tags, and any text records will be entered as keyboard entry.  Ideal for spreadsheet applications.                             
-								</TextBlock>
-								<StackPanel Margin="10">
-									<CheckBox Style="{StaticResource SimpleCheckBox}" Name="chbxAddlineBreak" Content="  Add CR, LF after each record" Foreground="White" Margin="2" 
+									The Tappy will scan for NDEF-formatted tags, and any text records will be entered as keyboard entry.  Ideal for spreadsheet applications.
+                                </TextBlock>
+                                <StackPanel Margin="10">
+                                    <CheckBox Style="{StaticResource SimpleCheckBox}" Name="chbxAddlineBreak" Content="  Add CR, LF after each record" Foreground="White" Margin="2" 
 											  Checked="chbxAddlineBreak_Checked" Unchecked="chbxAddlineBreak_Unchecked"/>
-									<CheckBox Style="{StaticResource SimpleCheckBox}" Name="chbxAddTab" Content="  Add TAB after each record" Foreground="White" Margin="2" 
+                                    <CheckBox Style="{StaticResource SimpleCheckBox}" Name="chbxAddTab" Content="  Add TAB after each record" Foreground="White" Margin="2" 
 											  Checked="chbxAddTab_Checked" Unchecked="chbxAddTab_Unchecked"/>
-									<CheckBox Style="{StaticResource SimpleCheckBox}" Name="chbxAddTabLineBreakLast" Content="  Add TAB after each record and CR,LF after final record" Foreground="White" Margin="2" 
+                                    <CheckBox Style="{StaticResource SimpleCheckBox}" Name="chbxAddTabLineBreakLast" Content="  Add TAB after each record and CR,LF after final record" Foreground="White" Margin="2" 
 											  Checked="chbxAddTabLineBreakLast_Checked" Unchecked="chbxAddTabLineBreakLast_Unchecked"/>
-								</StackPanel>
-							</StackPanel>
-							<Grid Background="{StaticResource DarkBackground}">
-								<Grid.ColumnDefinitions>
-									<ColumnDefinition Width="1*"/>
-									<ColumnDefinition Width="1*"/>
-								</Grid.ColumnDefinitions>
-								<TextBlock Grid.Column="1" Foreground="White" Text="Activate keyboard wedge mode"/>
-								<ToggleButton Grid.Column="1" HorizontalAlignment="Right" Name="tgbtnLaunchKeyboardFeature" 
+                                </StackPanel>
+                            </StackPanel>
+                            <Grid Background="{StaticResource DarkBackground}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="1*"/>
+                                    <ColumnDefinition Width="1*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="1" Foreground="White" Text="Activate keyboard wedge mode"/>
+                                <ToggleButton Grid.Column="1" HorizontalAlignment="Right" Name="tgbtnLaunchKeyboardFeature" 
 											  Width="50" Height="30" Margin="0,0,20,0" Style="{StaticResource AnimatedSwitch }" 
 											  Checked="tgbtnLaunchKeyboardFeature_Checked" Unchecked="tgbtnLaunchKeyboardFeature_Unchecked"/>
-								<!--Checked="tgbtnLaunchKeyboardFeature_Checked"-->
-							</Grid>
-						</StackPanel>
-					</TabItem>
-					<TabItem Style="{StaticResource PlatformConfig}">
+                                <!--Checked="tgbtnLaunchKeyboardFeature_Checked"-->
+                            </Grid>
+                        </StackPanel>
+                    </TabItem>
+                    <TabItem Style="{StaticResource PlatformConfig}">
                         <StackPanel Background="{StaticResource DarkBackground}">
                             <StackPanel Margin="10" DockPanel.Dock="Top">
                                 <TextBlock Foreground="White" TextWrapping="Wrap" FontSize="20" Margin="0,0,0,10">
@@ -452,6 +453,169 @@
                         </StackPanel>
                     </TabItem>
                 </TabControl>
+            </TabItem>
+            <TabItem Header="Batch Write">
+                <TabControl Padding="0" TabStripPlacement="Left" Background="{x:Null}" BorderThickness="0">
+                    <TabControl.Resources>
+                        <Style TargetType="{x:Type Grid}">
+                            <Setter Property="Background" Value="White"/>
+                        </Style>
+                        <Style TargetType="{x:Type TabPanel}">
+                            <Setter Property="VerticalAlignment" Value="Top"/>
+                        </Style>
+                    </TabControl.Resources>
+                    <TabItem Style="{StaticResource ImportNDEFRecords}">
+                        <StackPanel Background="{StaticResource DarkBackground}">
+                            <StackPanel Margin="10" DockPanel.Dock="Top">
+                                <TextBlock Foreground="White" TextWrapping="Wrap" FontSize="20" Margin="0,0,0,10">
+                                    Batch Encode NFC Tags
+                                </TextBlock>
+                                <TextBlock Foreground="White" TextWrapping="Wrap">
+                                    This is used to encode a batch of tags based on an imported file.
+                                </TextBlock>
+                            </StackPanel>
+                            <Button HorizontalAlignment="Right" Style="{StaticResource RoundButton}" Click="ImportURI_Click">
+                                Import URIs
+                            </Button>
+                            <Button HorizontalAlignment="Right" Style="{StaticResource RoundButton}" Click="ImportText_Click" Margin="0,0,0.2,0" Width="108">
+                                Import Text
+                            </Button>
+                        </StackPanel>
+                    </TabItem>
+                    <TabItem Style="{StaticResource ProtectTagBatchWrite}">
+                        <StackPanel Background="{StaticResource DarkBackground}">
+                            <TextBlock Foreground="White" TextWrapping="Wrap" FontSize="20" Margin="10,0,0,10">
+                                    Write Protect Batch Encoded Tags
+                            </TextBlock>
+                            <TextBlock Margin="10,0,0,10" Foreground="White" TextWrapping="Wrap">
+                                    Use these settings to protect your batch encoded tags from being overwritten.
+                            </TextBlock>
+                            <TextBlock Margin="10,0,0,10" Foreground="White" TextWrapping="Wrap">
+                                    There are two options: (1) To permanently lock the tags which prevent them from being overwritten, or (2), to require a password to overwrite data.  The password option is only available on NTAG21x tags.
+                            </TextBlock>
+                            <TextBlock Margin="10,0,0,10" Foreground="White" TextWrapping="Wrap">
+                                    To re-encode a batch of previously password protected tags, you also use this setting to enter the password required to overwrite the tags.
+                            </TextBlock>
+                            <StackPanel Orientation="Horizontal" Margin="10" DockPanel.Dock="Top">
+                                <CheckBox Name="batchLockTagsChkBx" IsChecked="False" VerticalAlignment="Center" Checked="SetBatchLocking" Unchecked="ClearBatchLocking" />
+                                <TextBlock Foreground="White" Margin="5,0,10,0" VerticalAlignment="Center">Permanently Lock Tags</TextBlock>
+                            </StackPanel>
+                            <StackPanel DockPanel.Dock="Top">
+                                <Button HorizontalAlignment="Left" Style="{StaticResource RoundButton}" Click="SetBatchPassword_Click">
+                                    Set write access password (NTAG21x tags only)
+                                </Button>
+                            </StackPanel>
+
+                        </StackPanel>
+                    </TabItem>
+
+                    <TabItem Style="{StaticResource EncodeBatchOfTags}" GotFocus="EncodeBatch_Focus">
+                        <StackPanel Background="{StaticResource DarkBackground}">
+                            <StackPanel Margin="10" DockPanel.Dock="Top">
+                                <StackPanel Margin="10" DockPanel.Dock="Top">
+                                    <TextBlock Foreground="White" TextWrapping="Wrap" FontSize="20" Margin="0,0,0,10">
+                                    Begin or Resume Batch Encoding
+                                    </TextBlock>
+                                    <TextBlock Foreground="White" TextWrapping="Wrap">
+                                    Begin or resume a batch encoding process here.
+                                    </TextBlock>
+                                </StackPanel>
+                                <Button HorizontalAlignment="Right" Style="{StaticResource RoundButton}" Click="BeginBatchEncoding">
+                                    Begin/Resume Batch Encoding
+                                </Button>
+                                <!--<Button HorizontalAlignment="Right" Style="{StaticResource RoundButton}" Click="TestPWDPACKEncoding">
+                                    Test PWD/PACK Write URI
+                                </Button>
+                                <Button HorizontalAlignment="Right" Style="{StaticResource RoundButton}" Click="TestNDEFPasswordRead">
+                                    Test NTAG PWD Read URI
+                                </Button>
+                                <Button HorizontalAlignment="Right" Style="{StaticResource RoundButton}" Click="TestCustomEncode">
+                                    Test Custom Encode
+                                </Button>
+                                <Button HorizontalAlignment="Right" Style="{StaticResource RoundButton}" Click="TestCustomEncodePwdPack">
+                                    Test Custom Encode PWD/PACK
+                                </Button>-->
+                                <TextBlock Foreground="White" TextWrapping="Wrap" FontSize="20" Margin="10,0,0,0">
+                                   Tags Encoded This Batch:
+                                </TextBlock>
+
+                                <TextBox x:Name="numTagsEncodedThisBatchTextBox" Margin="10,10,593.2,10" Foreground="Black"  AcceptsReturn="False"/>
+                                <TextBlock Foreground="White" TextWrapping="Wrap" FontSize="20" Margin="10,0,0,0">
+                                   Tags Remining This Batch:
+                                </TextBlock>
+                                <TextBox x:Name="numTagsRemainingThisBatch" Margin="10,10,593.2,10" Foreground="Black"  AcceptsReturn="False"/>
+                                <TextBlock Foreground="White" TextWrapping="Wrap" FontSize="20" Margin="10,0,0,0">
+                                   Current Message Being Encoded:
+                                </TextBlock>
+                                <TextBox x:Name="currentMessage" Margin="10,10,10.2,10" Foreground="Black"  AcceptsReturn="False" Height="77"/>
+                            </StackPanel>
+
+                        </StackPanel>
+                    </TabItem>
+                    <TabItem Style="{StaticResource ViewImportedBatchTable}">
+                        <StackPanel Background="{StaticResource DarkBackground}">
+                            <TextBlock Foreground="White" TextWrapping="Wrap" FontSize="20" Margin="10,0,0,0">
+                                    View imported batch status
+                            </TextBlock>
+                            <StackPanel Margin="10" DockPanel.Dock="Top">
+                                <DataGrid Background="{x:Null}" Name="dgImportedBatch" ItemsSource="{Binding}" AutoGenerateColumns="False" 
+										  Foreground="White" FontSize="14" Margin="10,10,0,10" HorizontalAlignment="Left" RowHeaderWidth="0" IsReadOnly="true" Grid.RowSpan="2"  Loaded="ViewImportedBatchTable_Loaded" VerticalScrollBarVisibility="Auto" Height="409" HorizontalScrollBarVisibility="Auto">
+                                    <DataGrid.Resources>
+                                        <Style TargetType="{x:Type DataGridColumnHeader}">
+                                            <Setter Property="Background" Value="{StaticResource AccentHighLightDark}"/>
+                                            <Setter Property="BorderBrush" Value="{StaticResource LightBackground}"/>
+                                            <Setter Property="BorderThickness" Value="1"/>
+                                        </Style>
+                                        <Style TargetType="{x:Type DataGridCell}">
+                                            <Setter Property="Background" Value="{StaticResource DarkBackground}"/>
+                                            <Setter Property="BorderBrush" Value="{StaticResource LightBackground}"/>
+                                            <Style.Triggers>
+                                                <Trigger Property="IsSelected" Value="True">
+                                                    <Setter Property="Background" Value="{StaticResource LightBackground}"/>
+                                                </Trigger>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter Property="Background" Value="{StaticResource LightBackground}"/>
+                                                </Trigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </DataGrid.Resources>
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Id" Binding="{Binding id}" Width="50"/>
+                                        <DataGridTextColumn Header="Type" Binding="{Binding type}" Width="50"/>
+                                        <DataGridTextColumn Header="Data" Binding="{Binding data}" Width="500"/>
+                                        <DataGridTextColumn Header="Encoded" Binding="{Binding encodedSuccessfully, Converter={StaticResource intToYesNoConverter}}" Width="500"/>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">                                       
+                                    <Button HorizontalAlignment="Right" Style="{StaticResource RoundButton}" Click="ExportImportedBatch">
+                                    Export to spreadsheet
+                                </Button>
+                                    <Button HorizontalAlignment="Right" Style="{StaticResource RoundButton}" Click="ClearImportedBatch">
+                                        Delete Imported Batch
+                                    </Button>
+                                </StackPanel>
+                            </StackPanel>
+
+                        </StackPanel>
+                    </TabItem>
+                    <TabItem Style="{StaticResource ExportEncodingEvents}">
+                        <StackPanel Background="{StaticResource DarkBackground}">
+                            <TextBlock Foreground="White" TextWrapping="Wrap" FontSize="20" Margin="10,0,0,0">
+                                    Export a spreadsheet of all tags batch encoded on this station
+                            </TextBlock>
+                            <StackPanel Margin="10" DockPanel.Dock="Top">
+               
+                                <Button HorizontalAlignment="Right" Style="{StaticResource RoundButton}" Click="ExportEncodingEvents">
+                                    Export Encoded Tag List
+                                </Button>
+                            </StackPanel>
+
+                        </StackPanel>
+                    </TabItem>
+                </TabControl>
+
+
+
             </TabItem>
         </TabControl>
     </Grid>

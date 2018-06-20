@@ -8,7 +8,7 @@
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>TapTrack.Demo</RootNamespace>
-    <AssemblyName>Tappy Demo 2.6</AssemblyName>
+    <AssemblyName>Tappy Demo 3.0</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -49,7 +49,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Debug\Tappy Demo 2.6.xml</DocumentationFile>
+    <DocumentationFile>bin\Debug\Tappy Demo 3.0.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -59,7 +59,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Release\Tappy Demo 2.6.xml</DocumentationFile>
+    <DocumentationFile>bin\Release\Tappy Demo 3.0.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
     <ManifestCertificateThumbprint>DA55EDA3D657C041EF308F9D8CDF1B5A4950F2E4</ManifestCertificateThumbprint>
@@ -83,6 +83,9 @@
     <ApplicationIcon>Resources\app.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="FileHelpers, Version=3.2.7.0, Culture=neutral, PublicKeyToken=3e0c08d59cc3d657, processorArchitecture=MSIL">
+      <HintPath>..\packages\FileHelpers.3.2.7\lib\net45\FileHelpers.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Expression.Drawing, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="NdefLibrary, Version=3.1.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\NdefLibrary.3.1.1\lib\portable-net45+win8+wp8+wpa81\NdefLibrary.dll</HintPath>
@@ -90,6 +93,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Data.Linq" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Management" />
     <Reference Include="System.Windows.Forms" />
@@ -139,6 +143,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="BatchPasswordEntryForm.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="ConnectWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -151,9 +159,20 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="BatchNDEF.cs" />
+    <Compile Include="BatchPasswordEntryForm.xaml.cs">
+      <DependentUpon>BatchPasswordEntryForm.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ConnectWindow.xaml.cs">
       <DependentUpon>ConnectWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Converters.cs" />
+    <Compile Include="DatabaseUtility.cs" />
+    <Compile Include="DataGridIntegerColumn.cs" />
+    <Compile Include="EncodingEvent.cs" />
+    <Compile Include="ImportedTextNDEFMessage.cs" />
+    <Compile Include="ImportedUriNDEFMessage.cs" />
+    <Compile Include="BatchNDEFType.cs" />
     <Compile Include="Row.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
@@ -661,6 +680,24 @@
       <Project>{cd277ef8-6666-4b0c-b482-9eafa662732e}</Project>
       <Name>TapTrack.Tcmp</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\import_contacts.png" />
+    <Resource Include="Resources\import_contacts_highlight.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="NDEFBatchMessages.mdf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="NDEFBatchMessages_log.ldf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <DependentUpon>NDEFBatchMessages.mdf</DependentUpon>
+    </Content>
+    <Resource Include="Resources\assessment.png" />
+    <Resource Include="Resources\assessment_highlight.png" />
+    <Resource Include="Resources\priority_high.png" />
+    <Resource Include="Resources\edit.png" />
+    <Resource Include="Resources\edit_highlight.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
