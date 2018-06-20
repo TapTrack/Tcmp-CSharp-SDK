@@ -471,7 +471,22 @@
                                     Batch Encode NFC Tags
                                 </TextBlock>
                                 <TextBlock Foreground="White" TextWrapping="Wrap">
-                                    This is used to encode a batch of tags based on an imported file.
+                                    This is used to encode a batch of tags based on an imported file.                                
+                                </TextBlock>
+                                <TextBlock Foreground="White" TextWrapping="Wrap" Margin="0,10,0,10">
+                                    The imported file should be a .csv or .txt file, and contain a single column for the URI or text for the NDEF with each entry appearing on a new line as follows:
+                                </TextBlock>
+                                <TextBlock Foreground="White" TextWrapping="Wrap" Margin="0,0,0,0">
+                                   http://www.myurl.com/uniqueIdentifier1
+                                </TextBlock>
+                                <TextBlock Foreground="White" TextWrapping="Wrap" Margin="0,0,0,0">
+                                   http://www.myurl.com/uniqueIdentifier2
+                                </TextBlock>
+                                <TextBlock Foreground="White" TextWrapping="Wrap" Margin="0,0,0,0">
+                                   ....
+                                </TextBlock>
+                                <TextBlock Foreground="White" TextWrapping="Wrap" Margin="0,0,0,0">
+                                   http://www.myurl.com/uniqueIdentifierN
                                 </TextBlock>
                             </StackPanel>
                             <Button HorizontalAlignment="Right" Style="{StaticResource RoundButton}" Click="ImportURI_Click">
