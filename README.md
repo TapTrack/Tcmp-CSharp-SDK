@@ -8,7 +8,7 @@ Nuget page: https://www.nuget.org/packages/TapTrack.Tcmp/
 `PM> Install-Package TapTrack.Tcmp`
 
 ### Required local database utility to use the batch NFC tag encoder in the example/demo app
-To use the batch tag encoder feature of the example/demo utility (v3.0+), you may need also install SQL local database 2016 for Windows.  The install package can be dowloaded [here](https://github.com/TapTrack/Tcmp-CSharp-SDK/releases/download/0.7.0/SqlLocalDB.msi)
+To use the batch tag encoder feature of the example/demo utility (v3.0+), you may also need to install SQL local database 2016 for Windows.  The install package can be dowloaded [here](https://github.com/TapTrack/Tcmp-CSharp-SDK/releases/download/0.7.0/SqlLocalDB.msi)
 
 ## TCMP Protocol Documentation
 
