@@ -19,11 +19,17 @@ namespace TapTrack.Tcmp.Communication.Bluetooth
 {
     internal class BluetoothConnection : Connection
     {
+        
         private enum Handle : ushort
         {
-            DeviceName = 4,
-            Write = 21,
-            Read = 24
+          //  DeviceName = 4,
+            /*v2.1 or later Truconnect*/
+            Write = 67,
+            WriteV1_5 = 21
+          //  Read = 70
+            /*v1.5 Truconnect*/
+            //Write = 21,
+            //Read = 24
         }
 
         private Bluegiga.BGLib bluetooth;
@@ -235,7 +241,14 @@ namespace TapTrack.Tcmp.Communication.Bluetooth
             bluetooth.BLEEventConnectionStatus -= connectionStatus;
 
             if (connectionEst)
+            {
+                /*Added during the update of Sept. 2018 to set the descriptor to the "Enable Notification Value", this is 
+                 * to support the later TappyBLEs w/ version 2.0 or later of the BLE module firmware from Silicon Labs*/
+                bluetooth.SendCommand(this.port,bluetooth.BLECommandATTClientAttributeWrite((byte)device.ConnectionHandle,71, new byte[] { 0x01, 0x00 }));
+                resp.WaitOne(1000);
                 isConnected = true;
+            }
+                
 
             return connectionEst;
         }
@@ -257,7 +270,7 @@ namespace TapTrack.Tcmp.Communication.Bluetooth
         {
 			if (device?.ConnectionHandle != null && (port?.IsOpen) != null)
 			{
-				bluetooth.SendCommand(port, bluetooth.BLECommandConnectionDisconnect((byte)device.ConnectionHandle));
+				bluetooth.SendCommand(port, bluetooth.BLECommandConnectionDisconnect((byte)device.ConnectionHandle)); 
 				DisconnectBlueGiga();
 			}
 		}
@@ -387,10 +400,24 @@ namespace TapTrack.Tcmp.Communication.Bluetooth
 
                         for (int i = 0; i < Math.Ceiling((double)data.Length / 20); i++)
                         {
-                            bluetooth.SendCommand(this.port,
-                                bluetooth.BLECommandATTClientAttributeWrite((byte)device.ConnectionHandle, (ushort)Handle.Write,
+                            /* Added during the update of Sept. 2018 (v0.8.0) to support the both earlier and later TappyBLEs w/ version 1.5 and 2.0 of the BLE module firmware from Silicon Labs.  Historically, TappyBLEs w/ SNs 00 through 069 */
+                            if (device.Name.Contains("TAPPY00") || device.Name.Contains("TAPPY01") || device.Name.Contains("TAPPY02") || device.Name.Contains("TAPPY03") || device.Name.Contains("TAPPY04") || device.Name.Contains("TAPPY05") || device.Name.Contains("TAPPY06"))
+                            {
+                                bluetooth.SendCommand(this.port,
+                                bluetooth.BLECommandATTClientAttributeWrite((byte)device.ConnectionHandle, 
+                                (ushort)Handle.WriteV1_5,
                                 payload.GetRange(i * 20, (total < 20) ? total : 20).ToArray())
-                            );
+                                );
+                            }
+                            else
+                            {
+                                bluetooth.SendCommand(this.port,
+                                bluetooth.BLECommandATTClientAttributeWrite((byte)device.ConnectionHandle, 
+                                (ushort)Handle.Write,
+                                payload.GetRange(i * 20, (total < 20) ? total : 20).ToArray())
+                                );
+                            }
+
                             total -= 20;
                             signal = proceed.WaitOne(200);
                             if (!signal)
@@ -399,7 +426,15 @@ namespace TapTrack.Tcmp.Communication.Bluetooth
                     }
                     else
                     {
-                        bluetooth.SendCommand(this.port, bluetooth.BLECommandATTClientAttributeWrite((byte)device.ConnectionHandle, (ushort)Handle.Write, data));
+                        /* Added during the update of Sept. 2018 (v0.8.0) to support the both earlier and later TappyBLEs w/ version 1.5 and 2.0 of the BLE module firmware from Silicon Labs.  Historically, TappyBLEs w/ SNs 00 through 069 */
+                        if (device.Name.Contains("TAPPY00") || device.Name.Contains("TAPPY01") || device.Name.Contains("TAPPY02") || device.Name.Contains("TAPPY03") || device.Name.Contains("TAPPY04") || device.Name.Contains("TAPPY05") || device.Name.Contains("TAPPY06"))
+                        {
+                            bluetooth.SendCommand(this.port, bluetooth.BLECommandATTClientAttributeWrite((byte)device.ConnectionHandle, (ushort)Handle.WriteV1_5, data));
+                        }
+                        else
+                        {
+                            bluetooth.SendCommand(this.port, bluetooth.BLECommandATTClientAttributeWrite((byte)device.ConnectionHandle, (ushort)Handle.Write, data));
+                        }                            
                         proceed.WaitOne(200);
                     }
 
