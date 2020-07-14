@@ -449,9 +449,11 @@ namespace TapTrack.Demo
 
             if (window.ShowDialog() == true)
             {
-                if (window.Protocol == CommunicationProtocol.Usb)
+                if (window.Protocol != CommunicationProtocol.Bluetooth)
+                {
                     batteryTab.Visibility = Visibility.Hidden;
-                else if (window.Protocol == CommunicationProtocol.Bluetooth)
+                }
+                else
                 {
                     batteryTab.Visibility = Visibility.Visible;
                     if (GetBluegigaDevice() == null)
@@ -459,7 +461,6 @@ namespace TapTrack.Demo
                         ShowFailStatus("Please insert BLED112 dongle");
                         return;
                     }
-
                 }
 
                 tappy.SwitchProtocol(window.Protocol);

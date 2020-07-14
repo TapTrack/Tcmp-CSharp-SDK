@@ -12,6 +12,7 @@ namespace TapTrack.Tcmp.Communication
     public enum CommunicationProtocol
     {
         Usb,
+        TrueUsb,
         Bluetooth
     }
 }

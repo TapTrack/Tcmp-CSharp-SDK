@@ -5,13 +5,13 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TapTrack.Demo"
         mc:Ignorable="d"
-        Title="ConnectWindow" Height="200" Width="300"
+        Title="ConnectWindow" Height="210.682" Width="300"
         Background="{StaticResource LightBackground}"
         WindowStartupLocation="CenterScreen">
     <StackPanel Orientation="Vertical" Margin="10" Background="{StaticResource LightBackground}">
         <TextBlock Foreground="White" HorizontalAlignment="Center">Connect to a</TextBlock>
         <Button Style="{StaticResource RoundButton}" Click="bleButton_Click">TappyBLE</Button>
-        <TextBlock Foreground="White" HorizontalAlignment="Center">or</TextBlock>
         <Button Style="{StaticResource RoundButton}" Click="usbButton_Click">TappyUSB</Button>
+        <Button Style="{StaticResource RoundButton}" Click="trueUsbButton_Click" Content="True TappyUSB"/>
     </StackPanel>
 </Window>

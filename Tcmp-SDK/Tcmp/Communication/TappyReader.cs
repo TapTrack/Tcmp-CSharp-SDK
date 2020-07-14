@@ -8,6 +8,7 @@ using TapTrack.Tcmp.CommandFamilies;
 using TapTrack.Tcmp.CommandFamilies.BasicNfc;
 using TapTrack.Tcmp.CommandFamilies.System;
 using System.Threading.Tasks;
+using Bluegiga.BLE.Events.Connection;
 
 namespace TapTrack.Tcmp.Communication
 {
@@ -117,45 +118,67 @@ namespace TapTrack.Tcmp.Communication
     public class TappyReader : IDisposable
     {
         private Connection conn;
-        private List<byte> buffer;
-
         private Callback responseCallback;
+
+        private List<byte> buffer = new List<byte>();
+        private CommunicationProtocol currentProtocol;
+
+        public CommunicationProtocol Protocol 
+        {
+            get
+            {
+                return currentProtocol;
+            }
+            set
+            {
+                currentProtocol = value;
+                InitializeConnection();
+            }
+        }
+
+        /// <summary>
+        /// Gets the name of the device the driver is currently connected to 
+        /// (USB port name or bluetooth device name depending on the current 
+        /// communcation protocol).
+        /// Returns null if there is no device connected.
+        /// </summary>
+        public string DeviceName { get; private set; }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="protocol">Which protocol the driver should communicate over</param>
-        public TappyReader(CommunicationProtocol protocol)
+        /// <param name="disconnectCallback"></param>
+        public TappyReader(CommunicationProtocol protocol, DisconnectedEventHandler disconnectCallback = null)
         {
-            if (protocol == CommunicationProtocol.Usb)
+            Protocol = protocol;
+            if (!(disconnectCallback is null))
             {
-                conn = new UsbConnection();
+                conn.setDisconnectCallback(disconnectCallback);
             }
-            else if (protocol == CommunicationProtocol.Bluetooth)
-            {
-                conn = new BluetoothConnection();
-            }
-
-            buffer = new List<byte>();
-            conn.DataReceived += new EventHandler(DataReceivedHandler);
-            DeviceName = null;
         }
-		public TappyReader(CommunicationProtocol protocol, Bluegiga.BLE.Events.Connection.DisconnectedEventHandler disconnectCallback)
-		{
-			if (protocol == CommunicationProtocol.Usb)
-			{
-				conn = new UsbConnection();
-			}
-			else if (protocol == CommunicationProtocol.Bluetooth)
-			{
-				conn = new BluetoothConnection(disconnectCallback);
-			}
 
-			buffer = new List<byte>();
-			conn.DataReceived += new EventHandler(DataReceivedHandler);
-			DeviceName = null;
-			
-		}
+        private void InitializeConnection(DisconnectedEventHandler disconnectCallback = null)
+        {
+            switch (currentProtocol)
+            {
+            case CommunicationProtocol.Usb:
+                {
+                    conn = new UsbConnection();
+                    break;
+                }
+            case CommunicationProtocol.TrueUsb:
+                {
+                    conn = new TrueUsbConnection();
+                    break;
+                }
+            case CommunicationProtocol.Bluetooth:
+                {
+                    conn = new BluetoothConnection(disconnectCallback);
+                    break;
+                }
+            }
+        }
 
 		private void DataReceivedHandler(object sender, EventArgs e)
         {
@@ -331,12 +354,8 @@ namespace TapTrack.Tcmp.Communication
 		public void SwitchProtocol(CommunicationProtocol protocol)
         {
             conn?.Disconnect();
-
-            if (protocol == CommunicationProtocol.Usb)
-                conn = new UsbConnection();
-            else if (protocol == CommunicationProtocol.Bluetooth)
-                conn = new BluetoothConnection();
-
+            Protocol = protocol;
+            InitializeConnection();
             FlushBuffer();
 
             conn.DataReceived += new EventHandler(DataReceivedHandler);
@@ -392,8 +411,6 @@ namespace TapTrack.Tcmp.Communication
 			return success;
 		}
 
-
-
 		/// <summary>
 		/// Disconnect from the current reader
 		/// </summary>
@@ -410,16 +427,6 @@ namespace TapTrack.Tcmp.Communication
         public string[] GetAvailableDevices()
         {
             return conn.GetAvailableDevices();
-        }
-
-        /// <summary>
-        /// Gets the name of the device the driver is currently connected to (USB port name or bluetooth device name depending on the current communcation protocol).
-        /// Returns null if there is no device connected.
-        /// </summary>
-        public string DeviceName
-        {
-            get;
-            private set;
         }
 
         /// <summary>
@@ -489,7 +496,7 @@ namespace TapTrack.Tcmp.Communication
 		/// <summary>
 		/// Add a method to be called if the BLE is disconnected
 		/// </summary>
-		public void setDisconnectCallback(Bluegiga.BLE.Events.Connection.DisconnectedEventHandler disconnectCallback)
+		public void setDisconnectCallback(DisconnectedEventHandler disconnectCallback)
 		{
 			conn.setDisconnectCallback(disconnectCallback);
 		}
