@@ -10,7 +10,7 @@
     xmlns:demo="clr-namespace:TapTrack.Demo"
     mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
-        Title="Tappy Demo 3.0" Height="650" Width="800" Foreground="{x:Null}" Background="{StaticResource LightBackground}">
+        Title="Tappy Demo 3.1" Height="650" Width="800" Foreground="{x:Null}" Background="{StaticResource LightBackground}">
     <Grid Background="{StaticResource LightBackground}">
         <Grid.RowDefinitions>
             <RowDefinition Height="50"/>
@@ -382,10 +382,14 @@
                                     <ColumnDefinition Width="1*"/>
                                     <ColumnDefinition Width="1*"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="1" Foreground="White" Text="Activate keyboard wedge mode"/>
+                                <TextBlock Foreground="White" Text="Activate keyboard wedge mode to read NDEF Text" Grid.ColumnSpan="2" Margin="320,0,51.2,0"/>
                                 <ToggleButton Grid.Column="1" HorizontalAlignment="Right" Name="tgbtnLaunchKeyboardFeature" 
 											  Width="50" Height="30" Margin="0,0,20,0" Style="{StaticResource AnimatedSwitch }" 
 											  Checked="tgbtnLaunchKeyboardFeature_Checked" Unchecked="tgbtnLaunchKeyboardFeature_Unchecked"/>
+                                <TextBlock Foreground="White" Text="Activate keyboard wedge mode to read UIDs" Margin="320,45,51.2,-45" Grid.ColumnSpan="2"/>
+                                <ToggleButton Grid.Column="1" HorizontalAlignment="Right" Name="tgbtnLaunchKeyboardFeatureUid" 
+											  Width="50" Height="30" Margin="0,45,20.2,-45" Style="{StaticResource AnimatedSwitch }" 
+											  Checked="tgbtnLaunchKeyboardFeatureUid_Checked" Unchecked="tgbtnLaunchKeyboardFeatureUid_Unchecked"/>
                                 <!--Checked="tgbtnLaunchKeyboardFeature_Checked"-->
                             </Grid>
                         </StackPanel>
@@ -471,7 +475,7 @@
                                     Batch Encode NFC Tags
                                 </TextBlock>
                                 <TextBlock Foreground="White" TextWrapping="Wrap">
-                                    This is used to encode a batch of tags based on an imported file.                                
+                                    This is used to encode a batch of tags based on an imported file.
                                 </TextBlock>
                                 <TextBlock Foreground="White" TextWrapping="Wrap" Margin="0,10,0,10">
                                     The imported file should be a .csv or .txt file, and contain a single column for the URI or text for the NDEF with each entry appearing on a new line as follows:
@@ -601,10 +605,10 @@
                                         <DataGridTextColumn Header="Encoded" Binding="{Binding encodedSuccessfully, Converter={StaticResource intToYesNoConverter}}" Width="500"/>
                                     </DataGrid.Columns>
                                 </DataGrid>
-                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">                                       
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                                     <Button HorizontalAlignment="Right" Style="{StaticResource RoundButton}" Click="ExportImportedBatch">
-                                    Export to spreadsheet
-                                </Button>
+                                        Export to spreadsheet
+                                    </Button>
                                     <Button HorizontalAlignment="Right" Style="{StaticResource RoundButton}" Click="ClearImportedBatch">
                                         Delete Imported Batch
                                     </Button>
@@ -619,7 +623,7 @@
                                     Export a spreadsheet of all tags batch encoded on this station
                             </TextBlock>
                             <StackPanel Margin="10" DockPanel.Dock="Top">
-               
+
                                 <Button HorizontalAlignment="Right" Style="{StaticResource RoundButton}" Click="ExportEncodingEvents">
                                     Export Encoded Tag List
                                 </Button>
