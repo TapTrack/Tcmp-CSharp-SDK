@@ -58,7 +58,7 @@ namespace TapTrack.Tcmp.Communication
 
         public override void Disconnect()
         {
-            device.Close();
+            device?.Close();
         }
 
         public override void DisconnectBlueGiga()
@@ -93,7 +93,7 @@ namespace TapTrack.Tcmp.Communication
             UsbRegDeviceList devices = UsbDevice.AllWinUsbDevices;
 
             // Select FullName only
-            return devices.Select(device => device.FullName).ToArray();
+            return devices.Select(reg => reg.Name).ToArray();
         }
 
         public override string[] GetAvailableDevices(int timeout)
