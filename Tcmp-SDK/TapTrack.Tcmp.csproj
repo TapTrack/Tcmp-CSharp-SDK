@@ -50,6 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Ndef\NdefUri.cs" />
+    <Compile Include="Tcmp\CommandFamilies\BasicNfc\AutoPollCommand.cs" />
     <Compile Include="Tcmp\CommandFamilies\BasicNfc\DetectCommand.cs" />
     <Compile Include="Tcmp\CommandFamilies\BasicNfc\DetectTagSetting.cs" />
     <Compile Include="Tcmp\CommandFamilies\BasicNfc\GetBasicCmdFamilyVersion.cs" />
