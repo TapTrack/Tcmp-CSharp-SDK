@@ -93,7 +93,7 @@ namespace TapTrack.Tcmp.Communication
             UsbRegDeviceList devices = UsbDevice.AllWinUsbDevices;
 
             // Select FullName only
-            return devices.Select(reg => reg.Name).ToArray();
+            return devices.Select(reg => reg.FullName).ToArray();
         }
 
         public override string[] GetAvailableDevices(int timeout)
