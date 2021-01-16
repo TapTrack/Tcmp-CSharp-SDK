@@ -131,8 +131,7 @@ namespace TapTrack.Tcmp.Communication
             }
             set
             {
-                currentProtocol = value;
-                InitializeConnection();
+                SwitchProtocol(value);
             }
         }
 
@@ -177,6 +176,8 @@ namespace TapTrack.Tcmp.Communication
                     conn = new BluetoothConnection(disconnectCallback);
                     break;
                 }
+            default:
+                throw new ArgumentOutOfRangeException();
             }
         }
 
@@ -230,7 +231,7 @@ namespace TapTrack.Tcmp.Communication
                 }
                 catch (HardwareException exc)
                 {
-                    responseCallback(null, new HardwareException("Connection to device is not open"));
+                    responseCallback?.Invoke(null, new HardwareException("Connection to device is not open"));
                 }
             }
         }
@@ -277,30 +278,30 @@ namespace TapTrack.Tcmp.Communication
             this.conn.Flush();
         }
 
-		/// <summary>
-		/// Connect to a Tappy device by the device name (TAPPY123)
-		/// </summary>
-		/// <returns>True if connection to a Tappy device was successful, false otherwise</returns>
+        /// <summary>
+        /// Connect to a Tappy device by the device name (TAPPY123)
+        /// </summary>
+        /// <returns>True if connection to a Tappy device was successful, false otherwise</returns>
 
-		public bool ConnectByName(string tappyName)
-		{
-				foreach (string name in conn.GetAvailableDevices())
-				{
-					if (name.ToUpper() == tappyName.ToUpper())
-					{
-						return Connect(tappyName);
-					}
-				}
-				return false;			
-		}
+        public bool ConnectByName(string tappyName)
+        {
+            foreach (string name in conn.GetAvailableDevices())
+            {
+                if (name.ToUpper() == tappyName.ToUpper())
+                {
+                    return Connect(tappyName);
+                }
+            }
+            return false;
+        }
 
 
-		/// <summary>
-		/// Connect to a Tappy device by the device name (TAPPY123) when it is in kiosk/keyboard wedge mode
-		/// </summary>
-		/// <returns>True if connection to a Tappy device was successful, false otherwise</returns>
-		/// 
-		public bool ConnectKioskKeyboardWedgeByName(string tappyName)
+        /// <summary>
+        /// Connect to a Tappy device by the device name (TAPPY123) when it is in kiosk/keyboard wedge mode
+        /// </summary>
+        /// <returns>True if connection to a Tappy device was successful, false otherwise</returns>
+        /// 
+        public bool ConnectKioskKeyboardWedgeByName(string tappyName)
 		{
 			foreach (string name in conn.GetAvailableDevices())
 			{
@@ -320,18 +321,15 @@ namespace TapTrack.Tcmp.Communication
 		/// <returns>True if connection to a Tappy device was successful, false otherwise</returns>
 		public bool AutoDetect()
         {
-            bool success;
             foreach (string name in conn.GetAvailableDevices())
             {
-                success = Connect(name);
-
-                if (success)
-                    return true;
+                if (Connect(name)) return true;
             }
+
             return false;
         }
 
-		/// <summary>
+        /// <summary>
 		/// Return a list of strings representing TappyBLEs nearby
 		/// </summary>
 		/// <returns>A list of strings representing TappyBLE device names</returns>
@@ -354,7 +352,7 @@ namespace TapTrack.Tcmp.Communication
 		public void SwitchProtocol(CommunicationProtocol protocol)
         {
             conn?.Disconnect();
-            Protocol = protocol;
+            currentProtocol = protocol;
             InitializeConnection();
             FlushBuffer();
 
