@@ -41,6 +41,7 @@ namespace TapTrack.Demo
         bool keyboardModeLineBreak = false;
         bool keyboardModeTab = false;
         bool keyboardModeTabLineBreakLast = false;
+        bool keyboardModeUid = false;
 
         int numTagsEncodedInThisBatch = 0;
         string batchPassword = null;
@@ -903,9 +904,18 @@ namespace TapTrack.Demo
 
         private void tgbtnLaunchKeyboardFeature_Checked(object sender, RoutedEventArgs e)
         {
+            keyboardModeUid = false;
+            StreamNdef streamNdef = new StreamNdef(0, DetectTagSetting.Type2Type4AandMifare);
+            tappy.SendCommand(streamNdef, InvokeKeyboardFeature);
+           
 
-            StreamNdef stream = new StreamNdef(0, DetectTagSetting.Type2Type4AandMifare);
-            tappy.SendCommand(stream, InvokeKeyboardFeature);
+        }
+
+        private void tgbtnLaunchKeyboardFeatureUid_Checked(object sender, RoutedEventArgs e)
+        {
+            keyboardModeUid = true;
+            StreamUid streamUid = new StreamUid(0, DetectTagSetting.Type2Type4AandMifare);
+            tappy.SendCommand(streamUid, InvokeKeyboardFeature);            
 
         }
 
@@ -924,6 +934,7 @@ namespace TapTrack.Demo
 
                 if (temp.Length > 0)
                 {
+                    if (keyboardModeUid == false) { 
                     Array.Copy(data, 2 + data[1], temp, 0, temp.Length);
 
                     NdefMessage message = NdefMessage.FromByteArray(temp);
@@ -960,6 +971,21 @@ namespace TapTrack.Demo
                     };
 
                     Dispatcher.BeginInvoke(EnterKeystrokes);
+                    }
+                    else //keyboard UID mode
+                    {
+                        Tag tag = new Tag(frame.Data);
+
+                      Action EnterKeystrokesUid = () =>
+                    {
+                        System.Windows.Forms.SendKeys.SendWait(BitConverter.ToString(tag.UID));
+                        if (keyboardModeLineBreak)
+                            System.Windows.Forms.SendKeys.SendWait("{ENTER}");
+                        if (keyboardModeTab)
+                            System.Windows.Forms.SendKeys.SendWait("{TAB}");            
+                    };
+                        Dispatcher.BeginInvoke(EnterKeystrokesUid);
+                    }
                 }
             }
 
@@ -969,6 +995,12 @@ namespace TapTrack.Demo
         {
             tappy.SendCommand<Stop>();
         }
+
+        private void tgbtnLaunchKeyboardFeatureUid_Unchecked(object sender, RoutedEventArgs e)
+        {
+            tappy.SendCommand<Stop>();
+        }
+
 
         void TextBox_KeyPressed(object sender, System.Windows.Input.KeyEventArgs e)
         {

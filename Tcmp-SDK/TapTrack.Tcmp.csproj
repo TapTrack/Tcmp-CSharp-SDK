@@ -54,6 +54,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Ndef\NdefUri.cs" />
+    <Compile Include="Tcmp\CommandFamilies\BasicNfc\AutoPollCommand.cs" />
     <Compile Include="Tcmp\CommandFamilies\BasicNfc\DetectCommand.cs" />
     <Compile Include="Tcmp\CommandFamilies\BasicNfc\DetectTagSetting.cs" />
     <Compile Include="Tcmp\CommandFamilies\BasicNfc\GetBasicCmdFamilyVersion.cs" />
@@ -90,6 +91,7 @@
     <Compile Include="Tcmp\CommandFamilies\System\ConfigureKioskKeyboardWedgeMode.cs" />
     <Compile Include="Tcmp\CommandFamilies\System\ConfigureSetting.cs" />
     <Compile Include="Tcmp\CommandFamilies\System\EnableDataThrottling.cs" />
+    <Compile Include="Tcmp\CommandFamilies\System\IndicatorCommand.cs" />
     <Compile Include="Tcmp\CommandFamilies\System\SetType2TagIdentification.cs" />
     <Compile Include="Tcmp\CommandFamilies\Type4\DetectType4B.cs" />
     <Compile Include="Tcmp\CommandFamilies\Type4\DetectType4A.cs" />
