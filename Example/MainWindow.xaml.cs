@@ -443,67 +443,72 @@ namespace TapTrack.Demo
             tappy.SendCommand<Stop>();
         }
 
-        private void AutoDetectButton_Click(object sender, RoutedEventArgs e)
+        private async void AutoDetectButton_Click(object sender, RoutedEventArgs e)
         {
             ConnectWindow window = new ConnectWindow();
 
-            if (window.ShowDialog() == true)
+            if (window.ShowDialog() != true)
             {
-                if (window.Protocol != CommunicationProtocol.Bluetooth)
+                return;
+            }
+
+            ShowPendingStatus("Searching for a Tappy");
+            tappy.SwitchProtocol(window.Protocol);
+            Task<bool> detectTask = Task.Run(() => tappy.AutoDetect());
+
+            if (window.Protocol != CommunicationProtocol.Bluetooth)
+            {
+                batteryTab.Visibility = Visibility.Hidden;
+            }
+            else
+            {
+                batteryTab.Visibility = Visibility.Visible;
+                if (GetBluegigaDevice() == null)
                 {
-                    batteryTab.Visibility = Visibility.Hidden;
+                    ShowFailStatus("Please insert BLED112 dongle");
+                    return;
                 }
-                else
+            }
+
+            bool didDetect = await detectTask;
+
+            // This app groups all USB protocols under Usb - we need to try alternative protocols too
+            if (!didDetect && tappy.Protocol == CommunicationProtocol.Usb)
+            {
+                tappy.SwitchProtocol(CommunicationProtocol.TrueUsb);
+                didDetect = await Task.Run(() => tappy.AutoDetect());
+            }
+
+            if (didDetect)
+            {
+                ShowSuccessStatus($"Connected to {tappy.DeviceName}");
+                if (tappy.Protocol == CommunicationProtocol.Bluetooth)
                 {
-                    batteryTab.Visibility = Visibility.Visible;
-                    if (GetBluegigaDevice() == null)
+                    try
                     {
-                        ShowFailStatus("Please insert BLED112 dongle");
+                        Command cmd = new EnableDataThrottling(10, 5);
+                        await Task.Run(() => tappy.SendCommand(cmd));
+                    }
+                    catch
+                    {
+
+                    }
+                }
+            }
+            else
+            {
+                ShowFailStatus("No Tappy found");
+                if (window.Protocol == CommunicationProtocol.Bluetooth)
+                {
+                    try
+                    {
+                        tappy.DisconnectBlueGiga();
+                    }
+                    catch
+                    {
                         return;
                     }
                 }
-
-                tappy.SwitchProtocol(window.Protocol);
-
-                ShowPendingStatus("Searching for a Tappy");
-
-                Task.Run(() =>
-                {
-                    if (tappy.AutoDetect())
-                    {
-                        ShowSuccessStatus($"Connected to {tappy.DeviceName}");
-                        if (window.Protocol == CommunicationProtocol.Bluetooth)
-                        {
-                            try
-                            {
-                                Command cmd = new EnableDataThrottling(10, 5);
-                                tappy.SendCommand(cmd);
-                            }
-                            catch
-                            {
-
-                            }
-                        }
-                    }
-                    else
-                    {
-                        ShowFailStatus("No Tappy found");
-                        if (window.Protocol == CommunicationProtocol.Bluetooth)
-                        {
-                            try
-                            {
-                                tappy.DisconnectBlueGiga();
-                            }
-                            catch
-                            {
-                                return;
-
-                            }
-
-                        }
-
-                    }
-                });
             }
         }
 

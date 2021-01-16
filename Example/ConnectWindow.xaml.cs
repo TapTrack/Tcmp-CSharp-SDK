@@ -40,12 +40,5 @@ namespace TapTrack.Demo
             this.DialogResult = true;
             this.Close();
         }
-
-        private void trueUsbButton_Click(object sender, RoutedEventArgs e)
-        {
-            this.Protocol = CommunicationProtocol.TrueUsb;
-            this.DialogResult = true;
-            this.Close();
-        }
     }
 }
