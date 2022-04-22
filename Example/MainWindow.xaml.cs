@@ -966,6 +966,25 @@ namespace TapTrack.Demo
 
                                 recordNum++;
                             }
+                            else if (type.Equals("U"))
+                            {
+                                NdefUriRecord uriRecord = new NdefUriRecord(record);
+                                System.Windows.Forms.SendKeys.SendWait(uriRecord.Uri);
+                                if (keyboardModeLineBreak)
+                                    System.Windows.Forms.SendKeys.SendWait("{ENTER}");
+                                if (keyboardModeTab)
+                                    System.Windows.Forms.SendKeys.SendWait("{TAB}");
+                                if (keyboardModeTabLineBreakLast)
+                                {
+                                    if (recordNum == numRecords)
+                                        System.Windows.Forms.SendKeys.SendWait("{ENTER}");
+                                    else
+                                        System.Windows.Forms.SendKeys.SendWait("{TAB}");
+
+                                }
+
+                                recordNum++;
+                            }
 
                         }
                     };
