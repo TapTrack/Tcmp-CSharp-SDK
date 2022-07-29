@@ -498,7 +498,7 @@ namespace TapTrack.Demo
             }
             else
             {
-                ShowFailStatus("No Tappy found");
+                ShowFailStatus("No Tappy found. Try unplugging other serial port USB devices if there are any connected and try again.");
                 if (window.Protocol == CommunicationProtocol.Bluetooth)
                 {
                     try

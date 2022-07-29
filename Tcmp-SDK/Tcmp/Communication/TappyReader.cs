@@ -366,7 +366,7 @@ namespace TapTrack.Tcmp.Communication
         /// <returns></returns>
         public bool Connect(string deviceName)
         {
-			return ConnectWithTimeout(deviceName, 250);
+			return ConnectWithTimeout(deviceName, 1000);
         }
 
 		/// <summary>
